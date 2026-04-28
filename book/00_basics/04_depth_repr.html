@@ -1,0 +1,613 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>深度表示 - 3D 视觉：从原理到实践</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="../favicon-8114d1fc.png">
+        <link rel="stylesheet" href="../css/variables-8adf115d.css">
+        <link rel="stylesheet" href="../css/general-2459343d.css">
+        <link rel="stylesheet" href="../css/chrome-ae938929.css">
+        <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="../highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="../tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex-51b17803.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc-d47b7a93.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">3D 视觉：从原理到实践</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/dull-bird/book_3d_cv" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/dull-bird/book_3d_cv/edit/main/src/00_basics/04_depth_repr.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <span class=fa-svg id="git-edit-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M421.7 220.3l-11.3 11.3-22.6 22.6-205 205c-6.6 6.6-14.8 11.5-23.8 14.1L30.8 511c-8.4 2.5-17.5 .2-23.7-6.1S-1.5 489.7 1 481.2L38.7 353.1c2.6-9 7.5-17.2 14.1-23.8l205-205 22.6-22.6 11.3-11.3 33.9 33.9 62.1 62.1 33.9 33.9zM96 353.9l-9.3 9.3c-.9 .9-1.6 2.1-2 3.4l-25.3 86 86-25.3c1.3-.4 2.5-1.1 3.4-2l9.3-9.3H112c-8.8 0-16-7.2-16-16V353.9zM453.3 19.3l39.4 39.4c25 25 25 65.5 0 90.5l-14.5 14.5-22.6 22.6-11.3 11.3-33.9-33.9-62.1-62.1L314.3 67.7l11.3-11.3 22.6-22.6 14.5-14.5c25-25 65.5-25 90.5 0z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="04-深度表示三维数据到底长什么样"><a class="header" href="#04-深度表示三维数据到底长什么样">04 深度表示：三维数据到底长什么样</a></h1>
+<blockquote>
+<p>预计阅读时间：35 分钟
+前置知识：本篇第 01 节（相机模型）、第 03 节（多视图几何入门）
+读完本节后，你可以：区分视差图、深度图和点云，理解三者之间的转换关系，用 NumPy 实现深度图与点云的互转，知道什么场景用哪种表示。</p>
+</blockquote>
+<hr>
+<h2 id="第一阶直观理解"><a class="header" href="#第一阶直观理解">第一阶：直观理解</a></h2>
+<h3 id="一个场景"><a class="header" href="#一个场景">一个场景</a></h3>
+<p>你已经学会了从两张照片算出三维点——三角测量的原理、基础矩阵的作用，你都清楚了。但算出来的这个“三维“到底长什么样？</p>
+<p>是一张图？一堆点？还是一串数字？</p>
+<p>答案是：三种形式都有，而且它们是同一份信息的不同“容器“。你在论文里看到的“深度估计“、在数据集里下载的 <code>.ply</code> 文件、在 ROS 里订阅的 <code>/depth_image</code> 话题——本质上都是三维几何的不同表达。搞清楚它们的区别和联系，是进入 3D 视觉工程实践的第一步。</p>
+<h3 id="核心直觉深度可以是一张图也可以是一团点"><a class="header" href="#核心直觉深度可以是一张图也可以是一团点">核心直觉：“深度“可以是一张图，也可以是一团点</a></h3>
+<p>想象你站在窗前看外面的建筑。你感知到的“远近“有两种自然的表达方式：</p>
+<ol>
+<li><strong>画在地面上</strong>——把建筑物每个位置离你有多远，画成一张图。近处偏暗，远处偏亮。这就是<strong>深度图</strong>。</li>
+<li><strong>撒在空中</strong>——把建筑物表面每个可见点独立标注为 $(X,Y,Z)$ 坐标，像一团悬浮的粉尘。这就是<strong>点云</strong>。</li>
+</ol>
+<p>这两种表达之间，靠相机的几何关系来转换——知道焦距和主点位置，就能把深度图的每个像素“反投影“成三维空间的一个点。反之，把点云“投影“回图像平面，就得到深度图。</p>
+<p>它们之间的第三种表示——<strong>视差图</strong>——只在双目/多目系统中有意义。它是左图和右图中对应点之间的像素偏移量。视差越大，物体越近；视差越小，物体越远。</p>
+<h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
+<pre><code class="language-mermaid">mindmap
+  root((Depth Representation))
+    Disparity Map
+      Left-right pixel shifts
+      Inverse proportion to depth
+      Unit: pixels
+      Stereo matching output
+    Depth Map
+      2D image of distances
+      Each pixel = Z value
+      Unit: meters or millimeters
+      .png .exr .npy formats
+    Point Cloud
+      Unordered set of (X,Y,Z)
+      Optionally colored RGB
+      .ply .pcd .las formats
+      Open3D / PCL libraries
+    Conversion Pipeline
+      Disparity -&gt; Depth: Z = f*b / d
+      Depth -&gt; Point Cloud: back-projection
+      Point Cloud -&gt; Depth: rasterization
+</code></pre>
+<h3 id="三种表示对比"><a class="header" href="#三种表示对比">三种表示对比</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>表示</th><th>数据类型</th><th>存储开销</th><th>优点</th><th>缺点</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>视差图 Disparity Map</strong></td><td>2D 图像，像素值 = 左右图列坐标差</td><td>低（单通道图像）</td><td>立体匹配算法的直接输出；在矫正过的双目对中，视差与深度呈简单反比</td><td>无相机参数时自身无物理意义；受遮挡影响（左图看得到右图看不到的地方没有视差）</td></tr>
+<tr><td><strong>深度图 Depth Map</strong></td><td>2D 图像，像素值 = 沿光轴的距离 Z</td><td>低（单通道图像）</td><td>物理意义明确（单位是米）；与 RGB 图像天然对齐（逐像素对应）；便于送入 CNN</td><td>2.5D 表示——只能看到相机前方的表面，背面/侧面不可见；单张深度图不包含完整的物体背面信息</td></tr>
+<tr><td><strong>点云 Point Cloud</strong></td><td>无序 $(X,Y,Z)$ 点集，可能带 RGB</td><td>高（每个点需 3-4 个 float）</td><td>完整的 3D 表达——可以在空间中任意旋转、剖切；适合几何处理（配准、分割、曲面重建）</td><td>无拓扑信息（点之间没有连接关系）；点数多时计算开销大；不是规则网格，CNN 不能直接用</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="mini-case加载一张深度图用热力图和点云两种方式看它"><a class="header" href="#mini-case加载一张深度图用热力图和点云两种方式看它">Mini Case：加载一张深度图，用热力图和点云两种方式看它</a></h3>
+<pre><code class="language-python">import numpy as np
+from PIL import Image
+import matplotlib.pyplot as plt
+
+# Load a 16-bit depth map (Middlebury or any dataset)
+# 16-bit PNG: pixel values in millimeters
+depth_png = np.array(Image.open("depth_map.png")).astype(np.float32)
+
+# Convert to meters
+depth_meters = depth_png / 1000.0
+
+# --- Visualization 1: Heatmap ---
+plt.figure(figsize=(12, 5))
+plt.subplot(1, 2, 1)
+plt.imshow(depth_meters, cmap='plasma')
+plt.colorbar(label='Depth (meters)')
+plt.title('Depth Map as Heatmap')
+
+# Mask out zero/invalid depths
+valid_mask = depth_meters &gt; 0
+
+plt.subplot(1, 2, 2)
+plt.hist(depth_meters[valid_mask].ravel(), bins=100, color='steelblue', edgecolor='white')
+plt.xlabel('Depth (meters)')
+plt.ylabel('Pixel Count')
+plt.title('Depth Distribution')
+plt.tight_layout()
+plt.show()
+
+# --- Visualization 2: Convert to point cloud ---
+H, W = depth_meters.shape
+fx, fy = 525.0, 525.0   # example focal lengths (pixels)
+cx, cy = W / 2, H / 2   # principal point at image center
+
+u, v = np.meshgrid(np.arange(W), np.arange(H))
+u = u[valid_mask]
+v = v[valid_mask]
+Z = depth_meters[valid_mask]
+
+X = (u - cx) * Z / fx
+Y = (v - cy) * Z / fy
+
+points = np.stack([X, Y, Z], axis=-1)
+print(f"Point cloud: {points.shape[0]} points")
+print(f"X range: [{X.min():.2f}, {X.max():.2f}] m")
+print(f"Y range: [{Y.min():.2f}, {Y.max():.2f}] m")
+print(f"Z range: [{Z.min():.2f}, {Z.max():.2f}] m")
+
+# Optional: view in Open3D
+# import open3d as o3d
+# pcd = o3d.geometry.PointCloud()
+# pcd.points = o3d.utility.Vector3dVector(points)
+# o3d.visualization.draw_geometries([pcd])
+</code></pre>
+<p>这段代码让你看到：同一份三维数据，既可以是色彩斑斓的热力图（一眼看出远近分布），也可以是悬浮在空间中的点团（旋转视角观察完整形状）。两种表示之间的桥梁，就是相机的内参。</p>
+<hr>
+<h2 id="第二阶原理解析"><a class="header" href="#第二阶原理解析">第二阶：原理解析</a></h2>
+<h3 id="视差图从两张照片到距离"><a class="header" href="#视差图从两张照片到距离">视差图——从两张照片到距离</a></h3>
+<p>在<strong>矫正过的双目系统</strong>中，左图和右图的对极线被对齐为水平行。同一个三维点在左图和右图中的投影，行坐标相同（$v_L = v_R$），只有列坐标不同。这个列坐标之差就是<strong>视差（disparity）</strong>：</p>
+<p>$$d = u_L - u_R$$</p>
+<p>视差 $d$ 与深度 $Z$ 呈反比例关系。由相似三角形可得：</p>
+<p>$$\boxed{Z = \frac{f \cdot b}{d}}$$</p>
+<p>其中 $f$ 是矫正后的焦距（像素单位），$b$ 是两台相机光心之间的距离（基线，单位米）。这个公式是所有双目深度计算的基础。</p>
+<p><strong>直觉</strong>：把手指放在鼻子前，交替闭左右眼——手指“跳来跳去“的幅度很大（视差大）。把手指伸到手臂远处再试——跳动的幅度变小了（视差小）。这就是 $Z = fb/d$ 的物理直觉：<strong>近处物体视差大，远处物体视差小。</strong> 当物体在无穷远处（如天上的云），左右眼的视差趋近于零——相机位置的变化对无穷远物体的投影位置几乎无影响。</p>
+<p>公式还揭示了一个工程约束：在给定焦距和基线时，视差每减小 1 个像素，对应的深度变化是不同的。设 $d=16$ 像素和 $d=15$ 像素分别对应 $Z_1$ 和 $Z_2$，则 $\Delta Z = Z_2 - Z_1 = fb/(15) - fb/(16) = fb/240$。设 $d=4$ 像素和 $d=3$ 像素分别对应 $Z_3$ 和 $Z_4$，则 $\Delta Z = fb/(3) - fb/(4) = fb/12$——相差 20 倍。这意味着<strong>双目系统对近处物体的深度分辨率远高于远处</strong>。这是几何本质决定的，不是工程缺陷。</p>
+<h3 id="深度图每个像素都是一把尺子"><a class="header" href="#深度图每个像素都是一把尺子">深度图——每个像素都是一把“尺子“</a></h3>
+<p>深度图（depth map）是一张二维图像。但跟普通照片记录颜色不同，深度图的每个像素记录的不是 RGB，而是一个距离值——从相机光心出发、沿光轴方向、到该像素对应的三维表面的距离。</p>
+<p>在透视相机模型下，这个“沿着光轴的距离“就是三维点 $X$ 在相机坐标系下的 $Z$ 坐标。因此深度图的数学定义极其简洁：</p>
+<p>$$\text{DepthMap}(u, v) = Z_{\text{cam}}$$</p>
+<p>其中 $(u, v)$ 是像素坐标，$Z_{\text{cam}}$ 是该像素对应的三维点在相机坐标系下的 $Z$ 分量。深度图与 RGB 图逐像素对齐——第 $i$ 行第 $j$ 列的 RGB 像素和第 $i$ 行第 $j$ 列的深度值，描述的是同一个表面点的颜色和距离。</p>
+<p><strong>单位约定</strong>：</p>
+<ul>
+<li><strong>毫米（mm）</strong> 用于 16 位无符号整数存储（$\text{uint16}$，范围 0-65535，覆盖 0-65.5 米）——几乎所有消费级深度相机（Kinect、RealSense）都用这个约定</li>
+<li><strong>米（m）</strong> 用于 32 位浮点数存储（$\text{float32}$）——精度更高，计算中无需单位换算</li>
+</ul>
+<p><strong>工程约定</strong>：深度值为 0 通常表示“无效深度“（如超出量程、被遮挡、或落在天空等无穷远区域）。处理深度图时，应在所有计算前先做 <code>mask = depth &gt; 0</code>。</p>
+<h3 id="点云三维点的不羁集合"><a class="header" href="#点云三维点的不羁集合">点云——三维点的不羁集合</a></h3>
+<p>点云（point cloud）是无序的 $(X, Y, Z)$ 点的集合，可选地携带颜色 $(R, G, B)$、法向量 $(n_x, n_y, n_z)$ 等属性。每个点独立存在——没有“谁在谁上面“的网格拓扑，没有“谁连着谁“的邻接关系。</p>
+<h4 id="从深度图到点云反投影back-projection"><a class="header" href="#从深度图到点云反投影back-projection">从深度图到点云：反投影（Back-Projection）</a></h4>
+<p>给定深度图 $D(u, v)$ 和相机内参矩阵 $K$，每个像素可以反投影为一个三维点。这是透视投影的逆运算（H&amp;Z section 6.1, p.154-155）：</p>
+<p>$$\boxed{X = \frac{(u - c_x) \cdot Z}{f_x}, \quad Y = \frac{(v - c_y) \cdot Z}{f_y}, \quad Z = D(u, v)}$$</p>
+<p>其中 $f_x, f_y$ 是像素单位的焦距（$\alpha_x, \alpha_y$，来自 $K$ 矩阵的前两个对角元——H&amp;Z 6.9, p.157），$c_x, c_y$ 是主点坐标。</p>
+<p><strong>推导</strong>：从透视投影公式 $(u, v) = (\frac{f_x X}{Z} + c_x, \frac{f_y Y}{Z} + c_y)$ 反解即可。反投影的本质是：已知深度 $Z$ 和投影几何，倒推 $X$ 和 $Y$。</p>
+<h4 id="从点云到深度图光栅化rasterization"><a class="header" href="#从点云到深度图光栅化rasterization">从点云到深度图：光栅化（Rasterization）</a></h4>
+<p>反向操作需要“把三维点画回二维网格“——对每个 $(X,Y,Z)$ 点，计算其像素坐标 $(u,v)$：</p>
+<p>$$u = \frac{f_x X}{Z} + c_x, \quad v = \frac{f_y Y}{Z} + c_y$$</p>
+<p>然后把深度值 $Z$ 填入 $(u,v)$ 位置。这里有一个工程细节：多个三维点可能落在同一个像素（前景遮挡背景时）——此时应取最小 $Z$（最近的那个），因为只有它能被相机看到。这也暴露了深度图的 2.5D 本质：点云中相机看不到的那些背面、侧面点，无法被存入深度图。</p>
+<h3 id="25d-的宿命深度图看得到什么看不到什么"><a class="header" href="#25d-的宿命深度图看得到什么看不到什么">2.5D 的宿命：深度图看得到什么，看不到什么</a></h3>
+<p>深度图被称为 <strong>2.5D 表示</strong>——不是完全的二维（它有距离信息），也不是真正的三维（它只能从一个视角记录可见表面）。</p>
+<p>在一张深度图中：</p>
+<ul>
+<li>你能看到一个立方体的<strong>正面</strong>——那是朝向相机的面</li>
+<li>你看不到它的<strong>背面</strong>——相机拍不到</li>
+<li>它的<strong>侧面</strong>落在深度图的边缘，与背景混在一起</li>
+</ul>
+<p>这个限制不是工程实现的问题，而是透视投影本身的物理事实：每个像素对应一条从相机中心出发的射线，这条射线击中场景的第一个表面后就被遮挡了——射线背后的一切都不可见。因此，单张深度图完全无法推理出完整的三维几何——就像你看着一个人的正面照片，不可能知道他后脑勺长什么样。</p>
+<p>这对下游任务有直接影响：如果需要从任意角度观察一个物体，或者需要知道物体背面的几何（如机器人从不同方向抓取），单张深度图是不够的。多视角深度图融合（TSDF、Surfel）或直接输出完整几何的表示（如 NeRF、3DGS）才能解决这个问题。</p>
+<h3 id="code-lens深度图与点云的-numpy-互转"><a class="header" href="#code-lens深度图与点云的-numpy-互转">Code Lens：深度图与点云的 NumPy 互转</a></h3>
+<p>以下代码实现了深度图到点云的转换（带颜色），以及点到点云到深度图的投影（光栅化）：</p>
+<pre><code class="language-python">import numpy as np
+
+
+def depth_to_pointcloud(depth, K, rgb=None):
+    """
+    Convert a depth map to a point cloud in camera coordinate frame.
+
+    Parameters
+    ----------
+    depth : np.ndarray, shape (H, W), float32
+        Depth map in meters. Zeros treated as invalid.
+    K : np.ndarray, shape (3, 3), float32
+        Camera intrinsic matrix: [[fx, 0, cx], [0, fy, cy], [0, 0, 1]]
+        H&amp;Z (6.9, p.157)
+    rgb : np.ndarray, shape (H, W, 3), optional
+        Aligned RGB image for colored point cloud.
+
+    Returns
+    -------
+    points : np.ndarray, shape (N, 3), float32
+        (X, Y, Z) coordinates in camera frame.
+    colors : np.ndarray, shape (N, 3), float32, or None
+        (R, G, B) values if rgb provided.
+    """
+    fx, fy = K[0, 0], K[1, 1]
+    cx, cy = K[0, 2], K[1, 2]
+    H, W = depth.shape
+
+    u, v = np.meshgrid(np.arange(W), np.arange(H))
+    valid = depth &gt; 0
+
+    Z = depth[valid]
+    X = (u[valid] - cx) * Z / fx   # H&amp;Z (6.1, p.154) inverted
+    Y = (v[valid] - cy) * Z / fy
+
+    points = np.stack([X, Y, Z], axis=-1)
+    colors = rgb[valid] if rgb is not None else None
+    return points, colors
+
+
+def pointcloud_to_depth(points, K, H, W):
+    """
+    Project a point cloud back to a depth map (rasterization).
+
+    Parameters
+    ----------
+    points : np.ndarray, shape (N, 3), float32
+        (X, Y, Z) in camera frame.
+    K : np.ndarray, shape (3, 3), float32
+        Camera intrinsic matrix.
+    H, W : int
+        Image height and width.
+
+    Returns
+    -------
+    depth : np.ndarray, shape (H, W), float32
+        Rasterized depth map. When multiple points project to the
+        same pixel, the minimum depth (closest to camera) is kept.
+    """
+    fx, fy = K[0, 0], K[1, 1]
+    cx, cy = K[0, 2], K[1, 2]
+
+    X, Y, Z = points[:, 0], points[:, 1], points[:, 2]
+    mask = Z &gt; 0  # points behind camera are invalid
+
+    u = np.round(fx * X[mask] / Z[mask] + cx).astype(np.int32)
+    v = np.round(fy * Y[mask] / Z[mask] + cy).astype(np.int32)
+    Z_valid = Z[mask]
+
+    in_bounds = (u &gt;= 0) &amp; (u &lt; W) &amp; (v &gt;= 0) &amp; (v &lt; H)
+    u, v, Z_valid = u[in_bounds], v[in_bounds], Z_valid[in_bounds]
+
+    depth = np.zeros((H, W), dtype=np.float32)
+    # For pixels with multiple projections, keep the smallest Z
+    for i in range(len(u)):
+        ui, vi = u[i], v[i]
+        if depth[vi, ui] == 0 or Z_valid[i] &lt; depth[vi, ui]:
+            depth[vi, ui] = Z_valid[i]
+
+    return depth
+</code></pre>
+<h3 id="坐标约定哪个轴是前方"><a class="header" href="#坐标约定哪个轴是前方">坐标约定：哪个轴是“前方“？</a></h3>
+<p>三种常见的坐标约定：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>坐标约定</th><th>X 轴</th><th>Y 轴</th><th>Z 轴（深度/前方）</th><th>手掌定则</th><th>使用场景</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>OpenCV</strong></td><td>右</td><td>下</td><td>前</td><td>右手</td><td>OpenCV, COLMAP, 多数学术代码</td></tr>
+<tr><td><strong>OpenGL</strong></td><td>右</td><td>上</td><td>后（或前，可配置）</td><td>右手</td><td>渲染引擎、3DGS 可视化</td></tr>
+<tr><td><strong>Unity</strong></td><td>右</td><td>上</td><td>前</td><td>左手</td><td>Unity 游戏引擎</td></tr>
+</tbody>
+</table>
+</div>
+<p>不一致的坐标约定是多传感器融合中最常见的 bug 来源之一。把 LiDAR 坐标系的点和相机坐标系的点画在一起之前，先确认 Z 轴的方向和左右手定则是否一致。</p>
+<hr>
+<h2 id="第三阶部署实战"><a class="header" href="#第三阶部署实战">第三阶：部署实战</a></h2>
+<h3 id="文件格式三维数据怎么存"><a class="header" href="#文件格式三维数据怎么存">文件格式——三维数据怎么存</a></h3>
+<p><strong>深度图文件格式</strong>：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>格式</th><th>数据类型</th><th>典型用途</th><th>注意事项</th></tr>
+</thead>
+<tbody>
+<tr><td>16-bit PNG</td><td>uint16, mm 单位</td><td>数据集发布（Middlebury, NYUv2）</td><td>范围 0-65535 mm；0 = 无效。精度 1 mm</td></tr>
+<tr><td>EXR</td><td>float32 或 float16</td><td>高质量合成数据、Blender 渲染输出</td><td>支持 HDR，存储真实米制深度</td></tr>
+<tr><td>NPY/NPZ</td><td>float32</td><td>Python 生态中间存储</td><td>原始数组，无压缩，无元数据</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>点云文件格式</strong>：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>格式</th><th>二进制/文本</th><th>扩展性</th><th>使用场景</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>PLY</strong> (Stanford)</td><td>两者皆可</td><td>好——可存储 RGB、法向量、自定义属性</td><td>学术研究、3D 重建输出。Open3D 原生支持</td></tr>
+<tr><td><strong>PCD</strong> (PCL)</td><td>两者皆可</td><td>好——PCL 功能矩阵（滤波、配准、分割）全面</td><td>PCL 生态。ROS 中常用 <code>sensor_msgs::PointCloud2</code></td></tr>
+<tr><td><strong>LAS/LAZ</strong></td><td>二进制</td><td>可存储分类、强度、回波数</td><td>测绘/遥感领域 LiDAR 标准格式</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="什么时候用哪种表示"><a class="header" href="#什么时候用哪种表示">什么时候用哪种表示？</a></h3>
+<pre><code class="language-mermaid">flowchart TD
+    A["I have 3D data"] --&gt; B{"Dense, regular&lt;br/&gt;grid structure?"}
+    B --&gt;|"Yes&lt;br/&gt;Depth camera / stereo output"| C{"Need per-pixel&lt;br/&gt;neighbor ops?"}
+    C --&gt;|"Yes&lt;br/&gt;CNN / filtering"| D["Depth Map&lt;br/&gt;.png / .npy"]
+    C --&gt;|"No&lt;br/&gt;3D geometry ops"| E{"RAM / speed&lt;br/&gt;constraints?"}
+    B --&gt;|"No&lt;br/&gt;LiDAR / SfM output"| F["Point Cloud&lt;br/&gt;.ply / .pcd"]
+    E --&gt;|"Tight"| D
+    E --&gt;|"Relaxed"| F
+</code></pre>
+<p><strong>经验法则</strong>：</p>
+<ul>
+<li>输入是深度相机 → 保持深度图，直到需要 3D 变换</li>
+<li>需要对距离做 CNN → 深度图（规则网格）</li>
+<li>需要旋转、配准、切割 → 点云</li>
+<li>需要发布到 ROS → <code>PointCloud2</code> 消息</li>
+<li>多帧融合 → 先转点云，配准后转 TSDF 体素网格</li>
+</ul>
+<h3 id="常见工具"><a class="header" href="#常见工具">常见工具</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>工具</th><th>语言</th><th>核心能力</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Open3D</strong></td><td>Python/C++</td><td>点云读写、可视化、配准（ICP）、体素降采样、法向量估计、三角面重建</td></tr>
+<tr><td><strong>PCL</strong> (Point Cloud Library)</td><td>C++</td><td>滤波、特征提取、分割、配准、曲面重建——点云处理的“OpenCV“</td></tr>
+<tr><td><strong>CloudCompare</strong></td><td>GUI</td><td>点云和网格的可视化对比、差异分析、手动对齐——质检神器</td></tr>
+<tr><td><strong>PDAL</strong></td><td>C++/Python</td><td>面向地理空间点云数据的流式处理管道</td></tr>
+</tbody>
+</table>
+</div>
+<pre><code class="language-python"># Open3D quick start
+import open3d as o3d
+
+# Read a point cloud
+pcd = o3d.io.read_point_cloud("scene.ply")
+print(f"Loaded {len(pcd.points)} points")
+
+# Downsample with voxel grid
+pcd_down = pcd.voxel_down_sample(voxel_size=0.01)
+
+# Estimate normals (needed for many algorithms)
+pcd_down.estimate_normals(
+    o3d.geometry.KDTreeSearchParamHybrid(radius=0.02, max_nn=30)
+)
+
+# Visualize
+o3d.visualization.draw_geometries([pcd_down])
+</code></pre>
+<hr>
+<h2 id="苏格拉底时刻"><a class="header" href="#苏格拉底时刻">苏格拉底时刻</a></h2>
+<ol>
+<li><strong>深度图本质上是一个 2.5D 表示——它只能看到相机前方的表面。如果一个机器人抓取系统使用深度图作为唯一的三维输入，它永远无法推理物体背面。这对抓取策略意味着什么？它需要满足什么条件才能成功抓取？</strong></li>
+</ol>
+<p>（提示：机器人需要从多个角度拍摄深度图并融合成完整的三维模型；或者依赖先验知识（如“杯子总是有一个背面，即使我看不到“）来补全几何。这正是为什么现代机器人系统使用 TSDF 融合或 NeRF 类方法来做完整的三维重建——而不是依赖单帧深度图。但也存在例外：对于平放在桌上的扁平物体（如信用卡、盘子），单张深度图足以确定抓取点的三维坐标——因为抓取点就在可见表面上。）</p>
+<ol start="2">
+<li><strong>视差 = 0 意味着什么？深度 = 0 又意味着什么？这两个“零“分别对应什么物理情况？</strong></li>
+</ol>
+<p>（提示：视差 = 0 意味着物体在无穷远处——平行光路，立体基线失去作用。深度 = 0 在工程约定中通常表示“无效深度“——可能是被遮挡区域、超出量程、或是天空/镜面等测距失效的表面。但在物理上，深度 = 0 意味着点在相机光心上——这不可能，因为物点不可能与光心重合。因此工程实践中深度 = 0 作为掩码标志，而非物理真实值。）</p>
+<hr>
+<h2 id="关键论文与文献清单"><a class="header" href="#关键论文与文献清单">关键论文与文献清单</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>年份</th><th>文献</th><th>一句话贡献</th></tr>
+</thead>
+<tbody>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry</em>, Ch.10</td><td>三角测量原理、射影重建定理、分层重建策略——从两视图恢复到三维点的理论框架（p.262-273）</td></tr>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry</em>, Ch.6</td><td>深度公式 $\text{depth}(X; P)$（6.15, p.162），相机内参矩阵 K 的定义与参数化（p.155-157）</td></tr>
+<tr><td>2012</td><td>D. Scharstein &amp; R. Szeliski, “A Taxonomy and Evaluation of Dense Two-Frame Stereo Correspondence Algorithms”, <em>IJCV</em></td><td>Middlebury 立体评估基准——定义了视差图/深度图的标准化评测方法，建立了从视差到深度的转换管道</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="实操练习"><a class="header" href="#实操练习">实操练习</a></h2>
+<ol>
+<li><strong>深度图 → 点云 → 深度图往返</strong>：下载 Middlebury 数据集的任意一张深度图，用 <code>depth_to_pointcloud</code> 转成点云，再用 <code>pointcloud_to_depth</code> 投影回来。比较原始深度图和往返后深度图的差异——哪些位置的深度值丢失了？为什么？</li>
+<li><strong>多视角融合的直观实验</strong>：用手机（或模拟数据）从两个不同角度拍同一场景的深度图，都转成点云，在 Open3D 中同时可视化两个点云——观察两个视角如何互补地覆盖物体的不同表面。然后尝试用 ICP（<code>pcd.icp()</code>）把它们对齐。</li>
+<li><strong>用 CloudCompare 做质检</strong>：下载两个重建方法（如 COLMAP 和 NeRF）对同一场景产生的点云，在 CloudCompare 中加载，计算它们之间的点到点距离——哪些区域差异最大？（提示：通常是边缘和纹理稀疏的区域。）</li>
+</ol>
+<hr>
+<h2 id="延伸阅读"><a class="header" href="#延伸阅读">延伸阅读</a></h2>
+<ul>
+<li>本书内：[[03 多视图几何入门]] · [[05 坐标系转换]] · [[06 优化基础]]</li>
+<li>H&amp;Z 原书 Ch.10：三角测量（p.262-264）、射影重建定理（p.266-267）、分层重建（p.267-273）——深度表示的两视图几何理论基础</li>
+<li>H&amp;Z 原书 Ch.6.2.3：深度公式 $\text{depth}(X; P)$（p.162-163）——从相机矩阵直接读出深度</li>
+<li>Middlebury Stereo Evaluation: https://vision.middlebury.edu/stereo/ —— 视差图/深度图的标准评测平台与数据集</li>
+<li>Open3D 教程: http://www.open3d.org/docs/release/tutorial/geometry/pointcloud.html</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../00_basics/03_multi_view.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                            </a>
+
+                            <a rel="next prefetch" href="../00_basics/05_coordinates.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../00_basics/03_multi_view.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                    </a>
+
+                    <a rel="next prefetch" href="../00_basics/05_coordinates.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                    </a>
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr-ef4e11c1.min.js"></script>
+        <script src="../mark-09e88c2c.min.js"></script>
+        <script src="../searcher-c2a407aa.js"></script>
+
+        <script src="../clipboard-1626706a.min.js"></script>
+        <script src="../highlight-abc7f01d.js"></script>
+        <script src="../book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

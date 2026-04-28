@@ -1,0 +1,631 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>坐标系转换 - 3D 视觉：从原理到实践</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="../favicon-8114d1fc.png">
+        <link rel="stylesheet" href="../css/variables-8adf115d.css">
+        <link rel="stylesheet" href="../css/general-2459343d.css">
+        <link rel="stylesheet" href="../css/chrome-ae938929.css">
+        <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="../highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="../tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex-51b17803.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc-d47b7a93.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">3D 视觉：从原理到实践</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/dull-bird/book_3d_cv" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/dull-bird/book_3d_cv/edit/main/src/00_basics/05_coordinates.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <span class=fa-svg id="git-edit-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M421.7 220.3l-11.3 11.3-22.6 22.6-205 205c-6.6 6.6-14.8 11.5-23.8 14.1L30.8 511c-8.4 2.5-17.5 .2-23.7-6.1S-1.5 489.7 1 481.2L38.7 353.1c2.6-9 7.5-17.2 14.1-23.8l205-205 22.6-22.6 11.3-11.3 33.9 33.9 62.1 62.1 33.9 33.9zM96 353.9l-9.3 9.3c-.9 .9-1.6 2.1-2 3.4l-25.3 86 86-25.3c1.3-.4 2.5-1.1 3.4-2l9.3-9.3H112c-8.8 0-16-7.2-16-16V353.9zM453.3 19.3l39.4 39.4c25 25 25 65.5 0 90.5l-14.5 14.5-22.6 22.6-11.3 11.3-33.9-33.9-62.1-62.1L314.3 67.7l11.3-11.3 22.6-22.6 14.5-14.5c25-25 65.5-25 90.5 0z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="05-坐标系转换从世界到像素的完整旅程"><a class="header" href="#05-坐标系转换从世界到像素的完整旅程">05 坐标系转换：从世界到像素的完整旅程</a></h1>
+<blockquote>
+<p>预计阅读时间：35 分钟
+前置知识：本篇第 01 节（相机模型）、第 02 节（投影几何）、第 04 节（深度表示）
+读完本节后，你可以：写出世界坐标系→相机坐标系→图像坐标系→像素坐标系的完整变换链，理解齐次坐标如何让每一步都变成线性运算，在 OpenCV、OpenGL、Unity 三种坐标约定之间做转换。</p>
+</blockquote>
+<hr>
+<h2 id="第一阶直观理解"><a class="header" href="#第一阶直观理解">第一阶：直观理解</a></h2>
+<h3 id="一个场景"><a class="header" href="#一个场景">一个场景</a></h3>
+<p>你在玩 VR 游戏，伸出手去抓一个虚拟杯子。三个不同坐标系在你毫不知情的情况下高速运转：</p>
+<ul>
+<li>杯子的位置是<strong>世界坐标系</strong>下的——它在虚拟房间的哪个角落</li>
+<li>你手的位置是<strong>相机坐标系</strong>下的——相对于你头盔上的摄像头</li>
+<li>屏幕上显示的位置是<strong>像素坐标系</strong>下的——在 1920x1080 的显示器上，杯子该画在哪个 pixel？</li>
+</ul>
+<p>没有坐标系转换，这三者完全无法对话。杯子在世界坐标系里是 $(3, 0.5, 2)$，你的手在相机坐标系里是 $(0.1, -0.2, 0.8)$——两者不在同一个“参考系“里，你永远抓不到它。</p>
+<p>坐标系转换就是给每个参考系之间架一座桥。四座桥，四个变换，把一个三维点从世界坐标系一路护送到底——直到屏幕上那个发光的像素。</p>
+<h3 id="核心直觉四层翻译"><a class="header" href="#核心直觉四层翻译">核心直觉：四层“翻译“</a></h3>
+<p>想象你站在一个房间里，手里拿着相机拍一张桌子。</p>
+<ol>
+<li><strong>世界坐标系</strong>：以房间的某个角落为原点。桌子中心在 $(3, 0.8, 1.5)$——离墙角 3 米、高 0.8 米、离墙 1.5 米。</li>
+<li><strong>相机坐标系</strong>：以相机光心为原点，相机朝向为 Z 轴。桌子中心现在“看起来“在 $(0.5, -0.3, 2.1)$——在相机右前方偏下约 2 米处。这一步只需要旋转和平移——<strong>刚体变换</strong>。</li>
+<li><strong>图像坐标系</strong>：相机把三维世界“压扁“到它的成像平面上。桌子中心的 Z 坐标消失，只剩下 $(x, y)$——一个二维坐标。这是<strong>透视投影</strong>——不可逆的一步。</li>
+<li><strong>像素坐标系</strong>：CMOS 传感器把连续的光信号离散成像素格。$(x, y)$ 变成 $(u, v)$——第几行第几列。这是<strong>采样和缩放</strong>。</li>
+</ol>
+<p>每一步都是一次“翻译“，把同一个物理点的坐标从一种语言翻成另一种语言。整个链条合在一起，就是 $P = K[R|t]$——整本书最重要的公式之一。</p>
+<h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
+<pre><code class="language-mermaid">mindmap
+  root((Coordinate Systems))
+    World Frame
+      Arbitrary origin
+      3 DOF translation
+      Z-up or Y-up convention
+    Camera Frame
+      Origin at camera center C
+      Z = optical axis forward
+      X right Y down (OpenCV)
+    Image Frame
+      2D continuous coordinates
+      Origin at principal point
+      Unit: mm or normalized
+    Pixel Frame
+      2D discrete coordinates
+      Origin at top-left (0,0)
+      Unit: pixel integer
+    Transforms
+      World -&gt; Camera R t 6 DOF
+      Camera -&gt; Image perspective K
+      Image -&gt; Pixel affine scaling
+</code></pre>
+<h3 id="mini-case跟踪一个点的完整旅程"><a class="header" href="#mini-case跟踪一个点的完整旅程">Mini Case：跟踪一个点的完整旅程</a></h3>
+<pre><code class="language-python">import numpy as np
+
+# --- Define the scene ---
+# A 3D point in world coordinates: a cup on the table
+X_world = np.array([3.0, 0.8, 1.5, 1.0])  # homogeneous (H&amp;Z section 2.2.1, p.26)
+
+# Camera pose (where the camera is in the world)
+R = np.array([
+    [0.0,  0.0, -1.0],
+    [-1.0, 0.0,  0.0],
+    [0.0,  1.0,  0.0]
+])  # rotation matrix
+C = np.array([1.0, 0.5, 0.0])  # camera center in world coordinates
+
+# Camera intrinsics
+K = np.array([
+    [525.0,   0.0, 320.0],
+    [  0.0, 525.0, 240.0],
+    [  0.0,   0.0,   1.0]
+])
+
+# --- Step 1: World -&gt; Camera (rigid body, H&amp;Z 6.6, p.156) ---
+t = -R @ C   # t = -R*C (H&amp;Z p.156, Eq 6.6)
+Rt = np.column_stack([R, t])  # 3x4 extrinsic matrix
+X_cam = Rt @ X_world  # X_cam is 3x1: (X_c, Y_c, Z_c) in camera frame
+print(f"Camera coord: ({X_cam[0]:.2f}, {X_cam[1]:.2f}, {X_cam[2]:.2f})")
+
+# --- Step 2: Camera -&gt; Image (perspective projection, H&amp;Z 6.1, p.154) ---
+P = K @ Rt  # Full camera matrix (H&amp;Z 6.8, p.156)
+x_image = P @ X_world  # homogeneous pixel coord: (u*h, v*h, h)
+
+# --- Step 3: Image -&gt; Pixel (dehomogenize, H&amp;Z 6.1, p.155) ---
+u, v = x_image[0] / x_image[2], x_image[1] / x_image[2]
+print(f"Pixel coord: ({u:.1f}, {v:.1f})")
+
+# --- Recap: the entire chain in one line ---
+x_pixel = K @ Rt @ X_world
+print(f"One-liner verification: ({x_pixel[0]/x_pixel[2]:.1f}, "
+      f"{x_pixel[1]/x_pixel[2]:.1f})")
+</code></pre>
+<p>这段代码追踪了一个三维点从世界坐标系到像素坐标系的完整旅程——四个坐标系，三个变换，一步到位。每个变换都是线性的（在齐次坐标下），整条链就是 $3 \times 4$ 相机矩阵 $P = K[R|t]$ 的一次乘法。</p>
+<hr>
+<h2 id="第二阶原理解析"><a class="header" href="#第二阶原理解析">第二阶：原理解析</a></h2>
+<h3 id="变换链全景"><a class="header" href="#变换链全景">变换链全景</a></h3>
+<pre><code class="language-mermaid">flowchart LR
+    subgraph W["World Frame O_w"]
+        Xw["X_w = (X, Y, Z, 1)^T"]
+    end
+    subgraph C["Camera Frame O_c"]
+        Xc["X_c = R(X_w - C_tilde)"]
+    end
+    subgraph I["Image Frame"]
+        x["x = (fX_c/Z_c, fY_c/Z_c)^T"]
+    end
+    subgraph Px["Pixel Frame"]
+        uv["(u, v) = (alpha_x*x/Z + x0, alpha_y*y/Z + y0)"]
+    end
+    W --&gt;|"R, t&lt;br/&gt;6 DOF"| C
+    C --&gt;|"Perspective&lt;br/&gt;Projection&lt;br/&gt;3D -&gt; 2D lossy"| I
+    I --&gt;|"K matrix&lt;br/&gt;Scaling + Offset"| Px
+</code></pre>
+<p>每一步的矩阵维度和变换性质：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>变换</th><th>矩阵</th><th>维度</th><th>自由度</th><th>可逆？</th><th>H&amp;Z 出处</th></tr>
+</thead>
+<tbody>
+<tr><td>世界 → 相机</td><td>$[R \mid t]$</td><td>$3 \times 4$</td><td>6 (3 旋转 + 3 平移)</td><td>是（刚体变换）</td><td>6.6, p.156</td></tr>
+<tr><td>相机 → 图像</td><td>透视投影</td><td>$3 \times 4$</td><td>0（几何过程，无自由参数）</td><td><strong>否</strong>——Z 信息丢失</td><td>6.1, p.154</td></tr>
+<tr><td>图像 → 像素</td><td>$K$</td><td>$3 \times 3$</td><td>3-5（内参个数）</td><td>是（仿射变换）</td><td>6.4, p.155</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="第一步世界--相机刚体变换"><a class="header" href="#第一步世界--相机刚体变换">第一步：世界 → 相机（刚体变换）</a></h3>
+<p>这是最直观的一步：把一个点从一个坐标系平移到另一个坐标系。相机在世界空间中有一个位置 $\tilde{C}$（相机中心的 world 坐标）和一个朝向 $R$（旋转矩阵）。</p>
+<p>两种等价写法（H&amp;Z section 6.1, p.155-156）：</p>
+<p>$$X_{\text{cam}} = R(X_{\text{world}} - \tilde{C}) \quad \text{（直观：先平移世界点到相机原点，再旋转）}$$</p>
+<p>$$X_{\text{cam}} = R X_{\text{world}} + t \quad \text{其中 } t = -R\tilde{C} \quad \text{（H&amp;Z 6.6, p.156）}$$</p>
+<p>第二种写法在齐次坐标下最方便——直接拼成 $3 \times 4$ 矩阵 $[R \mid t]$：</p>
+<p>$$\begin{bmatrix} X_c \ Y_c \ Z_c \end{bmatrix} = \begin{bmatrix} R_{11} &amp; R_{12} &amp; R_{13} &amp; t_1 \ R_{21} &amp; R_{22} &amp; R_{23} &amp; t_2 \ R_{31} &amp; R_{32} &amp; R_{33} &amp; t_3 \end{bmatrix} \begin{bmatrix} X_w \ Y_w \ Z_w \ 1 \end{bmatrix}$$</p>
+<p>6 DOF：3 个旋转角度（R 的正交约束下） + 3 个平移分量。这是整个变换链中最“贵“的一步——相机位姿估计（PnP、标定、SLAM）主要就是在估计这 6 个参数。</p>
+<h3 id="第二步相机--图像透视投影不可逆的一步"><a class="header" href="#第二步相机--图像透视投影不可逆的一步">第二步：相机 → 图像（透视投影——不可逆的一步）</a></h3>
+<p>这是<strong>中心投影</strong>——三维点通过小孔投射到二维成像平面。它是整个链中唯一不可逆的步骤，因为 Z 坐标在这个过程里被“压缩“了（H&amp;Z section 6.1, p.154）：</p>
+<p>$$(X_c, Y_c, Z_c)^T \longmapsto \left(\frac{f X_c}{Z_c}, \frac{f Y_c}{Z_c}\right)^T$$</p>
+<p>其中 $f$ 是焦距（毫米）。除以 $Z_c$ 这一步就是“透视“的来源——同样的物体，远了三倍，在图像上就只剩三分之一大。</p>
+<p>在齐次坐标下，这一步可以写成矩阵形式（H&amp;Z 6.2, p.154）：</p>
+<p>$$x = \begin{bmatrix} f &amp; 0 &amp; 0 &amp; 0 \ 0 &amp; f &amp; 0 &amp; 0 \ 0 &amp; 0 &amp; 1 &amp; 0 \end{bmatrix} X_{\text{cam}} = \text{diag}(f, f, 1) [I \mid 0] , X_{\text{cam}}$$</p>
+<p>其中 $x = (u, v, w)^T$ 是齐次坐标，真实的图像坐标是 $(u/w, v/w)$。</p>
+<p><strong>关键洞察</strong>：从 $3 \times 4$ 的原生投影矩阵 $[I \mid 0]$ 可以看出——第四列全是 0。这意味着相机中心（第四列对应的世界坐标点 $(0,0,0,1)$ 在相机坐标系下的齐次形式）映射到 $(0,0,0)^T$——一个齐次坐标为零的向量，不对应任何有限的图像点。这正好印证了“相机中心本身不能被投影“的物理事实。</p>
+<h3 id="第三步图像--像素k-矩阵登场"><a class="header" href="#第三步图像--像素k-矩阵登场">第三步：图像 → 像素（K 矩阵登场）</a></h3>
+<p>图像坐标系里的 $(x, y)$ 是以主点（principal point，光轴与成像平面的交点）为原点、以毫米为单位的。但像素坐标系是以图像左上角为原点、以像素为单位的。两者之间是一个仿射变换（H&amp;Z section 6.1, p.155-157）：</p>
+<p>$$\begin{bmatrix} u \ v \ 1 \end{bmatrix} = \begin{bmatrix} \alpha_x &amp; 0 &amp; x_0 \ 0 &amp; \alpha_y &amp; y_0 \ 0 &amp; 0 &amp; 1 \end{bmatrix} \begin{bmatrix} x \ y \ 1 \end{bmatrix}$$</p>
+<p>其中：</p>
+<ul>
+<li>$\alpha_x = f \cdot m_x$：横向焦距（像素单位），$m_x$ 是传感器每毫米的像素数</li>
+<li>$\alpha_y = f \cdot m_y$：纵向焦距（像素单位）</li>
+<li>$x_0, y_0$：主点的像素坐标（通常接近图像中心）</li>
+<li>最通用的 $K$ 还包含偏斜参数 $s$（H&amp;Z 6.10, p.157），但现代相机 $s \approx 0$</li>
+</ul>
+<h3 id="完整链p--krt"><a class="header" href="#完整链p--krt">完整链：$P = K[R|t]$</a></h3>
+<p>将三步合并（H&amp;Z 6.8, p.156）：</p>
+<p>$$\boxed{x_{\text{pixel}} = K [R \mid t] X_{\text{world}} = P X_{\text{world}}}$$</p>
+<p>展开即：</p>
+<p>$$\begin{bmatrix} u \ v \ 1 \end{bmatrix} = \begin{bmatrix} \alpha_x &amp; 0 &amp; x_0 \ 0 &amp; \alpha_y &amp; y_0 \ 0 &amp; 0 &amp; 1 \end{bmatrix} \begin{bmatrix} R_{11} &amp; R_{12} &amp; R_{13} &amp; t_1 \ R_{21} &amp; R_{22} &amp; R_{23} &amp; t_2 \ R_{31} &amp; R_{32} &amp; R_{33} &amp; t_3 \end{bmatrix} \begin{bmatrix} X_w \ Y_w \ Z_w \ 1 \end{bmatrix}$$</p>
+<p>$P$ 是一个 $3 \times 4$ 矩阵，秩为 3，有 11 个自由度（5 内参 + 3 旋转 + 3 平移）。这个公式是多视图几何万神殿中的第一神祇——所有下游算法，从三角测量到 BA（Bundle Adjustment），都以它为起点。</p>
+<p><strong>齐次坐标的妙处</strong>：等式 $\lambda x = PX$ 中，尺度因子 $\lambda$ 可以任意缩放。这意味着 $P$ 也只在尺度上可定义——$P$ 和 $kP$（$k \neq 0$）对应同一个投影。因此 $P$ 有 11 个而非 12 个自由度。</p>
+<h3 id="code-lens实现完整变换链"><a class="header" href="#code-lens实现完整变换链">Code Lens：实现完整变换链</a></h3>
+<pre><code class="language-python">import numpy as np
+
+
+def world_to_camera(X_world, R, C):
+    """World to Camera: rigid body transformation.
+    H&amp;Z (6.6, p.156): X_cam = R(X_world - C_tilde)
+    Equivalent: X_cam = RX_world + t, where t = -RC_tilde
+    """
+    t = -R @ C
+    return R @ X_world + t
+
+
+def camera_to_image(X_cam, f=1.0):
+    """Camera to Image: perspective projection.
+    H&amp;Z (6.1, p.154): (x, y) = (f*X/Z, f*Y/Z)
+    Returns normalized image coordinates (f=1).
+    """
+    x = X_cam[0] / X_cam[2]
+    y = X_cam[1] / X_cam[2]
+    return x, y
+
+
+def image_to_pixel(x, y, K):
+    """Image to Pixel: affine scaling with K matrix.
+    H&amp;Z (6.9, p.157): (u,v) = (alpha_x * x + x0, alpha_y * y + y0)
+    """
+    u = K[0, 0] * x + K[0, 2]
+    v = K[1, 1] * y + K[1, 2]
+    return u, v
+
+
+def full_projection(X_world, K, R, C):
+    """Complete chain: World -&gt; Camera -&gt; Image -&gt; Pixel.
+    H&amp;Z (6.8, p.156): x_pixel = K[R|t] X_world
+    """
+    t = -R @ C
+    Rt = np.column_stack([R, t])
+    P = K @ Rt  # 3x4 camera matrix
+    x_homo = P @ X_world
+    u = x_homo[0] / x_homo[2]
+    v = x_homo[1] / x_homo[2]
+    return u, v
+
+
+# --- Step-by-step trace ---
+np.random.seed(42)
+X_world = np.array([5.0, 2.0, 10.0])
+
+# Create a random but valid camera pose
+from scipy.spatial.transform import Rotation
+rot = Rotation.from_euler('xyz', [15, -10, 5], degrees=True)
+R = rot.as_matrix()
+C = np.array([0.0, 0.0, 0.0])  # camera at world origin
+
+# Standard K
+K = np.array([[500.0, 0.0, 320.0],
+              [0.0, 500.0, 240.0],
+              [0.0, 0.0, 1.0]])
+
+# Step 1
+X_cam = world_to_camera(X_world, R, C)
+print(f"Camera coord: X_c={X_cam[0]:.2f}, Y_c={X_cam[1]:.2f}, Z_c={X_cam[2]:.2f}")
+
+# Step 2
+x, y = camera_to_image(X_cam)
+print(f"Image coord (normalized): x={x:.4f}, y={y:.4f}")
+
+# Step 3
+u, v = image_to_pixel(x, y, K)
+print(f"Pixel coord: u={u:.1f}, v={v:.1f}")
+
+# One-shot verification
+u_full, v_full = full_projection(
+    np.append(X_world, 1.0), K, R, C
+)
+print(f"Verification (one-shot): u={u_full:.1f}, v={v_full:.1f}")
+</code></pre>
+<h3 id="坐标系转换的逆方向从像素回到世界"><a class="header" href="#坐标系转换的逆方向从像素回到世界">坐标系转换的逆方向：从像素回到世界</a></h3>
+<p>理解了正向链后，反向链同样重要——许多任务需要从图像坐标推断三维位置：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>方向</th><th>可用信息</th><th>能恢复什么</th><th>不能恢复什么</th></tr>
+</thead>
+<tbody>
+<tr><td>Pixel → Image</td><td>K 已知</td><td>连续图像坐标 $(x, y)$</td><td>—（可逆仿射变换）</td></tr>
+<tr><td>Image → Camera</td><td>无深度信息</td><td>射线方向：$X/Z = x/f$，$Y/Z = y/f$</td><td>Z（深度）——一条射线上的所有点投影到同一个像素</td></tr>
+<tr><td>Camera → World</td><td>$R, t$ 已知</td><td>$X_w = R^{-1}(X_c - t) = R^T X_c - R^T t$</td><td>—（可逆刚体变换）</td></tr>
+</tbody>
+</table>
+</div>
+<p>要点：从像素反推到三维世界时，你只能恢复一条射线（方向知道，深度未知）——而不是一个确定的点。这正是三角测量需要第二台相机的原因。</p>
+<hr>
+<h2 id="第三阶部署实战"><a class="header" href="#第三阶部署实战">第三阶：部署实战</a></h2>
+<h3 id="opencv-坐标约定"><a class="header" href="#opencv-坐标约定">OpenCV 坐标约定</a></h3>
+<p>OpenCV 采用右手坐标系（H&amp;Z 全书统一使用）：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>轴</th><th>方向</th><th>备注</th></tr>
+</thead>
+<tbody>
+<tr><td>X</td><td>右</td><td>—</td></tr>
+<tr><td>Y</td><td>下</td><td>与像素行号增加方向一致</td></tr>
+<tr><td>Z</td><td>前（远离相机）</td><td>光轴方向（“深度”）</td></tr>
+</tbody>
+</table>
+</div>
+<p>右手定则：右手大拇指指向 X，食指指向 Y，中指自然指向 Z（前方）。这一定则在 OpenCV 的所有函数中一致——从 <code>solvePnP</code> 到 <code>projectPoints</code> 到 <code>stereoRectify</code>。</p>
+<h3 id="常见坐标系统对比"><a class="header" href="#常见坐标系统对比">常见坐标系统对比</a></h3>
+<pre><code class="language-mermaid">quadrantChart
+    title Coordinate System Comparison
+    x-axis "X Direction" --&gt; "Right"
+    y-axis "Y Direction" --&gt; "Up vs Down"
+    quadrant-1 "OpenCV&lt;br/&gt;X=Right, Y=Down, Z=Forward&lt;br/&gt;Right-Hand"
+    quadrant-2 "OpenGL&lt;br/&gt;X=Right, Y=Up, Z=Backward&lt;br/&gt;Right-Hand"
+    quadrant-3 "Unity&lt;br/&gt;X=Right, Y=Up, Z=Forward&lt;br/&gt;Left-Hand"
+    quadrant-4 "ROS Robot&lt;br/&gt;X=Forward, Y=Left, Z=Up&lt;br/&gt;Right-Hand"
+</code></pre>
+<p><strong>转换速查表</strong>：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>从</th><th>到</th><th>变换</th></tr>
+</thead>
+<tbody>
+<tr><td>OpenCV</td><td>OpenGL</td><td>$Y \to -Y$，$Z \to -Z$（$X$ 不变）</td></tr>
+<tr><td>OpenCV</td><td>Unity</td><td>$Y \to -Y$（$X$ 和 $Z$ 不变——注意左手系）</td></tr>
+<tr><td>OpenGL</td><td>Unity</td><td>$Z \to -Z$（绕 X 轴翻转 Z，左手变右手）</td></tr>
+<tr><td>ROS (robot)</td><td>OpenCV</td><td>$X \to Z$，$Y \to -X$，$Z \to -Y$（大旋转）</td></tr>
+</tbody>
+</table>
+</div>
+<p>记住一个检查方法：<strong>在原点放一个正方体，用两种约定分别计算八个顶点的坐标——哪个角在哪个约定下“飞“到了错误的位置，就说明转换错了。</strong></p>
+<h3 id="实战读取相机标定文件变换-lidar-点到相机帧"><a class="header" href="#实战读取相机标定文件变换-lidar-点到相机帧">实战：读取相机标定文件，变换 LiDAR 点到相机帧</a></h3>
+<pre><code class="language-python">import numpy as np
+import json
+
+
+def load_calibration(calib_path):
+    """Load camera calibration (K) and LiDAR-to-camera extrinsics."""
+    with open(calib_path) as f:
+        calib = json.load(f)
+    K = np.array(calib['K']).reshape(3, 3)
+    R_lidar_to_cam = np.array(calib['R_lidar2cam']).reshape(3, 3)
+    t_lidar_to_cam = np.array(calib['t_lidar2cam']).reshape(3, 1)
+    return K, R_lidar_to_cam, t_lidar_to_cam
+
+
+def project_lidar_to_image(lidar_points, K, R, t):
+    """Project LiDAR points (in LiDAR frame) to image pixel coordinates.
+
+    Steps:
+      1. LiDAR frame -&gt; Camera frame: X_cam = R @ X_lidar + t
+      2. Camera frame -&gt; Image frame:  x = K @ X_cam (normalized)
+      3. Filter points behind camera (Z_cam &lt;= 0)
+    H&amp;Z (6.8, p.156): x_pixel = K[R|t] X_lidar
+    """
+    # Step 1 &amp; 2 combined
+    lidar_xyz = lidar_points[:, :3].T  # 3xN
+    lidar_homo = np.vstack([lidar_xyz, np.ones(lidar_xyz.shape[1])])  # 4xN
+    Rt = np.column_stack([R, t.flatten()])  # 3x4
+    P = K @ Rt  # 3x4 camera matrix
+    img_homo = P @ lidar_homo  # 3xN
+
+    # Step 3: dehomogenize and filter
+    depth = img_homo[2, :]
+    valid = depth &gt; 0  # keep only points in front of camera
+    u = img_homo[0, valid] / depth[valid]
+    v = img_homo[1, valid] / depth[valid]
+    points_in_front = lidar_points[valid]
+
+    return u, v, points_in_front, depth[valid]
+
+
+# --- Example usage ---
+# Synthetic LiDAR points (in LiDAR frame)
+lidar_pts = np.random.uniform(-10, 10, (1000, 4))
+
+# Load from calibration
+K, R_lc, t_lc = load_calibration("calibration.json")
+
+# Project
+u_vals, v_vals, pts_3d, depths = project_lidar_to_image(
+    lidar_pts, K, R_lc, t_lc
+)
+print(f"Projected {len(u_vals)} / {len(lidar_pts)} LiDAR points onto image")
+print(f"Depth range: [{depths.min():.2f}, {depths.max():.2f}] m")
+</code></pre>
+<p>这段代码是多传感器融合的标准操作——自动驾驶中最常见的场景：把 LiDAR 点投影到相机图像上做“着色“（给点云染上图像 RGB），或做“深度补全“（用 LiDAR 稀疏深度引导稠密深度估计）。</p>
+<hr>
+<h2 id="苏格拉底时刻"><a class="header" href="#苏格拉底时刻">苏格拉底时刻</a></h2>
+<ol>
+<li><strong>如果你把世界坐标系的原点从房间角落移到相机上，所有的三维坐标都变了。但相机拍到的照片不会变——为什么？这暗示了什么关于“绝对坐标“和“相对坐标“的本质差异？</strong></li>
+</ol>
+<p>（提示：照片记录的是三维场景相对于相机的位置——即相机坐标系的 $X_c, Y_c, Z_c$。世界坐标系的原点位置不影响相机与场景之间的相对关系。改变世界原点只是给所有世界坐标加一个偏移量——这个偏移量在 $X_{\text{cam}} = R(X_w - \tilde{C})$ 中被 $\tilde{C}$ 的变化抵消了。这揭示了多视图几何的一个根本事实：<strong>从图像中我们只能恢复相对几何——相机与场景之间、相机与相机之间的相对位置。绝对的世界坐标是一个人类赋予的标签，不是视觉系统能够感知的东西。</strong> 这也是为什么从 E 矩阵恢复平移时，$t$ 的绝对尺度无法确定——你永远不知道相机移动了 1 米还是 10 米，除非有额外的尺度信息（如已知基线长度的双目相机、或已知大小的标定物）。）</p>
+<ol start="2">
+<li><strong>齐次坐标让透视投影变成了线性运算。但“除以 Z“这个非线性步骤并没有真的消失——它去了哪里？</strong></li>
+</ol>
+<p>（提示：齐次坐标的把戏是把“除以 Z“推迟到最后一步——投影矩阵 $P$ 的输出是齐次坐标 $(u, v, w)^T$，真实的像素坐标需要做去齐次化 $(u/w, v/w)$。这个 $w$ 恰好等于相机坐标系下的 $Z_c$。所以齐次坐标没有“消灭“非线性——它只是把非线性从计算中间移到了计算末尾，从而让中间的矩阵乘法保持线性。这个优雅的 trick 才使得整条变换链能用一次矩阵乘法完成。）</p>
+<hr>
+<h2 id="关键论文与文献清单"><a class="header" href="#关键论文与文献清单">关键论文与文献清单</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>年份</th><th>文献</th><th>一句话贡献</th></tr>
+</thead>
+<tbody>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry</em>, Ch.6</td><td>$P = K[R</td></tr>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry</em>, Ch.2</td><td>齐次坐标、变换分层——射影/仿射/相似/欧几里得变换群的不变性层级（p.37-44）</td></tr>
+<tr><td>2000</td><td>Z. Zhang, “A Flexible New Technique for Camera Calibration”, <em>IEEE TPAMI</em></td><td>张氏标定法——只用棋盘格平面从多张图像同时恢复 $K$ 和每帧的 $[R</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="实操练习"><a class="header" href="#实操练习">实操练习</a></h2>
+<ol>
+<li><strong>亲手走一遍变换链</strong>：在房间角落里放一个虚拟相机（$C = (0,0,0)$，看向 Z 轴），在 $(3, 0.5, 5)$ 处放一个点。用手算（或用 Python 逐步骤算）这个点从世界坐标系走到像素坐标系的完整过程。验证最终结果和直接用 $P = K[R|t]$ 一次算出来的结果完全相同。</li>
+<li><strong>坐标约定陷阱实验</strong>：把一个 OpenGL 渲染的立方体的顶点坐标手动转换到 OpenCV 约定（$Y \to -Y$, $Z \to -Z$），然后用 OpenCV 的 <code>projectPoints</code> 投影到图像上。如果不做转换直接投影——立方体出现在图像的什么位置？为什么？</li>
+<li><strong>逆推射线</strong>：已知相机内参 $K$ 和图像上的一个像素 $(u,v)$，计算这条像素对应的三维射线在相机坐标系下的方向向量。在空间中画出这条射线——验证它确实穿过相机中心 $(0,0,0)$ 和成像平面上的 $(u - c_x, v - c_y, f)$。</li>
+</ol>
+<hr>
+<h2 id="延伸阅读"><a class="header" href="#延伸阅读">延伸阅读</a></h2>
+<ul>
+<li>本书内：[[01 相机模型]] · [[02 投影几何]] · [[04 深度表示]]</li>
+<li>H&amp;Z 原书 Ch.6.1：相机模型完整推导——从针孔投影到 $P = K[R|t]$（p.154-157）</li>
+<li>H&amp;Z 原书 Ch.6.2.4：RQ 分解——从已知 $P$ 矩阵中恢复 $K$ 和 $R$（p.163-165）</li>
+<li>H&amp;Z 原书 Ch.2.4：变换分层——射影/仿射/相似/欧几里得的不变性，理解“绝对坐标“与“相对坐标“的本质（p.37-44）</li>
+<li>OpenCV Camera Calibration Tutorial: https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../00_basics/04_depth_repr.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                            </a>
+
+                            <a rel="next prefetch" href="../00_basics/06_optimization.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../00_basics/04_depth_repr.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                    </a>
+
+                    <a rel="next prefetch" href="../00_basics/06_optimization.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                    </a>
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr-ef4e11c1.min.js"></script>
+        <script src="../mark-09e88c2c.min.js"></script>
+        <script src="../searcher-c2a407aa.js"></script>
+
+        <script src="../clipboard-1626706a.min.js"></script>
+        <script src="../highlight-abc7f01d.js"></script>
+        <script src="../book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

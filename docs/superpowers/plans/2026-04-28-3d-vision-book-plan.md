@@ -162,7 +162,7 @@ git commit -m "chore: initialize book project skeleton"
 
 ### 算法核心
 
-[关键公式 + 通俗解读。公式引用原文出处]
+[关键公式 + 人话翻译。公式引用原文出处]
 
 ### 方法演进对比
 
@@ -470,7 +470,7 @@ touch research/01_monocular_depth/literature_map.md
 按时间线阅读 Eigen → Monodepth → MiDaS → Depth Anything → Depth Pro。每篇论文笔记包含：
 - 解决的问题 + 前人方法的局限
 - 核心创新（架构、Loss、训练策略）
-- 关键公式 + 通俗解读
+- 关键公式 + 人话翻译
 - 实验结论 + 局限
 
 - [ ] **Step 3: 绘制文献演进地图**

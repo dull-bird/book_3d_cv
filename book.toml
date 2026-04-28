@@ -1,0 +1,14 @@
+[book]
+title = "3D 视觉：从原理到实践"
+authors = ["戴智文"]
+language = "zh"
+src = "src"
+
+[output.html]
+mathjax-support = true
+git-repository-url = "https://github.com/dull-bird/book_3d_cv"
+edit-url-template = "https://github.com/dull-bird/book_3d_cv/edit/main/{path}"
+site-url = "/book_3d_cv/"
+
+[output.html.search]
+enable = true
