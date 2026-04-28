@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-51b17803.js";
+            window.path_to_searchindex_js = "../searchindex-6dae151e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-d47b7a93.js"></script>
@@ -184,7 +184,7 @@
 <blockquote>
 <p>预计阅读时间：40 分钟
 前置知识：无（本篇第 01 节）
-读完本节后，你可以：写出完整的投影公式 <code>P = K[R|t]</code>，理解内参和外参的区别，用 OpenCV 标定自己的手机相机。</p>
+读完本节后，你可以：写出完整的投影公式 $P = K[R|t]$，理解内参和外参的区别，用 OpenCV 标定自己的手机相机。</p>
 </blockquote>
 <hr>
 <h2 id="第一阶直观理解"><a class="header" href="#第一阶直观理解">第一阶：直观理解</a></h2>
@@ -222,6 +222,7 @@
     相机类型
       透视相机 perspective
       仿射相机 affine
+      移轴相机 tilt shift
       正射投影 orthographic
     标定 Calibration
       Zhang's method
@@ -263,7 +264,7 @@ print("in the real world. The camera model tells you exactly which one.")
 <hr>
 <h2 id="第二阶原理解析"><a class="header" href="#第二阶原理解析">第二阶：原理解析</a></h2>
 <h3 id="第一性原理中心投影"><a class="header" href="#第一性原理中心投影">第一性原理：中心投影</a></h3>
-<p>针孔相机做的事情，用一句话说：<strong>将三维空间中的点，沿着穿过一个固定点（相机中心）的直线，映射到一个平面上</strong>。这在几何上称为<strong>中心投影（central projection）</strong>，是从三维射影空间 <code>IP^3</code> 到二维射影平面 <code>IP^2</code> 的映射。（H&amp;Z section 6.1, p.154）</p>
+<p>针孔相机做的事情，用一句话说：<strong>将三维空间中的点，沿着穿过一个固定点（相机中心）的直线，映射到一个平面上</strong>。这在几何上称为<strong>中心投影（central projection）</strong>，是从三维射影空间 $IP^3$ 到二维射影平面 $IP^2$ 的映射。（H&amp;Z section 6.1, p.154）</p>
 <h3 id="从三维点到像素坐标完整推导"><a class="header" href="#从三维点到像素坐标完整推导">从三维点到像素坐标——完整推导</a></h3>
 <h4 id="step-1最简单的针孔没有主点偏移"><a class="header" href="#step-1最简单的针孔没有主点偏移">Step 1：最简单的针孔——没有主点偏移</a></h4>
 <p>假设小孔（相机中心）位于原点，相机朝向 Z 轴正方向，成像平面在距离 f 处（f 是焦距）。根据相似三角形：</p>
@@ -328,7 +329,7 @@ $$(X, Y, Z)^T \rightarrow (fX/Z, fY/Z)^T$$</p>
 <li><strong>外参变换</strong>：把世界坐标系下的点转到相机坐标系下——$[R|t]$ 告诉你相机“在哪“和“朝哪看“。</li>
 <li><strong>内参投影</strong>：把相机坐标系下的点投影到像素平面上——K 告诉你相机的“个性“（焦距多长、主点在哪）。</li>
 </ol>
-<p><code>P = K[R|t]</code> 这个公式是整本书最重要的公式之一。</p>
+<p>$P = K[R|t]$ 这个公式是整本书最重要的公式之一。</p>
 </blockquote>
 <h3 id="投影管线全景"><a class="header" href="#投影管线全景">投影管线全景</a></h3>
 <pre class="mermaid">flowchart TD
@@ -390,7 +391,7 @@ $$\text{depth}(X; P) = \text{sign}(\det M) \cdot \frac{w}{T \cdot |m^3|}$$
 </ol>
 <p>RQ 分解后，K 需要归一化使得 $K[2,2] = 1$ 来消除尺度歧义。相机中心 C 则通过 SVD 求 P 的零空间得到，然后 $t = -R C$（H&amp;Z p.163-165）。</p>
 <h3 id="code-lens用-numpy-实现投影"><a class="header" href="#code-lens用-numpy-实现投影">Code Lens：用 NumPy 实现投影</a></h3>
-<p>以下代码直接验证 <code>P = K[R|t]</code> 的投影过程，基于 <code>code_verify.py</code> 的核心逻辑。</p>
+<p>以下代码直接验证 $P = K[R|t]$ 的投影过程，基于 $code_verify.py$ 的核心逻辑。</p>
 <pre><code class="language-python">import numpy as np
 
 
@@ -533,6 +534,41 @@ print("Manual formula check passed.")
 <li><strong>显微镜成像</strong>：被观测物体非常小，景深变化可忽略。</li>
 </ul>
 <p>一个实用的判断标准：如果场景中所有点到相机的距离变化 $\Delta Z$ 远小于平均距离 $\bar{Z}$（即 $\Delta Z / \bar{Z} \ll 1$），仿射近似就成立。此时使用仿射相机可以显著减少待估计的参数数量（8 vs 11），简化重建算法（比如用因子分解法——后面章节会讲）。</p>
+<h3 id="移轴相机透视之外的控制"><a class="header" href="#移轴相机透视之外的控制">移轴相机：透视之外的控制</a></h3>
+<p>在透视相机模型中，图像平面垂直于光轴——这意味着所有平行线都会汇聚到一个消失点。但在一些应用中，我们<strong>不想要这种汇聚</strong>。比如拍建筑时，如果相机朝上拍，楼会看起来向后倒；拍产品时需要精确控制景深以保证整体清晰。</p>
+<p>**移轴相机（Tilt-Shift Camera）<strong>通过让镜头相对传感器</strong>偏移（Shift）<strong>和</strong>倾斜（Tilt）**来解决这些问题。</p>
+<h4 id="shift改变成像区域而不改变透视"><a class="header" href="#shift改变成像区域而不改变透视">Shift：改变成像区域而不改变透视</a></h4>
+<p>Shift 是将镜头平行于传感器移动。因为透视由相机中心的位置决定，而 shift 只移动了镜头（传感器相对移动），<strong>相机中心没有变</strong>，所以透视关系保持不变。</p>
+<p>在数学上，shift 修改的是 $K$ 矩阵中的主点位置：
+$$K_{shift} = \begin{pmatrix} \alpha_x &amp; s &amp; x_0 + s_x \ 0 &amp; \alpha_y &amp; y_0 + s_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$$</p>
+<p>其中 $(s_x, s_y)$ 是 shift 量（单位：像素）。</p>
+<p><strong>实际用途</strong>：</p>
+<ul>
+<li>拍高楼时，保持相机朝正前方，shift 镜头向上——大楼不会“倒“，而且透视仍然是正视的</li>
+<li>全景拼接：用 shift 拍多张图，它们共享同一个相机中心，拼接时只有平面变换，没有视差</li>
+</ul>
+<h4 id="tilt改变焦平面scheimpflug-原理"><a class="header" href="#tilt改变焦平面scheimpflug-原理">Tilt：改变焦平面（Scheimpflug 原理）</a></h4>
+<p>Tilt 是将镜头相对传感器<strong>旋转</strong>一个角度。普通的透视相机焦平面（最清晰的平面）总是平行于传感器。但 tilt 之后，<strong>焦平面不再平行于传感器</strong>——它可以斜着伸展。</p>
+<p>这就是 <strong>Scheimpflug 原理</strong>：当镜头平面、传感器平面、焦平面三者的延长线相交于同一条线时，焦平面上的所有点都同时清晰。</p>
+<p>在计算机视觉中，tilt 的效果可以建模为对相机内参 $K$ 施加一个旋转变换：
+$$K_{tilt} = K \cdot R_{tilt}$$</p>
+<p>其中 $R_{tilt}$ 是一个描述镜头倾斜的旋转矩阵（通常在 $2^\circ$ 到 $8^\circ$ 之间）。</p>
+<p><strong>实际用途</strong>：</p>
+<ul>
+<li>产品摄影：让一个长物体的整个表面都清晰（焦平面沿物体表面延伸）</li>
+<li>微缩模型效果（Miniature Faking）：这是很多人认识的“移轴效果“——反向用 tilt 让焦平面非常窄，真实场景看起来像微缩模型</li>
+<li>结构光三维扫描：控制投影平面的聚焦范围</li>
+</ul>
+<h4 id="在计算机视觉中的意义"><a class="header" href="#在计算机视觉中的意义">在计算机视觉中的意义</a></h4>
+<p>移轴相机在传统 CV（尤其是摄影测量和工业检测）中有重要应用：</p>
+<ul>
+<li>摄影测量中，shift 可以消除建筑物透视变形，使测量更精确</li>
+<li>在立体视觉中，使用 tilt 可以扩展景深范围，减少因离焦带来的匹配失败</li>
+<li>在 SfM（Structure from Motion）中，如果输入图像来自移轴镜头，标准的针孔相机模型会失效——必须修改投影模型，否则重建会扭曲</li>
+</ul>
+<blockquote>
+<p><strong>一句话</strong>：普通相机服从 $P = K[R|t]$，移轴相机是 $P = K_{tilt,shift}[R|t]$——多出来的自由度给了你对成像平面和焦平面的精确控制。</p>
+</blockquote>
 <h3 id="实战用-opencv-标定你的相机"><a class="header" href="#实战用-opencv-标定你的相机">实战：用 OpenCV 标定你的相机</a></h3>
 <p>相机标定是要解决的问题是：给定一个相机，如何找出它的 $K$ 矩阵和畸变参数？</p>
 <p><strong>标定原理</strong>（Zhang’s method）：拍摄多张不同角度的棋盘格照片。棋盘格上每个角点的三维坐标已知（因为棋盘格是平面的，Z=0），在图像中检测角点得到二维坐标。对于每张图像，棋盘格平面和图像平面之间存在一个单应矩阵 H。利用 H 和旋转矩阵的正交性约束（$r_1 \cdot r_2 = 0$, $|r_1| = |r_2| = 1$），每张图像提供两个关于 K 的约束方程。K 有 5 个自由度（不统计畸变），所以至少需要 3 张图像。</p>
@@ -596,7 +632,7 @@ print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
 </code></pre>
 <p><strong>输出解读</strong>：</p>
 <ul>
-<li><code>K</code> 矩阵的 $K[0,0]$ 和 $K[1,1]$ 是 $\alpha_x, \alpha_y$（像素单位的焦距）。如果它们是 800，在 640x480 图像上意味着视场角约为 <code>2 * arctan(240/800) ≈ 33.4°</code>（垂直）。</li>
+<li><code>K</code> 矩阵的 $K[0,0]$ 和 $K[1,1]$ 是 $\alpha_x, \alpha_y$（像素单位的焦距）。如果它们是 800，在 640x480 图像上意味着视场角约为 $2 * arctan(240/800) ≈ 33.4°$（垂直）。</li>
 <li>主点 $K[0,2], K[1,2]$ 应该在图像中心附近（如 320, 240），如果偏离太远可能说明 sensor 装配有问题。</li>
 <li><code>dist</code> 是镜头畸变系数，包含径向畸变 $(k_1, k_2, k_3)$ 和切向畸变 $(p_1, p_2)$。</li>
 </ul>

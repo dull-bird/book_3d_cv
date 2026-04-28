@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-51b17803.js";
+            window.path_to_searchindex_js = "../searchindex-6dae151e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-d47b7a93.js"></script>
@@ -193,7 +193,7 @@
 <h2 id="学习目标"><a class="header" href="#学习目标">学习目标</a></h2>
 <p>读完本篇六个小节，你将能够：</p>
 <ol>
-<li>写出一个三维点到像素坐标的完整投影公式 <code>P = K[R|t]</code>，并解释每个符号的含义</li>
+<li>写出一个三维点到像素坐标的完整投影公式 $P = K[R|t]$，并解释每个符号的含义</li>
 <li>理解齐次坐标为什么是计算机视觉的“通用语言“</li>
 <li>用两幅图像的匹配点计算基础矩阵 F，理解对极约束如何将匹配搜索从二维降到一维</li>
 <li>分辨透视相机和仿射相机的区别，知道什么时候该用哪个</li>
@@ -206,7 +206,7 @@
 <tr><th>节</th><th>内容</th><th>核心收获</th><th>阅读时间</th></tr>
 </thead>
 <tbody>
-<tr><td>01 相机模型</td><td>针孔相机、内参 K、外参 R/t、投影矩阵 P</td><td>理解 <code>P = K[Rt]</code>的每一部分</td><td>40 分钟</td></tr>
+<tr><td>01 相机模型</td><td>针孔相机、内参 K、外参 R/t、投影矩阵 P</td><td>理解 $P = K[Rt]$的每一部分</td><td>40 分钟</td></tr>
 <tr><td>02 投影几何</td><td>齐次坐标、无穷远线、单应矩阵 H、变换分层</td><td>掌握“透视变换“的数学语言</td><td>45 分钟</td></tr>
 <tr><td>03 多视图几何入门</td><td>对极几何、基础矩阵 F、本质矩阵 E</td><td>理解两张图像之间的几何约束</td><td>50 分钟</td></tr>
 <tr><td>04 深度表示</td><td>深度图、视差图、点云</td><td>知道三维信息有哪几种“存法“</td><td>30 分钟</td></tr>
@@ -234,7 +234,7 @@
 </code></pre>
 <p>后续每个模块都会直接调用基础篇的概念。比如：</p>
 <ul>
-<li>模块 A 讨论“如何从像素坐标反推深度“时，用的是 <code>P = K[R|t]</code> 的逆过程</li>
+<li>模块 A 讨论“如何从像素坐标反推深度“时，用的是 $P = K[R|t]$ 的逆过程</li>
 <li>模块 B 讨论“左右图像如何匹配“时，依赖对极几何把搜索空间从整个图像压缩到一条线</li>
 <li>模块 C 的相机参数优化中，Bundle Adjustment 直接来自基础篇的优化基础</li>
 </ul>

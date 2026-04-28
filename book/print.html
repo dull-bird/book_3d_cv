@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-51b17803.js";
+            window.path_to_searchindex_js = "searchindex-6dae151e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-d47b7a93.js"></script>
@@ -193,7 +193,7 @@
 <h2 id="学习目标"><a class="header" href="#学习目标">学习目标</a></h2>
 <p>读完本篇六个小节，你将能够：</p>
 <ol>
-<li>写出一个三维点到像素坐标的完整投影公式 <code>P = K[R|t]</code>，并解释每个符号的含义</li>
+<li>写出一个三维点到像素坐标的完整投影公式 $P = K[R|t]$，并解释每个符号的含义</li>
 <li>理解齐次坐标为什么是计算机视觉的“通用语言“</li>
 <li>用两幅图像的匹配点计算基础矩阵 F，理解对极约束如何将匹配搜索从二维降到一维</li>
 <li>分辨透视相机和仿射相机的区别，知道什么时候该用哪个</li>
@@ -206,7 +206,7 @@
 <tr><th>节</th><th>内容</th><th>核心收获</th><th>阅读时间</th></tr>
 </thead>
 <tbody>
-<tr><td>01 相机模型</td><td>针孔相机、内参 K、外参 R/t、投影矩阵 P</td><td>理解 <code>P = K[Rt]</code>的每一部分</td><td>40 分钟</td></tr>
+<tr><td>01 相机模型</td><td>针孔相机、内参 K、外参 R/t、投影矩阵 P</td><td>理解 $P = K[Rt]$的每一部分</td><td>40 分钟</td></tr>
 <tr><td>02 投影几何</td><td>齐次坐标、无穷远线、单应矩阵 H、变换分层</td><td>掌握“透视变换“的数学语言</td><td>45 分钟</td></tr>
 <tr><td>03 多视图几何入门</td><td>对极几何、基础矩阵 F、本质矩阵 E</td><td>理解两张图像之间的几何约束</td><td>50 分钟</td></tr>
 <tr><td>04 深度表示</td><td>深度图、视差图、点云</td><td>知道三维信息有哪几种“存法“</td><td>30 分钟</td></tr>
@@ -234,7 +234,7 @@
 </code></pre>
 <p>后续每个模块都会直接调用基础篇的概念。比如：</p>
 <ul>
-<li>模块 A 讨论“如何从像素坐标反推深度“时，用的是 <code>P = K[R|t]</code> 的逆过程</li>
+<li>模块 A 讨论“如何从像素坐标反推深度“时，用的是 $P = K[R|t]$ 的逆过程</li>
 <li>模块 B 讨论“左右图像如何匹配“时，依赖对极几何把搜索空间从整个图像压缩到一条线</li>
 <li>模块 C 的相机参数优化中，Bundle Adjustment 直接来自基础篇的优化基础</li>
 </ul>
@@ -358,7 +358,7 @@ print(f"Pairwise distances (unscaled): {np.sort(distances)[::-1][:5]}")
 <blockquote>
 <p>预计阅读时间：40 分钟
 前置知识：无（本篇第 01 节）
-读完本节后，你可以：写出完整的投影公式 <code>P = K[R|t]</code>，理解内参和外参的区别，用 OpenCV 标定自己的手机相机。</p>
+读完本节后，你可以：写出完整的投影公式 $P = K[R|t]$，理解内参和外参的区别，用 OpenCV 标定自己的手机相机。</p>
 </blockquote>
 <hr>
 <h2 id="第一阶直观理解"><a class="header" href="#第一阶直观理解">第一阶：直观理解</a></h2>
@@ -396,6 +396,7 @@ print(f"Pairwise distances (unscaled): {np.sort(distances)[::-1][:5]}")
     相机类型
       透视相机 perspective
       仿射相机 affine
+      移轴相机 tilt shift
       正射投影 orthographic
     标定 Calibration
       Zhang's method
@@ -437,7 +438,7 @@ print("in the real world. The camera model tells you exactly which one.")
 <hr>
 <h2 id="第二阶原理解析"><a class="header" href="#第二阶原理解析">第二阶：原理解析</a></h2>
 <h3 id="第一性原理中心投影"><a class="header" href="#第一性原理中心投影">第一性原理：中心投影</a></h3>
-<p>针孔相机做的事情，用一句话说：<strong>将三维空间中的点，沿着穿过一个固定点（相机中心）的直线，映射到一个平面上</strong>。这在几何上称为<strong>中心投影（central projection）</strong>，是从三维射影空间 <code>IP^3</code> 到二维射影平面 <code>IP^2</code> 的映射。（H&amp;Z section 6.1, p.154）</p>
+<p>针孔相机做的事情，用一句话说：<strong>将三维空间中的点，沿着穿过一个固定点（相机中心）的直线，映射到一个平面上</strong>。这在几何上称为<strong>中心投影（central projection）</strong>，是从三维射影空间 $IP^3$ 到二维射影平面 $IP^2$ 的映射。（H&amp;Z section 6.1, p.154）</p>
 <h3 id="从三维点到像素坐标完整推导"><a class="header" href="#从三维点到像素坐标完整推导">从三维点到像素坐标——完整推导</a></h3>
 <h4 id="step-1最简单的针孔没有主点偏移"><a class="header" href="#step-1最简单的针孔没有主点偏移">Step 1：最简单的针孔——没有主点偏移</a></h4>
 <p>假设小孔（相机中心）位于原点，相机朝向 Z 轴正方向，成像平面在距离 f 处（f 是焦距）。根据相似三角形：</p>
@@ -502,7 +503,7 @@ $$(X, Y, Z)^T \rightarrow (fX/Z, fY/Z)^T$$</p>
 <li><strong>外参变换</strong>：把世界坐标系下的点转到相机坐标系下——$[R|t]$ 告诉你相机“在哪“和“朝哪看“。</li>
 <li><strong>内参投影</strong>：把相机坐标系下的点投影到像素平面上——K 告诉你相机的“个性“（焦距多长、主点在哪）。</li>
 </ol>
-<p><code>P = K[R|t]</code> 这个公式是整本书最重要的公式之一。</p>
+<p>$P = K[R|t]$ 这个公式是整本书最重要的公式之一。</p>
 </blockquote>
 <h3 id="投影管线全景"><a class="header" href="#投影管线全景">投影管线全景</a></h3>
 <pre class="mermaid">flowchart TD
@@ -564,7 +565,7 @@ $$\text{depth}(X; P) = \text{sign}(\det M) \cdot \frac{w}{T \cdot |m^3|}$$
 </ol>
 <p>RQ 分解后，K 需要归一化使得 $K[2,2] = 1$ 来消除尺度歧义。相机中心 C 则通过 SVD 求 P 的零空间得到，然后 $t = -R C$（H&amp;Z p.163-165）。</p>
 <h3 id="code-lens用-numpy-实现投影"><a class="header" href="#code-lens用-numpy-实现投影">Code Lens：用 NumPy 实现投影</a></h3>
-<p>以下代码直接验证 <code>P = K[R|t]</code> 的投影过程，基于 <code>code_verify.py</code> 的核心逻辑。</p>
+<p>以下代码直接验证 $P = K[R|t]$ 的投影过程，基于 $code_verify.py$ 的核心逻辑。</p>
 <pre><code class="language-python">import numpy as np
 
 
@@ -707,6 +708,41 @@ print("Manual formula check passed.")
 <li><strong>显微镜成像</strong>：被观测物体非常小，景深变化可忽略。</li>
 </ul>
 <p>一个实用的判断标准：如果场景中所有点到相机的距离变化 $\Delta Z$ 远小于平均距离 $\bar{Z}$（即 $\Delta Z / \bar{Z} \ll 1$），仿射近似就成立。此时使用仿射相机可以显著减少待估计的参数数量（8 vs 11），简化重建算法（比如用因子分解法——后面章节会讲）。</p>
+<h3 id="移轴相机透视之外的控制"><a class="header" href="#移轴相机透视之外的控制">移轴相机：透视之外的控制</a></h3>
+<p>在透视相机模型中，图像平面垂直于光轴——这意味着所有平行线都会汇聚到一个消失点。但在一些应用中，我们<strong>不想要这种汇聚</strong>。比如拍建筑时，如果相机朝上拍，楼会看起来向后倒；拍产品时需要精确控制景深以保证整体清晰。</p>
+<p>**移轴相机（Tilt-Shift Camera）<strong>通过让镜头相对传感器</strong>偏移（Shift）<strong>和</strong>倾斜（Tilt）**来解决这些问题。</p>
+<h4 id="shift改变成像区域而不改变透视"><a class="header" href="#shift改变成像区域而不改变透视">Shift：改变成像区域而不改变透视</a></h4>
+<p>Shift 是将镜头平行于传感器移动。因为透视由相机中心的位置决定，而 shift 只移动了镜头（传感器相对移动），<strong>相机中心没有变</strong>，所以透视关系保持不变。</p>
+<p>在数学上，shift 修改的是 $K$ 矩阵中的主点位置：
+$$K_{shift} = \begin{pmatrix} \alpha_x &amp; s &amp; x_0 + s_x \ 0 &amp; \alpha_y &amp; y_0 + s_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$$</p>
+<p>其中 $(s_x, s_y)$ 是 shift 量（单位：像素）。</p>
+<p><strong>实际用途</strong>：</p>
+<ul>
+<li>拍高楼时，保持相机朝正前方，shift 镜头向上——大楼不会“倒“，而且透视仍然是正视的</li>
+<li>全景拼接：用 shift 拍多张图，它们共享同一个相机中心，拼接时只有平面变换，没有视差</li>
+</ul>
+<h4 id="tilt改变焦平面scheimpflug-原理"><a class="header" href="#tilt改变焦平面scheimpflug-原理">Tilt：改变焦平面（Scheimpflug 原理）</a></h4>
+<p>Tilt 是将镜头相对传感器<strong>旋转</strong>一个角度。普通的透视相机焦平面（最清晰的平面）总是平行于传感器。但 tilt 之后，<strong>焦平面不再平行于传感器</strong>——它可以斜着伸展。</p>
+<p>这就是 <strong>Scheimpflug 原理</strong>：当镜头平面、传感器平面、焦平面三者的延长线相交于同一条线时，焦平面上的所有点都同时清晰。</p>
+<p>在计算机视觉中，tilt 的效果可以建模为对相机内参 $K$ 施加一个旋转变换：
+$$K_{tilt} = K \cdot R_{tilt}$$</p>
+<p>其中 $R_{tilt}$ 是一个描述镜头倾斜的旋转矩阵（通常在 $2^\circ$ 到 $8^\circ$ 之间）。</p>
+<p><strong>实际用途</strong>：</p>
+<ul>
+<li>产品摄影：让一个长物体的整个表面都清晰（焦平面沿物体表面延伸）</li>
+<li>微缩模型效果（Miniature Faking）：这是很多人认识的“移轴效果“——反向用 tilt 让焦平面非常窄，真实场景看起来像微缩模型</li>
+<li>结构光三维扫描：控制投影平面的聚焦范围</li>
+</ul>
+<h4 id="在计算机视觉中的意义"><a class="header" href="#在计算机视觉中的意义">在计算机视觉中的意义</a></h4>
+<p>移轴相机在传统 CV（尤其是摄影测量和工业检测）中有重要应用：</p>
+<ul>
+<li>摄影测量中，shift 可以消除建筑物透视变形，使测量更精确</li>
+<li>在立体视觉中，使用 tilt 可以扩展景深范围，减少因离焦带来的匹配失败</li>
+<li>在 SfM（Structure from Motion）中，如果输入图像来自移轴镜头，标准的针孔相机模型会失效——必须修改投影模型，否则重建会扭曲</li>
+</ul>
+<blockquote>
+<p><strong>一句话</strong>：普通相机服从 $P = K[R|t]$，移轴相机是 $P = K_{tilt,shift}[R|t]$——多出来的自由度给了你对成像平面和焦平面的精确控制。</p>
+</blockquote>
 <h3 id="实战用-opencv-标定你的相机"><a class="header" href="#实战用-opencv-标定你的相机">实战：用 OpenCV 标定你的相机</a></h3>
 <p>相机标定是要解决的问题是：给定一个相机，如何找出它的 $K$ 矩阵和畸变参数？</p>
 <p><strong>标定原理</strong>（Zhang’s method）：拍摄多张不同角度的棋盘格照片。棋盘格上每个角点的三维坐标已知（因为棋盘格是平面的，Z=0），在图像中检测角点得到二维坐标。对于每张图像，棋盘格平面和图像平面之间存在一个单应矩阵 H。利用 H 和旋转矩阵的正交性约束（$r_1 \cdot r_2 = 0$, $|r_1| = |r_2| = 1$），每张图像提供两个关于 K 的约束方程。K 有 5 个自由度（不统计畸变），所以至少需要 3 张图像。</p>
@@ -770,7 +806,7 @@ print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
 </code></pre>
 <p><strong>输出解读</strong>：</p>
 <ul>
-<li><code>K</code> 矩阵的 $K[0,0]$ 和 $K[1,1]$ 是 $\alpha_x, \alpha_y$（像素单位的焦距）。如果它们是 800，在 640x480 图像上意味着视场角约为 <code>2 * arctan(240/800) ≈ 33.4°</code>（垂直）。</li>
+<li><code>K</code> 矩阵的 $K[0,0]$ 和 $K[1,1]$ 是 $\alpha_x, \alpha_y$（像素单位的焦距）。如果它们是 800，在 640x480 图像上意味着视场角约为 $2 * arctan(240/800) ≈ 33.4°$（垂直）。</li>
 <li>主点 $K[0,2], K[1,2]$ 应该在图像中心附近（如 320, 240），如果偏离太远可能说明 sensor 装配有问题。</li>
 <li><code>dist</code> 是镜头畸变系数，包含径向畸变 $(k_1, k_2, k_3)$ 和切向畸变 $(p_1, p_2)$。</li>
 </ul>
@@ -1996,7 +2032,7 @@ print(f"Z range: [{Z.min():.2f}, {Z.max():.2f}] m")
 <li><strong>毫米（mm）</strong> 用于 16 位无符号整数存储（$\text{uint16}$，范围 0-65535，覆盖 0-65.5 米）——几乎所有消费级深度相机（Kinect、RealSense）都用这个约定</li>
 <li><strong>米（m）</strong> 用于 32 位浮点数存储（$\text{float32}$）——精度更高，计算中无需单位换算</li>
 </ul>
-<p><strong>工程约定</strong>：深度值为 0 通常表示“无效深度“（如超出量程、被遮挡、或落在天空等无穷远区域）。处理深度图时，应在所有计算前先做 <code>mask = depth &gt; 0</code>。</p>
+<p><strong>工程约定</strong>：深度值为 0 通常表示“无效深度“（如超出量程、被遮挡、或落在天空等无穷远区域）。处理深度图时，应在所有计算前先做 $mask = depth &gt; 0$。</p>
 <h3 id="点云三维点的不羁集合"><a class="header" href="#点云三维点的不羁集合">点云——三维点的不羁集合</a></h3>
 <p>点云（point cloud）是无序的 $(X, Y, Z)$ 点的集合，可选地携带颜色 $(R, G, B)$、法向量 $(n_x, n_y, n_z)$ 等属性。每个点独立存在——没有“谁在谁上面“的网格拓扑，没有“谁连着谁“的邻接关系。</p>
 <h4 id="从深度图到点云反投影back-projection"><a class="header" href="#从深度图到点云反投影back-projection">从深度图到点云：反投影（Back-Projection）</a></h4>
@@ -2140,7 +2176,7 @@ def pointcloud_to_depth(points, K, H, W):
 </thead>
 <tbody>
 <tr><td><strong>PLY</strong> (Stanford)</td><td>两者皆可</td><td>好——可存储 RGB、法向量、自定义属性</td><td>学术研究、3D 重建输出。Open3D 原生支持</td></tr>
-<tr><td><strong>PCD</strong> (PCL)</td><td>两者皆可</td><td>好——PCL 功能矩阵（滤波、配准、分割）全面</td><td>PCL 生态。ROS 中常用 <code>sensor_msgs::PointCloud2</code></td></tr>
+<tr><td><strong>PCD</strong> (PCL)</td><td>两者皆可</td><td>好——PCL 功能矩阵（滤波、配准、分割）全面</td><td>PCL 生态。ROS 中常用 $sensor_msgs::PointCloud2$</td></tr>
 <tr><td><strong>LAS/LAZ</strong></td><td>二进制</td><td>可存储分类、强度、回波数</td><td>测绘/遥感领域 LiDAR 标准格式</td></tr>
 </tbody>
 </table>
@@ -2639,16 +2675,16 @@ print(f"Depth range: [{depths.min():.2f}, {depths.max():.2f}] m")
 <hr>
 <h2 id="第一阶直观理解-5"><a class="header" href="#第一阶直观理解-5">第一阶：直观理解</a></h2>
 <h3 id="一个场景-5"><a class="header" href="#一个场景-5">一个场景</a></h3>
-<p>前面的五节教你了一套完整的“几何语言“——你知道如何用 <code>P = K[R|t]</code> 描述相机，知道两张图之间的对极约束 <code>x'^T F x = 0</code>，知道三角测量可以从两个视角恢复 3D 点。</p>
+<p>前面的五节教你了一套完整的“几何语言“——你知道如何用 $P = K[R|t]$ 描述相机，知道两张图之间的对极约束 $x’^T F x = 0$，知道三角测量可以从两个视角恢复 3D 点。</p>
 <p>但这一切都建立在一个假设上：你测量到的像素坐标是<strong>精确的</strong>。</p>
-<p>现实中不是这样。你手动点选的对应点会有像素偏差，自动特征匹配也有误配，甚至传感器本身也有噪声。如果你把有噪声的测量直接扔进 <code>x'^T F x = 0</code>，方程两边很可能不等于零——它不是 0，而是某个小量。</p>
+<p>现实中不是这样。你手动点选的对应点会有像素偏差，自动特征匹配也有误配，甚至传感器本身也有噪声。如果你把有噪声的测量直接扔进 $x’^T F x = 0$，方程两边很可能不等于零——它不是 0，而是某个小量。</p>
 <p><strong>问题来了：当数据有噪声时，如何仍然得到最好的估计？</strong></p>
 <p>这就是优化的用武之地。优化不是 3D 视觉的特产，而是贯穿整个领域的“底层工具“——从最简单的直线拟合，到上千张图片的全局 Bundle Adjustment，本质上都是在回答同一个问题：在数据不完美的情况下，怎么找到最接近真相的解。</p>
 <h3 id="核心直觉三种估计范式"><a class="header" href="#核心直觉三种估计范式">核心直觉：三种估计范式</a></h3>
 <p>3D 视觉中的参数估计方法可以按“精度 vs 速度“分成三种范式：</p>
 <ol>
 <li>
-<p><strong>代数方法（Algebraic）</strong>——快，但粗糙。把约束改写成线性方程组 <code>Ah = 0</code>，用 SVD 一步出解。代价函数（代数误差）没有几何意义，但胜在不需要迭代，是绝佳的初始值来源。</p>
+<p><strong>代数方法（Algebraic）</strong>——快，但粗糙。把约束改写成线性方程组 $Ah = 0$，用 SVD 一步出解。代价函数（代数误差）没有几何意义，但胜在不需要迭代，是绝佳的初始值来源。</p>
 </li>
 <li>
 <p><strong>几何方法（Geometric）</strong>——准，但需要迭代。直接最小化图像上像素距离的平方和（重投影误差），有明确的物理意义。在假设高斯噪声的前提下，这是<strong>最大似然估计</strong>——统计意义上的最优解。</p>
@@ -2710,9 +2746,9 @@ print(f"Estimated: y = {a_hat:.2f}x + {b_hat:.2f}")
 </code></pre>
 <p>这个简单的直线拟合包含了优化的所有核心要素：</p>
 <ul>
-<li><strong>模型</strong>：直线 <code>y = ax + b</code>（就像 <code>x'^T F x = 0</code>）</li>
+<li><strong>模型</strong>：直线 $y = ax + b$（就像 $x’^T F x = 0$）</li>
 <li><strong>观测量</strong>：50 个带噪声的点（就像 50 对特征匹配点）</li>
-<li><strong>代价函数</strong>：所有点误差的平方和 <code>Σ(y_obs_i - (a·x_i + b))^2</code></li>
+<li><strong>代价函数</strong>：所有点误差的平方和 $Σ(y_obs_i - (a·x_i + b))^2$</li>
 <li><strong>求解</strong>：找到使代价函数最小的参数 a, b</li>
 </ul>
 <p>从直线拟合到 Bundle Adjustment，本质上只是<strong>模型变复杂了、参数变多了、代价函数从直线距离变成了像素距离</strong>罢了。</p>
@@ -2729,24 +2765,24 @@ print(f"Estimated: y = {a_hat:.2f}x + {b_hat:.2f}")
 <p>在数学上，我们假设观测噪声服从某种概率分布（最常见的是均值为零的高斯分布），然后问：<strong>给定这些有噪声的观测，最可能的“真实参数“是什么？</strong> 这就是参数估计的核心问题。</p>
 <h3 id="长链推演从线性代数到全局优化"><a class="header" href="#长链推演从线性代数到全局优化">长链推演：从线性代数到全局优化</a></h3>
 <h4 id="步骤-1dlt--把非线性约束变成线性方程组"><a class="header" href="#步骤-1dlt--把非线性约束变成线性方程组">步骤 1：DLT —— 把非线性约束变成线性方程组</a></h4>
-<p>以估计单应矩阵 H 为例。已知四组或更多对应点 <code>x_i = (x_i, y_i, 1)^T</code> 和 <code>x'_i = (x'_i, y'_i, 1)^T</code>，满足 <code>x'_i = H x_i</code>。</p>
+<p>以估计单应矩阵 H 为例。已知四组或更多对应点 $x_i = (x_i, y_i, 1)^T$ 和 $x’_i = (x’_i, y’_i, 1)^T$，满足 $x’_i = H x_i$。</p>
 <p>这是一个非线性关系（齐次坐标下 H 有 9 个未知数）。DLT（Direct Linear Transformation）的妙处是把约束改写为：</p>
 <p>$$x’_i \times H x_i = 0$$</p>
 <p>展开后，每个点对提供两个独立的线性方程（第三个是前两个的线性组合）。把所有点对的方程堆在一起，得到：</p>
 <p>$$A h = 0$$</p>
 <p>其中 h 是 H 的 9 个元素排成的列向量，A 是 2n x 9 的系数矩阵。（H&amp;Z §4.1, p.88-89）</p>
-<p><strong>求解</strong>：<code>h</code> 是 A 的最小奇异值对应的右奇异向量——也就是对 A 做 SVD，<code>A = U Σ V^T</code>，取 V 的最后一行。（H&amp;Z §4.1, p.90）</p>
-<p>为什么用 SVD？因为 <code>||Ah||</code> 在 <code>||h|| = 1</code> 约束下的极小值就是最小奇异值，对应的 h 就是解。这个解最小化的是<strong>代数误差</strong> <code>||Ah||</code>——它度量的是“方程两边离零有多远“，而不是“投影点离测量点有多少像素“。这就是“代数“二字的含义。</p>
+<p><strong>求解</strong>：<code>h</code> 是 A 的最小奇异值对应的右奇异向量——也就是对 A 做 SVD，$A = U Σ V^T$，取 V 的最后一行。（H&amp;Z §4.1, p.90）</p>
+<p>为什么用 SVD？因为 $||Ah||$ 在 $||h|| = 1$ 约束下的极小值就是最小奇异值，对应的 h 就是解。这个解最小化的是<strong>代数误差</strong> $||Ah||$——它度量的是“方程两边离零有多远“，而不是“投影点离测量点有多少像素“。这就是“代数“二字的含义。</p>
 <h4 id="步骤-2代价函数升级--从代数到几何"><a class="header" href="#步骤-2代价函数升级--从代数到几何">步骤 2：代价函数升级 —— 从代数到几何</a></h4>
 <p><strong>代数误差</strong>（H&amp;Z §4.2, p.91-92）：
 $$\epsilon_{alg} = ||Ah||$$</p>
 <p>优点：有闭合解，计算极快。缺点：没有几何意义——如果把图像坐标放大 10 倍，代数误差也变 10 倍，但几何关系没变。它不代表像素距离。</p>
 <p><strong>几何误差 —— 单边转移误差</strong>（H&amp;Z §4.2.3, p.94-95）：
 $$\epsilon_{geo} = \sum_i d(x’_i, H\bar{x}_i)^2$$</p>
-<p>其中 <code>d(·,·)</code> 是图像平面上的欧几里得距离（像素距离），<code>H\bar{x}_i</code> 是将第一幅图的测量点投影到第二幅图的位置。这有明确的物理意义——“我算出来的投影位置和实际看到的位置差了多少像素”。</p>
+<p>其中 <code>d(·,·)</code> 是图像平面上的欧几里得距离（像素距离），$H\bar{x}_i$ 是将第一幅图的测量点投影到第二幅图的位置。这有明确的物理意义——“我算出来的投影位置和实际看到的位置差了多少像素”。</p>
 <p><strong>几何误差 —— 对称转移误差</strong>（H&amp;Z §4.2.3, p.95, eq 4.8）：
 $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
-<p>同时考虑两个方向的重投影误差——不是单向转移，而是找一个完美匹配的对应对 <code>(x̂_i, x̂'_i)</code>，使它们既满足 <code>x̂'_i = H x̂_i</code>，又分别离各自的测量点最近。</p>
+<p>同时考虑两个方向的重投影误差——不是单向转移，而是找一个完美匹配的对应对 $(x̂_i, x̂’_i)$，使它们既满足 $x̂’_i = H x̂_i$，又分别离各自的测量点最近。</p>
 <p><strong>Sampson 误差</strong>（H&amp;Z §4.2.6, p.98-99, eq 4.10）：代数误差和几何误差之间的实用折中。它用一阶导数对代数误差做了几何修正，有闭合形式，不需要迭代：</p>
 <p>$$\epsilon_{Sampson} = \sum_i \frac{(x’^T_i F x_i)^2}{(F x_i)_x^2 + (F x_i)_y^2 + (F^T x’_i)_x^2 + (F^T x’_i)_y^2}$$</p>
 <p>在很多情况下，Sampson 误差的优化结果跟完全几何误差几乎一样好——但不需要迭代。（H&amp;Z §4.2.6, p.99）</p>
@@ -2766,7 +2802,7 @@ $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
 <h4 id="步骤-3mle--为什么最小化几何误差是最优的"><a class="header" href="#步骤-3mle--为什么最小化几何误差是最优的">步骤 3：MLE —— 为什么最小化几何误差是“最优“的</a></h4>
 <p>如果测量噪声服从均值为零、方差为 σ^2 的独立高斯分布，那么观测值的<strong>似然函数</strong>是：</p>
 <p>$$p({x_i, x’_i} | H) = \prod_i \frac{1}{2\pi\sigma^2} \exp\left(-\frac{d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2}{2\sigma^2}\right)$$</p>
-<p><strong>最大化这个似然函数，等价于最小化几何误差</strong> <code>Σ d(x_i, x̂_i)^2 + d(x'_i, x̂'_i)^2</code>。（H&amp;Z §4.3, p.102-108）</p>
+<p><strong>最大化这个似然函数，等价于最小化几何误差</strong> $Σ d(x_i, x̂_i)^2 + d(x’_i, x̂’_i)^2$。（H&amp;Z §4.3, p.102-108）</p>
 <p>这就是为什么几何误差的 Gold Standard 算法（Algorithm 4.3, p.114）被当作基准——在常见噪声假设下，它给出了统计意义上的最优估计。</p>
 <p><strong>这一原理贯穿全书</strong>：Bundle Adjustment 最小化重投影误差，本质上就是在做最大似然估计。这个“底座“让所有优化方法有了统计学的正当性。</p>
 <h4 id="步骤-4ransac--对抗-outlier"><a class="header" href="#步骤-4ransac--对抗-outlier">步骤 4：RANSAC —— 对抗 outlier</a></h4>
@@ -2788,7 +2824,7 @@ $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
 <p>当你有多张图片和很多 3D 点，前面几步给了你初始的相机参数和 3D 点位置，但每个量都不太准。Bundle Adjustment 的做法是：<strong>把所有的相机参数和所有的 3D 点同时优化，使重投影误差的总和最小</strong>。</p>
 <p>（H&amp;Z §18.1, p.434-436）</p>
 <p>$$\min_{P^i, X_j} \sum_{i,j} d(P^i \hat{X}_j, x^i_j)^2$$</p>
-<p>这句话的含义：对于第 <code>i</code> 个相机和第 <code>j</code> 个 3D 点，如果这个 3D 点在第 <code>i</code> 张图中可见（有对应像素 <code>x^i_j</code>），就计算“把 <code>X_j</code> 投影到第 <code>i</code> 张图上得到的像素“与“实际观测到的像素 <code>x^i_j</code>“之间的距离。把所有这样的距离的平方加起来，调整所有的相机矩阵 <code>P^i</code> 和 3D 点 <code>X_j</code>，使这个和最小。</p>
+<p>这句话的含义：对于第 <code>i</code> 个相机和第 <code>j</code> 个 3D 点，如果这个 3D 点在第 <code>i</code> 张图中可见（有对应像素 $x^i_j$），就计算“把 <code>X_j</code> 投影到第 <code>i</code> 张图上得到的像素“与“实际观测到的像素 $x^i_j$“之间的距离。把所有这样的距离的平方加起来，调整所有的相机矩阵 $P^i$ 和 3D 点 <code>X_j</code>，使这个和最小。</p>
 <p><strong>问题的规模</strong>：m 个相机，n 个 3D 点 → 3n + 11m 个参数（每个 3D 点 3 DOF，每个透视相机 11 DOF）。</p>
 <p><strong>为什么能解</strong>：这时候你可能会问——几千个未知数，怎么优化？答案在于<strong>稀疏性</strong>。每个重投影误差只涉及一个相机和一个 3D 点，与其他的相机和点<strong>无关</strong>。这意味着 Hessian 矩阵（二阶导数矩阵）具有“块对角 + 低秩边缘“的结构。</p>
 <p>利用这个结构，可以用 <strong>Schur 补</strong>（也叫 Marginalization）把 3D 点参数“消去“，先解相机参数（规模小得多），再回代解 3D 点。（H&amp;Z Appendix 6, p.597）</p>
@@ -2974,7 +3010,7 @@ if __name__ == "__main__":
 <li><strong>内点距离阈值</strong>（H&amp;Z §4.7.1, p.118）：对图像特征匹配，典型值是 <strong>1-3 像素</strong>。设得太大会把 outlier 也纳入内点，设得太小会把真实内点排除。可根据特征点定位精度（通常 0.5-2 像素级的 SIFT）来设定。</li>
 <li><strong>置信概率 p</strong>：通常设为 <strong>0.99</strong>。这确保有 99% 的概率至少有一次采样全都是真正的 inlier。</li>
 <li><strong>最少采样数 s</strong>：取决于模型——H 需 4 对（H&amp;Z §4.1, p.88），F 需 7 或 8 对（H&amp;Z §9.2, p.245），E 在校准情形下只需 5 对（H&amp;Z §9.6, p.258）。</li>
-<li><strong>最大迭代次数 N</strong>：用公式 <code>N = log(1-p) / log(1-(1-ε)^s)</code> 计算，或设一个保守的上界（如 2000）。在实践中常做一个 <strong>adaptive</strong> 版本：每当发现更好的模型时，根据当前估计的 outlier 比例更新 N，可以提前终止。</li>
+<li><strong>最大迭代次数 N</strong>：用公式 $N = log(1-p) / log(1-(1-ε)^s)$ 计算，或设一个保守的上界（如 2000）。在实践中常做一个 <strong>adaptive</strong> 版本：每当发现更好的模型时，根据当前估计的 outlier 比例更新 N，可以提前终止。</li>
 </ul>
 <h3 id="实践中的函数"><a class="header" href="#实践中的函数">实践中的函数</a></h3>
 <p>在 OpenCV 中，许多关键函数内部都使用了 DLT + RANSAC 的组合：</p>
@@ -3004,7 +3040,7 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
 <li><strong>Ceres Solver</strong>（Google）：C++ 库，COLMAP 使用它做 BA。支持自动微分，建模灵活。Google 的街景重建也依赖它。</li>
 <li><strong>g2o</strong>（General Graph Optimization）：C++ 图优化框架，广泛应用于 SLAM（ORB-SLAM 等）。将 BA 问题建模为图（节点是参数，边是约束）。</li>
 <li><strong>COLMAP</strong>：完整的 SfM + MVS 流程，内部使用 Ceres 做 BA。</li>
-<li><strong>SciPy / PyTorch</strong>：对于小规模问题（&lt; 100 个参数），<code>scipy.optimize.least_squares</code> 或 PyTorch 的 autograd 也完全可用。</li>
+<li><strong>SciPy / PyTorch</strong>：对于小规模问题（&lt; 100 个参数），$scipy.optimize.least_squares$ 或 PyTorch 的 autograd 也完全可用。</li>
 </ul>
 <h3 id="常见陷阱"><a class="header" href="#常见陷阱">常见陷阱</a></h3>
 <ol>
