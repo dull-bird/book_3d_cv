@@ -121,7 +121,7 @@ $$l_\infty = (0, 0, 1)^T$$
 
 验证：任意理想点 $(x_1, x_2, 0)^T$ 都满足 $(x_1, x_2, 0)(0, 0, 1)^T = 0$。
 
-> **人话翻译**：无穷远线就是世界的"地平线"——所有方向的"尽头"都在上面。两条平行线不是不相交，而是交在这条线上（用同一个理想点表征线的方向）。站在铁轨中间拍照时，两条铁轨在远处汇聚到的那一点，就是铁轨方向对应的理想点在照片上的像。
+> **通俗解读**：无穷远线就是世界的"地平线"——所有方向的"尽头"都在上面。两条平行线不是不相交，而是交在这条线上（用同一个理想点表征线的方向）。站在铁轨中间拍照时，两条铁轨在远处汇聚到的那一点，就是铁轨方向对应的理想点在照片上的像。
 
 $l_\infty$ 是区分**仿射几何**和**射影几何**的关键：在仿射变换下，$l_\infty$ 保持不变（作为集合）；在射影变换下，$l_\infty$ 可能被映射到有限远的位置。这就是为什么透视照片中平行线会"交汇"——无穷远线被"拉"到了有限远。
 
@@ -150,7 +150,7 @@ $$x' = Hx$$
 
 直线的逆转置变换 $H^{-T}$ 保证了点在直线上这个关系在变换后依然成立：$x^T l = 0 \iff x'^T l' = 0$。
 
-> **人话翻译**：如果你拿到了 H，你就拿到了"变形秘籍"——不光知道点怎么变，还知道线怎么变、椭圆怎么变。这意味着你可以把歪扭扭的照片里的任何几何元素"矫正"回正视图。
+> **通俗解读**：如果你拿到了 H，你就拿到了"变形秘籍"——不光知道点怎么变，还知道线怎么变、椭圆怎么变。这意味着你可以把歪扭扭的照片里的任何几何元素"矫正"回正视图。
 
 #### 用 DLT 从点对应求解 H
 
@@ -185,7 +185,7 @@ flowchart TD
 | 相似 Similarity | $\begin{pmatrix} s r_{11} & s r_{12} & t_x \\ s r_{21} & s r_{22} & t_y \\ 0 & 0 & 1 \end{pmatrix}$ | 4 | 角度、任意线段长度比 | 绝对长度 |
 | 欧几里得 Euclidean | $\begin{pmatrix} r_{11} & r_{12} & t_x \\ r_{21} & r_{22} & t_y \\ 0 & 0 & 1 \end{pmatrix}$ | 3 | 长度、面积、角度 | — |
 
-> **人话翻译**：这四个层级就像从"自由到严格"的变形操作：
+> **通俗解读**：这四个层级就像从"自由到严格"的变形操作：
 > - **射影变换**：像捏橡皮泥——正方形可以变任意四边形，直线还是直线，但平行线可能相交，角度全乱。
 > - **仿射变换**：正方形可以变平行四边形，但梯形不行——平行线始终平行。最后一行固定为 $(0,0,1)$，即固定了 $l_\infty$。
 > - **相似变换**：正方形只能变正方形——旋转、平移、均匀缩放。角度完全保留，形状不变。
@@ -217,7 +217,7 @@ $$C^*_\infty = IJ^T + JI^T$$
 
 $$\cos\theta = \frac{l^T C^*_\infty m}{\sqrt{(l^T C^*_\infty l)(m^T C^*_\infty m)}}$$
 
-> **人话翻译**：一张歪歪扭扭的建筑物照片，要把它"校正"成正视图，分两步走：
+> **通俗解读**：一张歪歪扭扭的建筑物照片，要把它"校正"成正视图，分两步走：
 > 1. 找到两条水平平行线的消失点 + 两条垂直平行线的消失点 → 连起来就是 $l_\infty$ → 做仿射矫正。此时梯形变成平行四边形。
 > 2. 如果你知道照片里哪些线原本是正交的（如门的横边和竖边），就可以确定 $C^*_\infty$ → 做度量矫正。平行四边形最终变成真正的矩形。
 >
@@ -237,7 +237,7 @@ $$\cos\theta = \frac{l^T C^*_\infty m}{\sqrt{(l^T C^*_\infty l)(m^T C^*_\infty m
 
 圆经过射影变换变成椭圆——圆与 $l_\infty$ 交于 I 和 J（两个虚点），变换后的椭圆与变换后的 $l_\infty$ 仍然交于变换后的 I 和 J。
 
-> **人话翻译**：你透过玻璃窗看桌面上的一个圆形杯垫——因为视角倾斜，你看到的是一个椭圆。你换个角度看，椭圆的长短轴比例会变。极端情况下，如果杯垫的边缘与你的视线方向平行，你会看到一条线段。圆、椭圆、抛物线、双曲线本质上都是"同一个东西在不同视角下的形状"。区别只是它们跟无穷远线怎么相交。
+> **通俗解读**：你透过玻璃窗看桌面上的一个圆形杯垫——因为视角倾斜，你看到的是一个椭圆。你换个角度看，椭圆的长短轴比例会变。极端情况下，如果杯垫的边缘与你的视线方向平行，你会看到一条线段。圆、椭圆、抛物线、双曲线本质上都是"同一个东西在不同视角下的形状"。区别只是它们跟无穷远线怎么相交。
 
 ### Code Lens：用 OpenCV 计算和应用单应矩阵
 
@@ -444,13 +444,13 @@ for (s, d) in zip(src, dst):
 
 ## 关键论文清单
 
-| 年份 | 论文/书籍 | 一句话贡献 |
-|------|----------|-----------|
-| 2004 | Hartley & Zisserman, *Multiple View Geometry in Computer Vision* (2nd Ed.) | 本章主要参考 Ch.2（投影几何）和 Ch.4（估计），建立了变换分层与 DLT 的完整框架 |
-| 1971 | Y. I. Abdel-Aziz & H. M. Karara, "Direct Linear Transformation from Comparator Coordinates into Object Space Coordinates", ASP/UI Symposium | DLT 算法的原始提出——用线性方法求解摄影测量中的投影关系 |
-| 1981 | M. A. Fischler & R. C. Bolles, "Random Sample Consensus: A Paradigm for Model Fitting", Comm. ACM | RANSAC——对抗 outlier 的经典方法，成为所有几何估计算法的标配 |
-| 1998 | D. Liebowitz & A. Zisserman, "Metric Rectification for Perspective Images of Planes", CVPR | 平面图像的度量矫正——从单张照片恢复真实世界的角度和比例 |
-| 1999 | P. Sturm & S. Maybank, "On Plane-Based Camera Calibration: A General Algorithm, Singularities and Applications", CVPR | 平面标定的理论基础，利用平面场景中的 H 矩阵推导相机内参 |
+| 年份   | 论文/书籍                                                                                                                                       | 一句话贡献                                          |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| 2004 | Hartley & Zisserman, *Multiple View Geometry in Computer Vision* (2nd Ed.)                                                                  | 本章主要参考 Ch.2（投影几何）和 Ch.4（估计），建立了变换分层与 DLT 的完整框架 |
+| 1971 | Y. I. Abdel-Aziz & H. M. Karara, "Direct Linear Transformation from Comparator Coordinates into Object Space Coordinates", ASP/UI Symposium | DLT 算法的原始提出——用线性方法求解摄影测量中的投影关系                 |
+| 1981 | M. A. Fischler & R. C. Bolles, "Random Sample Consensus: A Paradigm for Model Fitting", Comm. ACM                                           | RANSAC——对抗 outlier 的经典方法，成为所有几何估计算法的标配         |
+| 1998 | D. Liebowitz & A. Zisserman, "Metric Rectification for Perspective Images of Planes", CVPR                                                  | 平面图像的度量矫正——从单张照片恢复真实世界的角度和比例                   |
+| 1999 | P. Sturm & S. Maybank, "On Plane-Based Camera Calibration: A General Algorithm, Singularities and Applications", CVPR                       | 平面标定的理论基础，利用平面场景中的 H 矩阵推导相机内参                  |
 
 ---
 

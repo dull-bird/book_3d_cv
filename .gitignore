@@ -1,0 +1,6 @@
+.superpowers/
+.DS_Store
+.venv/
+__pycache__/
+*.pdf
+# Diagnostic PDFs from TikZ compilation

@@ -1,0 +1,57 @@
+\documentclass{article}
+\usepackage[paperwidth=14cm,paperheight=9cm,margin=0.3cm]{geometry}
+\usepackage{tikz}
+\usepackage{xeCJK}
+\setCJKmainfont{Songti SC}
+\usetikzlibrary{intersections,calc,decorations.pathreplacing}
+\pagestyle{empty}
+\begin{document}
+\centering
+\begin{tikzpicture}[scale=1.2,
+    point/.style={circle,fill,inner sep=1.5pt},
+    vector/.style={->,>=stealth,thick,gray},
+    ray/.style={dashed,thin,gray!70}]
+
+% Camera center
+\coordinate (C) at (0,0);
+\node[point] at (C) {};
+\node[below=2pt] at (C) {$C$ (相机中心)};
+
+% Image plane (draw as line)
+\draw[thick,blue!50] (-2.5,4) -- (2.5,4);
+\node[blue!50] at (3.0,4) {图像平面};
+
+% Principal point
+\coordinate (p) at (0,4);
+\node[point] at (p) {};
+\node[right=1pt] at (p) {$p$ (主点)};
+
+% Optical axis
+\draw[vector] (C) -- (0,5) node[above] {$Z$ (光轴)};
+
+% Focal length brace
+\draw[gray,decorate,decoration={brace,amplitude=4pt}] (0.4,0) -- (0.4,4) node[midway,right=6pt] {$f$};
+
+% 3D world point
+\coordinate (X) at (1.5,2.5);
+\node[point] at (X) {};
+\node[left=2pt] at (X) {$\mathbf{X}$};
+
+% Projection
+\coordinate (ximg) at (2.4,4);
+\draw[ray] (C) -- (X);
+\draw[ray] (X) -- (ximg);
+\node[point] at (ximg) {};
+\node[above=2pt] at (ximg) {$\mathbf{x}$};
+
+\draw[ray] (C) -- (p);
+
+% Coordinate axes
+\draw[vector] (C) -- (1.5,0) node[right] {$X$};
+\draw[vector] (C) -- (0,1.5) node[above] {$Y$};
+
+% Formula
+\node at (0,-0.8) {$\displaystyle x = f\frac{X}{Z} + p_x,\qquad y = f\frac{Y}{Z} + p_y$};
+
+\end{tikzpicture}
+\end{document}

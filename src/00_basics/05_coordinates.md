@@ -145,7 +145,7 @@ flowchart LR
 
 $$X_{\text{cam}} = R(X_{\text{world}} - \tilde{C}) \quad \text{（直观：先平移世界点到相机原点，再旋转）}$$
 
-$$X_{\text{cam}} = R X_{\text{world}} + t \quad \text{其中 } t = -R\tilde{C} \quad \text{（H&Z 6.6, p.156）}$$
+$$X_{\text{cam}} = R X_{\text{world}} + t \quad \text{其中 } t = -R\tilde{C} \quad \text{（H\&Z 6.6, p.156）}$$
 
 第二种写法在齐次坐标下最方便——直接拼成 $3 \times 4$ 矩阵 $[R \mid t]$：
 

@@ -1,0 +1,73 @@
+\documentclass{article}
+\usepackage[paperwidth=16cm,paperheight=10cm,margin=0.3cm]{geometry}
+\usepackage{tikz}
+\usepackage{xeCJK}
+\setCJKmainfont{Songti SC}
+\usetikzlibrary{calc}
+\pagestyle{empty}
+\begin{document}
+\centering
+\begin{tikzpicture}[scale=1.0,
+    point/.style={circle,fill,inner sep=1.5pt},
+    camera/.style={fill=gray!20,minimum width=1cm,minimum height=0.8cm},
+    ray/.style={dashed,thin,gray!60}]
+
+% Left camera
+\node[camera,label=below:{左相机}] (CL) at (0,0) {};
+\draw[thick] (-0.2,0.3) -- (0.2,0.3);
+\node at (0,-0.8) {$C$};
+
+% Right camera
+\node[camera,label=below:{右相机}] (CR) at (6,0) {};
+\draw[thick] (5.8,0.3) -- (6.2,0.3);
+\node at (6,-0.8) {$C'$};
+
+% Image planes
+\draw[thick,blue!40] (-0.5,1.5) -- (0.8,1.5);
+\draw[thick,blue!40] (5.2,1.5) -- (6.5,1.5);
+\node[blue!50,font=\small] at (0.15,1.8) {左图像};
+\node[blue!50,font=\small] at (5.85,1.8) {右图像};
+
+% 3D point
+\coordinate (X) at (3,4);
+\node[point,label=above:{$\mathbf{X}$}] at (X) {};
+
+% Projection rays
+\draw[ray] (0,0) -- (X);
+\draw[ray] (6,0) -- (X);
+
+% Image points
+\coordinate (xL) at (0.35,1.5);
+\coordinate (xR) at (5.25,1.5);
+\node[point] at (xL) {};
+\node[point] at (xR) {};
+\node[below=2pt,font=\small] at (xL) {$\mathbf{x}$};
+\node[below=2pt,font=\small] at (xR) {$\mathbf{x}'$};
+
+% Epipoles
+\coordinate (eL) at (0.8,1.5);
+\draw[thick] (0,0) -- (6,0);
+\node[point,red] at (0,0) {};
+\node[left=2pt,red,font=\small] at (0,0) {$e$};
+\node[point,red] at (6,0) {};
+\node[right=2pt,red,font=\small] at (6,0) {$e'$};
+
+% Epipolar plane hint
+\draw[fill=gray!10,opacity=0.3] (0,0) -- (6,0) -- (X) -- cycle;
+\node[gray,font=\small] at (3,1.2) {对极平面};
+
+% Epipolar lines
+\draw[red!60,thick] (0.15,1.5) -- (0.8,1.5);
+\node[red!60,font=\small] at (0.15,1.2) {对极线 $l$};
+\draw[red!60,thick] (5.2,1.5) -- (5.5,1.5);
+\node[red!60,font=\small] at (5.5,1.2) {对极线 $l'$};
+
+% Baseline
+\draw[gray,thick] (0,-0.3) -- (6,-0.3);
+\node[gray,font=\small] at (3,-0.6) {基线};
+
+% Formula
+\node at (3,-1.5) {$\mathbf{x}'^{\mathsf{T}}F\mathbf{x}=0\qquad F = K'^{-\mathsf{T}}[t]_{\times}RK^{-1}$};
+
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,34 @@
+\documentclass{article}
+\usepackage[paperwidth=16cm,paperheight=7cm,margin=0.3cm]{geometry}
+\usepackage{tikz}
+\usepackage{xeCJK}
+\setCJKmainfont{Songti SC}
+\usetikzlibrary{arrows.meta,calc,positioning}
+\pagestyle{empty}
+\begin{document}
+\centering
+\begin{tikzpicture}[
+    box/.style={draw,rounded corners,minimum width=2.2cm,minimum height=1.2cm,align=center,font=\small},
+    arrow/.style={->,>=Stealth,thick}]
+
+% Four coordinate frames
+\node[box,fill=blue!5] (world) {世界坐标系\\$\mathbf{X}_w$};
+\node[box,fill=green!5,right=2.2cm of world] (cam) {相机坐标系\\$\mathbf{X}_c$};
+\node[box,fill=yellow!5,right=2.2cm of cam] (img) {图像坐标系\\$\mathbf{x}_n$};
+\node[box,fill=red!5,right=2.2cm of img] (pix) {像素坐标系\\$(u,v)$};
+
+% Arrows
+\draw[arrow] (world) -- (cam) node[midway,above,font=\footnotesize] {$R,t$ (外参)};
+\draw[arrow] (cam) -- (img) node[midway,above,font=\footnotesize] {投影};
+\draw[arrow] (img) -- (pix) node[midway,above,font=\footnotesize] {$K$ (内参)};
+
+% Labels below boxes
+\node[font=\footnotesize,gray,below=0.5cm of world] {刚性变换 6 DOF};
+\node[font=\footnotesize,gray,below=0.5cm of cam] {非线性 3D$\to$2D};
+\node[font=\footnotesize,gray,below=0.5cm of img] {仿射变换};
+
+% Combined formula at bottom
+\node[font=\footnotesize,below=0.5cm of cam,yshift=-0.5cm] {$x_p = K_{\text{内参}}\;[R|t]_{\text{外参}}\;X_w$};
+
+\end{tikzpicture}
+\end{document}
