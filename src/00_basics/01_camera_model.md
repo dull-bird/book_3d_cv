@@ -126,9 +126,9 @@ $$x = P X$$
 
 其中 $P = \text{diag}(f, f, 1)[I\;|\;0]$，展开为：
 
-$$\begin{pmatrix} u \\ v \\ w \end{pmatrix} =
-\begin{pmatrix} f & 0 & 0 & 0 \\ 0 & f & 0 & 0 \\ 0 & 0 & 1 & 0 \end{pmatrix}
-\begin{pmatrix} X \\ Y \\ Z \\ 1 \end{pmatrix}$$
+$$\begin{pmatrix} u \cr v \cr w \end{pmatrix} =
+\begin{pmatrix} f & 0 & 0 & 0 \cr 0 & f & 0 & 0 \cr 0 & 0 & 1 & 0 \end{pmatrix}
+\begin{pmatrix} X \cr Y \cr Z \cr 1 \end{pmatrix}$$
 
 从齐次坐标回到像素坐标只需除以第三分量：$(u/w, v/w)$。这就是齐次坐标的核心魅力——用多一维的代价换来线性的简洁。
 
@@ -140,7 +140,7 @@ $$(X, Y, Z)^T \rightarrow (fX/Z + p_x, fY/Z + p_y)^T$$
 
 在齐次形式下，这等价于在投影矩阵中嵌入标定矩阵 K（H&Z 6.4, p.155）：
 
-$$K = \begin{pmatrix} f & 0 & p_x \\ 0 & f & p_y \\ 0 & 0 & 1 \end{pmatrix}$$
+$$K = \begin{pmatrix} f & 0 & p_x \cr 0 & f & p_y \cr 0 & 0 & 1 \end{pmatrix}$$
 
 此时投影变为 $x = K[I\;|\;0]X_{cam}$。
 
@@ -152,7 +152,7 @@ $$\alpha_x = f \cdot m_x, \quad \alpha_y = f \cdot m_y$$
 
 其中 $m_x, m_y$ 是单位距离内的像素数。最通用的 K 矩阵还包含一个偏斜参数 $s$，表示像素的歪斜程度（H&Z 6.10, p.157）：
 
-$$K = \begin{pmatrix} \alpha_x & s & x_0 \\ 0 & \alpha_y & y_0 \\ 0 & 0 & 1 \end{pmatrix}$$
+$$K = \begin{pmatrix} \alpha_x & s & x_0 \cr 0 & \alpha_y & y_0 \cr 0 & 0 & 1 \end{pmatrix}$$
 
 | 参数 | 含义 | 物理意义 |
 |------|------|---------|
@@ -172,7 +172,7 @@ $$X_{cam} = R(X - \tilde{C})$$
 
 在齐次坐标下，这写成（H&Z 6.8, p.156）：
 
-$$X_{cam} = \begin{pmatrix} R & -R\tilde{C} \\ 0 & 1 \end{pmatrix} X_{world}$$
+$$X_{cam} = \begin{pmatrix} R & -R\tilde{C} \cr 0 & 1 \end{pmatrix} X_{world}$$
 
 定义 $t = -R\tilde{C}$，于是：
 
@@ -188,8 +188,8 @@ $$P = K[R\;|\;t]$$
 
 展开：
 
-$$\underbrace{\begin{pmatrix} \alpha_x & s & x_0 \\ 0 & \alpha_y & y_0 \\ 0 & 0 & 1 \end{pmatrix}}_{K}
-\underbrace{\begin{pmatrix} r_{11} & r_{12} & r_{13} & t_1 \\ r_{21} & r_{22} & r_{23} & t_2 \\ r_{31} & r_{32} & r_{33} & t_3 \end{pmatrix}}_{[R|t]}$$
+$$\underbrace{\begin{pmatrix} \alpha_x & s & x_0 \cr 0 & \alpha_y & y_0 \cr 0 & 0 & 1 \end{pmatrix}}_{K}
+\underbrace{\begin{pmatrix} r_{11} & r_{12} & r_{13} & t_1 \cr r_{21} & r_{22} & r_{23} & t_2 \cr r_{31} & r_{32} & r_{33} & t_3 \end{pmatrix}}_{[R|t]}$$
 
 **P 是一个 3x4 矩阵，秩为 3，有 11 个自由度**（5 个内参 + 3 个旋转 + 3 个平移）。
 
@@ -411,12 +411,16 @@ print("Manual formula check passed.")
 
 **移轴相机（Tilt-Shift Camera）**通过让镜头相对传感器**偏移（Shift）**和**倾斜（Tilt）**来解决这些问题。
 
+![移轴相机镜头结构，可见镜头相对传感器偏移和倾斜的机械结构](../assets/figures/tilt-shift-camera.png)
+
+> **补充资料**：YouTube 上 [Tilt-Shift Lens: Explained](https://www.youtube.com/watch?v=gvV5sINKnT8) 对移轴镜头的光学原理和实际操作有直观演示。
+
 #### Shift：改变成像区域而不改变透视
 
 Shift 是将镜头平行于传感器移动。因为透视由相机中心的位置决定，而 shift 只移动了镜头（传感器相对移动），**相机中心没有变**，所以透视关系保持不变。
 
 在数学上，shift 修改的是 $K$ 矩阵中的主点位置：
-$$K_{shift} = \begin{pmatrix} \alpha_x & s & x_0 + s_x \\ 0 & \alpha_y & y_0 + s_y \\ 0 & 0 & 1 \end{pmatrix}$$
+$$K_{shift} = \begin{pmatrix} \alpha_x & s & x_0 + s_x \cr 0 & \alpha_y & y_0 + s_y \cr 0 & 0 & 1 \end{pmatrix}$$
 
 其中 $(s_x, s_y)$ 是 shift 量（单位：像素）。
 

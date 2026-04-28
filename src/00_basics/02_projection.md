@@ -180,10 +180,10 @@ flowchart TD
 
 | 变换类型 | 矩阵形式 | DOF | 保持不变的性质 | 丢失的性质 |
 |---------|---------|-----|--------------|-----------|
-| 射影 Projective | $$\begin{pmatrix} h_{11} & h_{12} & h_{13} \\ h_{21} & h_{22} & h_{23} \\ h_{31} & h_{32} & h_{33} \end{pmatrix}$$ | 8 | 共线性（collinearity）、交比（cross-ratio） | 平行性、角度、长度 |
-| 仿射 Affine | $$\begin{pmatrix} a_{11} & a_{12} & t_x \\ a_{21} & a_{22} & t_y \\ 0 & 0 & 1 \end{pmatrix}$$ | 6 | 平行性、面积比、平行线段长度比 | 角度、绝对长度 |
-| 相似 Similarity | $$\begin{pmatrix} s r_{11} & s r_{12} & t_x \\ s r_{21} & s r_{22} & t_y \\ 0 & 0 & 1 \end{pmatrix}$$ | 4 | 角度、任意线段长度比 | 绝对长度 |
-| 欧几里得 Euclidean | $$\begin{pmatrix} r_{11} & r_{12} & t_x \\ r_{21} & r_{22} & t_y \\ 0 & 0 & 1 \end{pmatrix}$$ | 3 | 长度、面积、角度 | — |
+| 射影 Projective | $$\begin{pmatrix} h_{11} & h_{12} & h_{13} \cr h_{21} & h_{22} & h_{23} \cr h_{31} & h_{32} & h_{33} \end{pmatrix}$$ | 8 | 共线性（collinearity）、交比（cross-ratio） | 平行性、角度、长度 |
+| 仿射 Affine | $$\begin{pmatrix} a_{11} & a_{12} & t_x \cr a_{21} & a_{22} & t_y \cr 0 & 0 & 1 \end{pmatrix}$$ | 6 | 平行性、面积比、平行线段长度比 | 角度、绝对长度 |
+| 相似 Similarity | $$\begin{pmatrix} s r_{11} & s r_{12} & t_x \cr s r_{21} & s r_{22} & t_y \cr 0 & 0 & 1 \end{pmatrix}$$ | 4 | 角度、任意线段长度比 | 绝对长度 |
+| 欧几里得 Euclidean | $$\begin{pmatrix} r_{11} & r_{12} & t_x \cr r_{21} & r_{22} & t_y \cr 0 & 0 & 1 \end{pmatrix}$$ | 3 | 长度、面积、角度 | — |
 
 > **人话翻译**：这四个层级就像从"自由到严格"的变形操作：
 > - **射影变换**：像捏橡皮泥——正方形可以变任意四边形，直线还是直线，但平行线可能相交，角度全乱。
