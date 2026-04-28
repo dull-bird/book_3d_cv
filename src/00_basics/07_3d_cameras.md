@@ -282,14 +282,14 @@ graph TD
     A --> C[混合固态 / 半固态]
     A --> D[全固态]
     
-    B --> B1[360° 电机旋转<br>Velodyne / 禾赛 Pandar]
+    B --> B1[360度电机旋转: Velodyne / 禾赛 Pandar]
     
-    C --> C1[MEMS 振镜<br>速腾聚创]
-    C --> C2[旋转转镜<br>禾赛 AT128]
-    C --> C3[旋转棱镜<br>Livox]
+    C --> C1[MEMS振镜: 速腾聚创]
+    C --> C2[旋转转镜: 禾赛 AT128]
+    C --> C3[旋转棱镜: Livox]
     
-    D --> D1[Flash 面阵<br>SPAD 阵列接收<br>iPhone Pro / 禾赛 FT120]
-    D --> D2[OPA 光学相控阵<br>电子扫描<br>Quanergy / SiLC]
+    D --> D1[Flash面阵: SPAD阵列接收, iPhone Pro / 禾赛 FT120]
+    D --> D2[OPA光学相控阵: 电子扫描, Quanergy / SiLC]
 ```
 
 #### 机械旋转式
@@ -376,32 +376,24 @@ graph TD
 flowchart TD
     Start["需要 3D 传感器"] --> Q1{"测量距离？"}
     
-    Q1 -->|< 1 m 微米级| Q2{"什么场景？"}
-    Q1 -->|0.1–10 m| Q3{"室内还是户外？"}
-    Q1 -->|> 10 m| Q4{"什么应用？"}
+    Q1 -->|短距微米级| Q2{"什么场景？"}
+    Q1 -->|中距0.1-10m| Q3{"室内还是户外？"}
+    Q1 -->|长距大于10m| Q4{"什么应用？"}
     
-    Q2 -->|在线尺寸检测| A1["线激光轮廓仪\n基恩士/深视智能"]
-    Q2 -->|散料抓取/装配| A2["工业面结构光\nPhotoneo/梅卡曼德"]
+    Q2 -->|在线尺寸检测| A1["线激光轮廓仪: 基恩士/深视智能"]
+    Q2 -->|散料抓取/装配| A2["工业面结构光: Photoneo/梅卡曼德"]
     
     Q3 -->|室内为主| Q5{"需要什么精度？"}
     Q3 -->|户外/强光| Q6{"移动还是固定？"}
     
-    Q5 -->|mm 级| A3["消费级 RGB-D\nRealSense / Orbbec Gemini"]
-    Q5 -->|sub-mm 级| A2
+    Q5 -->|mm级| A3["消费级RGB-D: RealSense / Orbbec Gemini"]
+    Q5 -->|sub-mm级| A2
     
-    Q6 -->|移动机器人| A4["dToF LiDAR\n禾赛/速腾/Orbbec MS200k"]
-    Q6 -->|固定部署| A5["dToF 相机\nOrbbec Femto / Sony IMX"]
+    Q6 -->|移动机器人| A4["dToF LiDAR: 禾赛/速腾/Orbbec MS200k"]
+    Q6 -->|固定部署| A5["dToF 相机: Orbbec Femto / Sony IMX"]
     
-    Q4 -->|自动驾驶| A6["半固态 LiDAR\n禾赛 AT128 / 速腾 M1"]
-    Q4 -->|测绘/工业| A7["机械式 LiDAR\n禾赛 Pandar / Livox"]
-    
-    style A1 fill:#f9f,stroke:#333
-    style A2 fill:#f9f,stroke:#333
-    style A3 fill:#bbf,stroke:#333
-    style A4 fill:#bfb,stroke:#333
-    style A5 fill:#bfb,stroke:#333
-    style A6 fill:#fbb,stroke:#333
-    style A7 fill:#fbb,stroke:#333
+    Q4 -->|自动驾驶| A6["半固态LiDAR: 禾赛 AT128 / 速腾 M1"]
+    Q4 -->|测绘/工业| A7["机械式LiDAR: 禾赛 Pandar / Livox"]
 ```
 
 **快速决策表**：
