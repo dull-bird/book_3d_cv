@@ -29,15 +29,13 @@
 
         <!-- Custom theme stylesheets -->
 
-        <!-- MathJax -->
-        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
         <!-- Provide site root and default themes to javascript -->
         <script>
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-51b17803.js";
+            window.path_to_searchindex_js = "../searchindex-6128ff9d.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-d47b7a93.js"></script>
@@ -203,7 +201,7 @@
 <p>这两种表达之间，靠相机的几何关系来转换——知道焦距和主点位置，就能把深度图的每个像素“反投影“成三维空间的一个点。反之，把点云“投影“回图像平面，就得到深度图。</p>
 <p>它们之间的第三种表示——<strong>视差图</strong>——只在双目/多目系统中有意义。它是左图和右图中对应点之间的像素偏移量。视差越大，物体越近；视差越小，物体越远。</p>
 <h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Depth Representation))
     Disparity Map
       Left-right pixel shifts
@@ -224,7 +222,8 @@
       Disparity -&gt; Depth: Z = f*b / d
       Depth -&gt; Point Cloud: back-projection
       Point Cloud -&gt; Depth: rasterization
-</code></pre>
+</pre>
+
 <h3 id="三种表示对比"><a class="header" href="#三种表示对比">三种表示对比</a></h3>
 <div class="table-wrapper">
 <table>
@@ -314,7 +313,7 @@ print(f"Z range: [{Z.min():.2f}, {Z.max():.2f}] m")
 <li><strong>毫米（mm）</strong> 用于 16 位无符号整数存储（$\text{uint16}$，范围 0-65535，覆盖 0-65.5 米）——几乎所有消费级深度相机（Kinect、RealSense）都用这个约定</li>
 <li><strong>米（m）</strong> 用于 32 位浮点数存储（$\text{float32}$）——精度更高，计算中无需单位换算</li>
 </ul>
-<p><strong>工程约定</strong>：深度值为 0 通常表示“无效深度“（如超出量程、被遮挡、或落在天空等无穷远区域）。处理深度图时，应在所有计算前先做 <code>mask = depth &gt; 0</code>。</p>
+<p><strong>工程约定</strong>：深度值为 0 通常表示“无效深度“（如超出量程、被遮挡、或落在天空等无穷远区域）。处理深度图时，应在所有计算前先做 $mask = depth &gt; 0$。</p>
 <h3 id="点云三维点的不羁集合"><a class="header" href="#点云三维点的不羁集合">点云——三维点的不羁集合</a></h3>
 <p>点云（point cloud）是无序的 $(X, Y, Z)$ 点的集合，可选地携带颜色 $(R, G, B)$、法向量 $(n_x, n_y, n_z)$ 等属性。每个点独立存在——没有“谁在谁上面“的网格拓扑，没有“谁连着谁“的邻接关系。</p>
 <h4 id="从深度图到点云反投影back-projection"><a class="header" href="#从深度图到点云反投影back-projection">从深度图到点云：反投影（Back-Projection）</a></h4>
@@ -458,13 +457,13 @@ def pointcloud_to_depth(points, K, H, W):
 </thead>
 <tbody>
 <tr><td><strong>PLY</strong> (Stanford)</td><td>两者皆可</td><td>好——可存储 RGB、法向量、自定义属性</td><td>学术研究、3D 重建输出。Open3D 原生支持</td></tr>
-<tr><td><strong>PCD</strong> (PCL)</td><td>两者皆可</td><td>好——PCL 功能矩阵（滤波、配准、分割）全面</td><td>PCL 生态。ROS 中常用 <code>sensor_msgs::PointCloud2</code></td></tr>
+<tr><td><strong>PCD</strong> (PCL)</td><td>两者皆可</td><td>好——PCL 功能矩阵（滤波、配准、分割）全面</td><td>PCL 生态。ROS 中常用 $sensor_msgs::PointCloud2$</td></tr>
 <tr><td><strong>LAS/LAZ</strong></td><td>二进制</td><td>可存储分类、强度、回波数</td><td>测绘/遥感领域 LiDAR 标准格式</td></tr>
 </tbody>
 </table>
 </div>
 <h3 id="什么时候用哪种表示"><a class="header" href="#什么时候用哪种表示">什么时候用哪种表示？</a></h3>
-<pre><code class="language-mermaid">flowchart TD
+<pre class="mermaid">flowchart TD
     A["I have 3D data"] --&gt; B{"Dense, regular&lt;br/&gt;grid structure?"}
     B --&gt;|"Yes&lt;br/&gt;Depth camera / stereo output"| C{"Need per-pixel&lt;br/&gt;neighbor ops?"}
     C --&gt;|"Yes&lt;br/&gt;CNN / filtering"| D["Depth Map&lt;br/&gt;.png / .npy"]
@@ -472,7 +471,8 @@ def pointcloud_to_depth(points, K, H, W):
     B --&gt;|"No&lt;br/&gt;LiDAR / SfM output"| F["Point Cloud&lt;br/&gt;.ply / .pcd"]
     E --&gt;|"Tight"| D
     E --&gt;|"Relaxed"| F
-</code></pre>
+</pre>
+
 <p><strong>经验法则</strong>：</p>
 <ul>
 <li>输入是深度相机 → 保持深度图，直到需要 3D 变换</li>
@@ -605,6 +605,7 @@ o3d.visualization.draw_geometries([pcd_down])
         <script src="../book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/js/mathjax-mermaid-a0d07254.js"></script>
 
 
 

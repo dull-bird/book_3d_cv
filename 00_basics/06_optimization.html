@@ -29,15 +29,13 @@
 
         <!-- Custom theme stylesheets -->
 
-        <!-- MathJax -->
-        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
         <!-- Provide site root and default themes to javascript -->
         <script>
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-51b17803.js";
+            window.path_to_searchindex_js = "../searchindex-6128ff9d.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-d47b7a93.js"></script>
@@ -191,16 +189,16 @@
 <hr>
 <h2 id="第一阶直观理解"><a class="header" href="#第一阶直观理解">第一阶：直观理解</a></h2>
 <h3 id="一个场景"><a class="header" href="#一个场景">一个场景</a></h3>
-<p>前面的五节教你了一套完整的“几何语言“——你知道如何用 <code>P = K[R|t]</code> 描述相机，知道两张图之间的对极约束 <code>x'^T F x = 0</code>，知道三角测量可以从两个视角恢复 3D 点。</p>
+<p>前面的五节教你了一套完整的“几何语言“——你知道如何用 $P = K[R|t]$ 描述相机，知道两张图之间的对极约束 $x’^T F x = 0$，知道三角测量可以从两个视角恢复 3D 点。</p>
 <p>但这一切都建立在一个假设上：你测量到的像素坐标是<strong>精确的</strong>。</p>
-<p>现实中不是这样。你手动点选的对应点会有像素偏差，自动特征匹配也有误配，甚至传感器本身也有噪声。如果你把有噪声的测量直接扔进 <code>x'^T F x = 0</code>，方程两边很可能不等于零——它不是 0，而是某个小量。</p>
+<p>现实中不是这样。你手动点选的对应点会有像素偏差，自动特征匹配也有误配，甚至传感器本身也有噪声。如果你把有噪声的测量直接扔进 $x’^T F x = 0$，方程两边很可能不等于零——它不是 0，而是某个小量。</p>
 <p><strong>问题来了：当数据有噪声时，如何仍然得到最好的估计？</strong></p>
 <p>这就是优化的用武之地。优化不是 3D 视觉的特产，而是贯穿整个领域的“底层工具“——从最简单的直线拟合，到上千张图片的全局 Bundle Adjustment，本质上都是在回答同一个问题：在数据不完美的情况下，怎么找到最接近真相的解。</p>
 <h3 id="核心直觉三种估计范式"><a class="header" href="#核心直觉三种估计范式">核心直觉：三种估计范式</a></h3>
 <p>3D 视觉中的参数估计方法可以按“精度 vs 速度“分成三种范式：</p>
 <ol>
 <li>
-<p><strong>代数方法（Algebraic）</strong>——快，但粗糙。把约束改写成线性方程组 <code>Ah = 0</code>，用 SVD 一步出解。代价函数（代数误差）没有几何意义，但胜在不需要迭代，是绝佳的初始值来源。</p>
+<p><strong>代数方法（Algebraic）</strong>——快，但粗糙。把约束改写成线性方程组 $Ah = 0$，用 SVD 一步出解。代价函数（代数误差）没有几何意义，但胜在不需要迭代，是绝佳的初始值来源。</p>
 </li>
 <li>
 <p><strong>几何方法（Geometric）</strong>——准，但需要迭代。直接最小化图像上像素距离的平方和（重投影误差），有明确的物理意义。在假设高斯噪声的前提下，这是<strong>最大似然估计</strong>——统计意义上的最优解。</p>
@@ -211,7 +209,7 @@
 </ol>
 <p>实践中，这三者通常是串联使用的：<strong>RANSAC 剔除 outlier → DLT 给出初值 → 几何优化精细打磨</strong>。这是 3D 视觉中最常见的估计流水线。</p>
 <h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Optimization))
     Algebraic Methods
       DLT Direct Linear Transformation
@@ -236,7 +234,8 @@
       Levenberg-Marquardt
       Schur complement
       Sparse BA
-</code></pre>
+</pre>
+
 <h3 id="mini-case用最小二乘法拟合一条直线"><a class="header" href="#mini-case用最小二乘法拟合一条直线">Mini Case：用最小二乘法拟合一条直线</a></h3>
 <p>先忘掉 3D 和相机。最简单的问题：平面上有一堆带噪声的点，你想找到穿过它们的“最佳直线“。</p>
 <pre><code class="language-python">import numpy as np
@@ -261,9 +260,9 @@ print(f"Estimated: y = {a_hat:.2f}x + {b_hat:.2f}")
 </code></pre>
 <p>这个简单的直线拟合包含了优化的所有核心要素：</p>
 <ul>
-<li><strong>模型</strong>：直线 <code>y = ax + b</code>（就像 <code>x'^T F x = 0</code>）</li>
+<li><strong>模型</strong>：直线 $y = ax + b$（就像 $x’^T F x = 0$）</li>
 <li><strong>观测量</strong>：50 个带噪声的点（就像 50 对特征匹配点）</li>
-<li><strong>代价函数</strong>：所有点误差的平方和 <code>Σ(y_obs_i - (a·x_i + b))^2</code></li>
+<li><strong>代价函数</strong>：所有点误差的平方和 $Σ(y_obs_i - (a·x_i + b))^2$</li>
 <li><strong>求解</strong>：找到使代价函数最小的参数 a, b</li>
 </ul>
 <p>从直线拟合到 Bundle Adjustment，本质上只是<strong>模型变复杂了、参数变多了、代价函数从直线距离变成了像素距离</strong>罢了。</p>
@@ -280,24 +279,24 @@ print(f"Estimated: y = {a_hat:.2f}x + {b_hat:.2f}")
 <p>在数学上，我们假设观测噪声服从某种概率分布（最常见的是均值为零的高斯分布），然后问：<strong>给定这些有噪声的观测，最可能的“真实参数“是什么？</strong> 这就是参数估计的核心问题。</p>
 <h3 id="长链推演从线性代数到全局优化"><a class="header" href="#长链推演从线性代数到全局优化">长链推演：从线性代数到全局优化</a></h3>
 <h4 id="步骤-1dlt--把非线性约束变成线性方程组"><a class="header" href="#步骤-1dlt--把非线性约束变成线性方程组">步骤 1：DLT —— 把非线性约束变成线性方程组</a></h4>
-<p>以估计单应矩阵 H 为例。已知四组或更多对应点 <code>x_i = (x_i, y_i, 1)^T</code> 和 <code>x'_i = (x'_i, y'_i, 1)^T</code>，满足 <code>x'_i = H x_i</code>。</p>
+<p>以估计单应矩阵 H 为例。已知四组或更多对应点 $x_i = (x_i, y_i, 1)^T$ 和 $x’_i = (x’_i, y’_i, 1)^T$，满足 $x’_i = H x_i$。</p>
 <p>这是一个非线性关系（齐次坐标下 H 有 9 个未知数）。DLT（Direct Linear Transformation）的妙处是把约束改写为：</p>
 <p>$$x’_i \times H x_i = 0$$</p>
 <p>展开后，每个点对提供两个独立的线性方程（第三个是前两个的线性组合）。把所有点对的方程堆在一起，得到：</p>
 <p>$$A h = 0$$</p>
 <p>其中 h 是 H 的 9 个元素排成的列向量，A 是 2n x 9 的系数矩阵。（H&amp;Z §4.1, p.88-89）</p>
-<p><strong>求解</strong>：<code>h</code> 是 A 的最小奇异值对应的右奇异向量——也就是对 A 做 SVD，<code>A = U Σ V^T</code>，取 V 的最后一行。（H&amp;Z §4.1, p.90）</p>
-<p>为什么用 SVD？因为 <code>||Ah||</code> 在 <code>||h|| = 1</code> 约束下的极小值就是最小奇异值，对应的 h 就是解。这个解最小化的是<strong>代数误差</strong> <code>||Ah||</code>——它度量的是“方程两边离零有多远“，而不是“投影点离测量点有多少像素“。这就是“代数“二字的含义。</p>
+<p><strong>求解</strong>：<code>h</code> 是 A 的最小奇异值对应的右奇异向量——也就是对 A 做 SVD，$A = U Σ V^T$，取 V 的最后一行。（H&amp;Z §4.1, p.90）</p>
+<p>为什么用 SVD？因为 $||Ah||$ 在 $||h|| = 1$ 约束下的极小值就是最小奇异值，对应的 h 就是解。这个解最小化的是<strong>代数误差</strong> $||Ah||$——它度量的是“方程两边离零有多远“，而不是“投影点离测量点有多少像素“。这就是“代数“二字的含义。</p>
 <h4 id="步骤-2代价函数升级--从代数到几何"><a class="header" href="#步骤-2代价函数升级--从代数到几何">步骤 2：代价函数升级 —— 从代数到几何</a></h4>
 <p><strong>代数误差</strong>（H&amp;Z §4.2, p.91-92）：
 $$\epsilon_{alg} = ||Ah||$$</p>
 <p>优点：有闭合解，计算极快。缺点：没有几何意义——如果把图像坐标放大 10 倍，代数误差也变 10 倍，但几何关系没变。它不代表像素距离。</p>
 <p><strong>几何误差 —— 单边转移误差</strong>（H&amp;Z §4.2.3, p.94-95）：
 $$\epsilon_{geo} = \sum_i d(x’_i, H\bar{x}_i)^2$$</p>
-<p>其中 <code>d(·,·)</code> 是图像平面上的欧几里得距离（像素距离），<code>H\bar{x}_i</code> 是将第一幅图的测量点投影到第二幅图的位置。这有明确的物理意义——“我算出来的投影位置和实际看到的位置差了多少像素”。</p>
+<p>其中 <code>d(·,·)</code> 是图像平面上的欧几里得距离（像素距离），$H\bar{x}_i$ 是将第一幅图的测量点投影到第二幅图的位置。这有明确的物理意义——“我算出来的投影位置和实际看到的位置差了多少像素”。</p>
 <p><strong>几何误差 —— 对称转移误差</strong>（H&amp;Z §4.2.3, p.95, eq 4.8）：
 $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
-<p>同时考虑两个方向的重投影误差——不是单向转移，而是找一个完美匹配的对应对 <code>(x̂_i, x̂'_i)</code>，使它们既满足 <code>x̂'_i = H x̂_i</code>，又分别离各自的测量点最近。</p>
+<p>同时考虑两个方向的重投影误差——不是单向转移，而是找一个完美匹配的对应对 $(x̂_i, x̂’_i)$，使它们既满足 $x̂’_i = H x̂_i$，又分别离各自的测量点最近。</p>
 <p><strong>Sampson 误差</strong>（H&amp;Z §4.2.6, p.98-99, eq 4.10）：代数误差和几何误差之间的实用折中。它用一阶导数对代数误差做了几何修正，有闭合形式，不需要迭代：</p>
 <p>$$\epsilon_{Sampson} = \sum_i \frac{(x’^T_i F x_i)^2}{(F x_i)_x^2 + (F x_i)_y^2 + (F^T x’_i)_x^2 + (F^T x’_i)_y^2}$$</p>
 <p>在很多情况下，Sampson 误差的优化结果跟完全几何误差几乎一样好——但不需要迭代。（H&amp;Z §4.2.6, p.99）</p>
@@ -317,7 +316,7 @@ $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
 <h4 id="步骤-3mle--为什么最小化几何误差是最优的"><a class="header" href="#步骤-3mle--为什么最小化几何误差是最优的">步骤 3：MLE —— 为什么最小化几何误差是“最优“的</a></h4>
 <p>如果测量噪声服从均值为零、方差为 σ^2 的独立高斯分布，那么观测值的<strong>似然函数</strong>是：</p>
 <p>$$p({x_i, x’_i} | H) = \prod_i \frac{1}{2\pi\sigma^2} \exp\left(-\frac{d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2}{2\sigma^2}\right)$$</p>
-<p><strong>最大化这个似然函数，等价于最小化几何误差</strong> <code>Σ d(x_i, x̂_i)^2 + d(x'_i, x̂'_i)^2</code>。（H&amp;Z §4.3, p.102-108）</p>
+<p><strong>最大化这个似然函数，等价于最小化几何误差</strong> $Σ d(x_i, x̂_i)^2 + d(x’_i, x̂’_i)^2$。（H&amp;Z §4.3, p.102-108）</p>
 <p>这就是为什么几何误差的 Gold Standard 算法（Algorithm 4.3, p.114）被当作基准——在常见噪声假设下，它给出了统计意义上的最优估计。</p>
 <p><strong>这一原理贯穿全书</strong>：Bundle Adjustment 最小化重投影误差，本质上就是在做最大似然估计。这个“底座“让所有优化方法有了统计学的正当性。</p>
 <h4 id="步骤-4ransac--对抗-outlier"><a class="header" href="#步骤-4ransac--对抗-outlier">步骤 4：RANSAC —— 对抗 outlier</a></h4>
@@ -339,7 +338,7 @@ $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
 <p>当你有多张图片和很多 3D 点，前面几步给了你初始的相机参数和 3D 点位置，但每个量都不太准。Bundle Adjustment 的做法是：<strong>把所有的相机参数和所有的 3D 点同时优化，使重投影误差的总和最小</strong>。</p>
 <p>（H&amp;Z §18.1, p.434-436）</p>
 <p>$$\min_{P^i, X_j} \sum_{i,j} d(P^i \hat{X}_j, x^i_j)^2$$</p>
-<p>这句话的含义：对于第 <code>i</code> 个相机和第 <code>j</code> 个 3D 点，如果这个 3D 点在第 <code>i</code> 张图中可见（有对应像素 <code>x^i_j</code>），就计算“把 <code>X_j</code> 投影到第 <code>i</code> 张图上得到的像素“与“实际观测到的像素 <code>x^i_j</code>“之间的距离。把所有这样的距离的平方加起来，调整所有的相机矩阵 <code>P^i</code> 和 3D 点 <code>X_j</code>，使这个和最小。</p>
+<p>这句话的含义：对于第 <code>i</code> 个相机和第 <code>j</code> 个 3D 点，如果这个 3D 点在第 <code>i</code> 张图中可见（有对应像素 $x^i_j$），就计算“把 <code>X_j</code> 投影到第 <code>i</code> 张图上得到的像素“与“实际观测到的像素 $x^i_j$“之间的距离。把所有这样的距离的平方加起来，调整所有的相机矩阵 $P^i$ 和 3D 点 <code>X_j</code>，使这个和最小。</p>
 <p><strong>问题的规模</strong>：m 个相机，n 个 3D 点 → 3n + 11m 个参数（每个 3D 点 3 DOF，每个透视相机 11 DOF）。</p>
 <p><strong>为什么能解</strong>：这时候你可能会问——几千个未知数，怎么优化？答案在于<strong>稀疏性</strong>。每个重投影误差只涉及一个相机和一个 3D 点，与其他的相机和点<strong>无关</strong>。这意味着 Hessian 矩阵（二阶导数矩阵）具有“块对角 + 低秩边缘“的结构。</p>
 <p>利用这个结构，可以用 <strong>Schur 补</strong>（也叫 Marginalization）把 3D 点参数“消去“，先解相机参数（规模小得多），再回代解 3D 点。（H&amp;Z Appendix 6, p.597）</p>
@@ -351,7 +350,7 @@ $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
 <p>其中 M（2m x 3）包含所有相机的运动信息，X（3 x n）包含所有 3D 点的结构信息。对 W 做 SVD 取前 3 个奇异值，就同时得到了运动和结构。（H&amp;Z §18.2, p.436-440）</p>
 <p>这是整个 3D 视觉中最优雅的算法之一——不需要迭代，SVD 一步到位；在等方差各向同性高斯噪声假设下，它是最大似然估计。（H&amp;Z §18.2, p.439）可惜它要求仿射相机假设和稠密对应（每个点在每个视图中都被观测到），限制了它的实际应用。</p>
 <h3 id="完整流程从原始匹配到最终解"><a class="header" href="#完整流程从原始匹配到最终解">完整流程：从原始匹配到最终解</a></h3>
-<pre><code class="language-mermaid">flowchart TD
+<pre class="mermaid">flowchart TD
     A[Raw Feature Matches] --&gt; B{RANSAC}
     B --&gt;|Reject| C[Outlier Pairs: discard]
     B --&gt;|Accept| D[Inlier Pairs]
@@ -362,7 +361,8 @@ $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
     H --&gt;|No| G
     H --&gt;|Yes| I[Golden Standard MLE]
     I --&gt; J[Final Estimates: H E P X]
-</code></pre>
+</pre>
+
 <h3 id="code-lens用-numpy-实现-dlt-和简单-ransac"><a class="header" href="#code-lens用-numpy-实现-dlt-和简单-ransac">Code Lens：用 NumPy 实现 DLT 和简单 RANSAC</a></h3>
 <pre><code class="language-python">import numpy as np
 from numpy.linalg import svd, norm
@@ -524,7 +524,7 @@ if __name__ == "__main__":
 <li><strong>内点距离阈值</strong>（H&amp;Z §4.7.1, p.118）：对图像特征匹配，典型值是 <strong>1-3 像素</strong>。设得太大会把 outlier 也纳入内点，设得太小会把真实内点排除。可根据特征点定位精度（通常 0.5-2 像素级的 SIFT）来设定。</li>
 <li><strong>置信概率 p</strong>：通常设为 <strong>0.99</strong>。这确保有 99% 的概率至少有一次采样全都是真正的 inlier。</li>
 <li><strong>最少采样数 s</strong>：取决于模型——H 需 4 对（H&amp;Z §4.1, p.88），F 需 7 或 8 对（H&amp;Z §9.2, p.245），E 在校准情形下只需 5 对（H&amp;Z §9.6, p.258）。</li>
-<li><strong>最大迭代次数 N</strong>：用公式 <code>N = log(1-p) / log(1-(1-ε)^s)</code> 计算，或设一个保守的上界（如 2000）。在实践中常做一个 <strong>adaptive</strong> 版本：每当发现更好的模型时，根据当前估计的 outlier 比例更新 N，可以提前终止。</li>
+<li><strong>最大迭代次数 N</strong>：用公式 $N = log(1-p) / log(1-(1-ε)^s)$ 计算，或设一个保守的上界（如 2000）。在实践中常做一个 <strong>adaptive</strong> 版本：每当发现更好的模型时，根据当前估计的 outlier 比例更新 N，可以提前终止。</li>
 </ul>
 <h3 id="实践中的函数"><a class="header" href="#实践中的函数">实践中的函数</a></h3>
 <p>在 OpenCV 中，许多关键函数内部都使用了 DLT + RANSAC 的组合：</p>
@@ -554,7 +554,7 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
 <li><strong>Ceres Solver</strong>（Google）：C++ 库，COLMAP 使用它做 BA。支持自动微分，建模灵活。Google 的街景重建也依赖它。</li>
 <li><strong>g2o</strong>（General Graph Optimization）：C++ 图优化框架，广泛应用于 SLAM（ORB-SLAM 等）。将 BA 问题建模为图（节点是参数，边是约束）。</li>
 <li><strong>COLMAP</strong>：完整的 SfM + MVS 流程，内部使用 Ceres 做 BA。</li>
-<li><strong>SciPy / PyTorch</strong>：对于小规模问题（&lt; 100 个参数），<code>scipy.optimize.least_squares</code> 或 PyTorch 的 autograd 也完全可用。</li>
+<li><strong>SciPy / PyTorch</strong>：对于小规模问题（&lt; 100 个参数），$scipy.optimize.least_squares$ 或 PyTorch 的 autograd 也完全可用。</li>
 </ul>
 <h3 id="常见陷阱"><a class="header" href="#常见陷阱">常见陷阱</a></h3>
 <ol>
@@ -677,6 +677,7 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
         <script src="../book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/js/mathjax-mermaid-a0d07254.js"></script>
 
 
 
