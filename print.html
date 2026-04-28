@@ -1,0 +1,3142 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>3D 视觉：从原理到实践</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="favicon-8114d1fc.png">
+        <link rel="stylesheet" href="css/variables-8adf115d.css">
+        <link rel="stylesheet" href="css/general-2459343d.css">
+        <link rel="stylesheet" href="css/chrome-ae938929.css">
+        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex-51b17803.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc-d47b7a93.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">3D 视觉：从原理到实践</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/dull-bird/book_3d_cv" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="前言"><a class="header" href="#前言">前言</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="基础篇导读"><a class="header" href="#基础篇导读">基础篇导读</a></h1>
+<blockquote>
+<p>预计总阅读时间：3-4 小时
+前置知识：无（本篇是全书起点）
+读完本篇后，你可以：理解相机如何将三维世界变成二维图像、掌握多视图几何的骨架概念，为后续每一个实战模块打下地基。</p>
+</blockquote>
+<h2 id="为什么基础篇是必读的"><a class="header" href="#为什么基础篇是必读的">为什么基础篇是必读的</a></h2>
+<p>拍摄一张照片时，真实世界是三维的，照片是二维的。三维怎么变成二维的？这个“压扁“的过程就是<strong>投影</strong>。</p>
+<p>本书所有的模块——单目深度估计、双目立体匹配、3D Gaussian Splatting——都在回答同一个问题：<strong>如何从二维图像恢复三维信息</strong>。而回答这个问题的前提，是理解相反的路径：三维是怎么“丢“进二维的。</p>
+<p>基础篇要搭建的，就是这套从三维到二维、再从二维回到三维的<strong>概念脚手架</strong>。它不涉及任何深度学习模型，只用几何和代数，把相机成像的本质讲清楚。</p>
+<h2 id="学习目标"><a class="header" href="#学习目标">学习目标</a></h2>
+<p>读完本篇六个小节，你将能够：</p>
+<ol>
+<li>写出一个三维点到像素坐标的完整投影公式 <code>P = K[R|t]</code>，并解释每个符号的含义</li>
+<li>理解齐次坐标为什么是计算机视觉的“通用语言“</li>
+<li>用两幅图像的匹配点计算基础矩阵 F，理解对极约束如何将匹配搜索从二维降到一维</li>
+<li>分辨透视相机和仿射相机的区别，知道什么时候该用哪个</li>
+<li>掌握 DLT、RANSAC、Bundle Adjustment 等方法的基本原理，理解为什么“优化“贯穿整个 3D 视觉</li>
+</ol>
+<h2 id="各节概览与估计阅读时间"><a class="header" href="#各节概览与估计阅读时间">各节概览与估计阅读时间</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>节</th><th>内容</th><th>核心收获</th><th>阅读时间</th></tr>
+</thead>
+<tbody>
+<tr><td>01 相机模型</td><td>针孔相机、内参 K、外参 R/t、投影矩阵 P</td><td>理解 <code>P = K[Rt]</code>的每一部分</td><td>40 分钟</td></tr>
+<tr><td>02 投影几何</td><td>齐次坐标、无穷远线、单应矩阵 H、变换分层</td><td>掌握“透视变换“的数学语言</td><td>45 分钟</td></tr>
+<tr><td>03 多视图几何入门</td><td>对极几何、基础矩阵 F、本质矩阵 E</td><td>理解两张图像之间的几何约束</td><td>50 分钟</td></tr>
+<tr><td>04 深度表示</td><td>深度图、视差图、点云</td><td>知道三维信息有哪几种“存法“</td><td>30 分钟</td></tr>
+<tr><td>05 坐标系转换</td><td>世界、相机、图像、像素四坐标系</td><td>不再被“各种坐标系“绕晕</td><td>30 分钟</td></tr>
+<tr><td>06 优化基础</td><td>DLT、几何误差、RANSAC、Bundle Adjustment</td><td>理解 3D 视觉中“为什么需要优化“</td><td>40 分钟</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p>建议按顺序阅读。第 01 和 02 节是后续所有内容的基础；如果你已有一定基础，第 04 和 05 节可以快速扫读。</p>
+</blockquote>
+<h2 id="本篇如何连接到后续模块"><a class="header" href="#本篇如何连接到后续模块">本篇如何连接到后续模块</a></h2>
+<pre><code>基础篇（本篇）
+  ├── 相机模型、投影几何 ─────→ 模块 A「单目深度估计」：一张图推测深度
+  │                           需要理解"世界→像素"的投影过程
+  │
+  ├── 相机模型、坐标变换 ─────→ 模块 C「3D Gaussian Splatting」：从多图重建三维场景
+  │                           需要理解相机内外参和投影几何
+  │
+  ├── 对极几何、多视图 ───────→ 模块 B「双目立体匹配」：两张图恢复深度
+  │                           需要理解对极约束和视差-深度关系
+  │
+  └── DLT、RANSAC、BA ────────→ 所有模块：优化和鲁棒估计是贯穿全书的"
+                               底层工具"
+</code></pre>
+<p>后续每个模块都会直接调用基础篇的概念。比如：</p>
+<ul>
+<li>模块 A 讨论“如何从像素坐标反推深度“时，用的是 <code>P = K[R|t]</code> 的逆过程</li>
+<li>模块 B 讨论“左右图像如何匹配“时，依赖对极几何把搜索空间从整个图像压缩到一条线</li>
+<li>模块 C 的相机参数优化中，Bundle Adjustment 直接来自基础篇的优化基础</li>
+</ul>
+<p><strong>基础篇不求贪多，但求扎实。</strong> 每个概念都将反复出现在后面的模块中。如果第一次读不太懂某个推导，先记住公式的“人话版本“和它在实践中怎么用，后面自然会越来越清晰。</p>
+<h2 id="预备知识"><a class="header" href="#预备知识">预备知识</a></h2>
+<p>本篇是全书起点，只假设你具备：</p>
+<ul>
+<li>高中数学（向量、矩阵乘法的基本概念）</li>
+<li>会写简单的 Python 代码</li>
+<li>对“相机拍照“有常识性理解</li>
+</ul>
+<p><strong>不需要</strong>任何相机标定、射影几何或 3D 重建的预备知识。每一个概念都会从零开始解释。</p>
+<hr>
+<h2 id="mini-case用手机拍两张照片手动算桌子的距离"><a class="header" href="#mini-case用手机拍两张照片手动算桌子的距离">Mini Case：用手机拍两张照片，手动算桌子的距离</a></h2>
+<blockquote>
+<p>这个案例贯穿基础篇全部六节的知识。完成基础篇学习后，你应该能独立完成这个任务。</p>
+</blockquote>
+<h3 id="你需要"><a class="header" href="#你需要">你需要</a></h3>
+<ul>
+<li>一部手机（拍照）</li>
+<li>Python + OpenCV + NumPy</li>
+</ul>
+<h3 id="步骤概览"><a class="header" href="#步骤概览">步骤概览</a></h3>
+<ol>
+<li><strong>拍照</strong>：用手机从两个不同位置拍同一张桌子，两张照片</li>
+<li><strong>标定</strong>：用棋盘格标定手机相机，得到内参 K（对应 §1 相机模型）</li>
+<li><strong>找对应点</strong>：在两张照片中手动选取至少 8 对同名点（桌子角、杯子边缘等）</li>
+<li><strong>算基础矩阵</strong>：用 8 点法 + RANSAC 从对应点算 F（对应 §3 多视图几何）</li>
+<li><strong>恢复位姿</strong>：从 F 和 K 得到 E，SVD 分解得到 R 和 t（对应 §5 坐标系转换）</li>
+<li><strong>三角化</strong>：对每对同名点，用 R、t 恢复 3D 坐标（对应 §4 深度表示）</li>
+<li><strong>算距离</strong>：从 3D 点云的尺度还原桌子的实际宽度</li>
+</ol>
+<h3 id="代码骨架"><a class="header" href="#代码骨架">代码骨架</a></h3>
+<pre><code class="language-python">import cv2
+import numpy as np
+from numpy.linalg import svd, inv, norm
+
+
+# ---- 1. Load images and calibration ----
+img1 = cv2.imread("table_01.jpg")
+img2 = cv2.imread("table_02.jpg")
+
+# Camera intrinsics from chessboard calibration (H&amp;Z section 6.1)
+K = np.array([[1200.0, 0.0, 960.0],
+              [0.0, 1200.0, 540.0],
+              [0.0, 0.0, 1.0]])  # Replace with your calibrated K
+
+# ---- 2. Detect and match features ----
+sift = cv2.SIFT_create()
+kp1, des1 = sift.detectAndCompute(img1, None)
+kp2, des2 = sift.detectAndCompute(img2, None)
+
+# Match features and apply ratio test
+bf = cv2.BFMatcher()
+matches = bf.knnMatch(des1, des2, k=2)
+good = [m for m, n in matches if m.distance &lt; 0.75 * n.distance]
+
+pts1 = np.float32([kp1[m.queryIdx].pt for m in good])
+pts2 = np.float32([kp2[m.trainIdx].pt for m in good])
+
+# ---- 3. Find Fundamental matrix with RANSAC (H&amp;Z section 9.2, p.245) ----
+F, mask = cv2.findFundamentalMat(
+    pts1, pts2, method=cv2.FM_RANSAC,
+    ransacReprojThreshold=1.0, confidence=0.99)
+pts1_in = pts1[mask.ravel() == 1]
+pts2_in = pts2[mask.ravel() == 1]
+print(f"{len(pts1_in)} inlier matches found")
+
+# ---- 4. Compute Essential matrix and recover pose (H&amp;Z section 9.6, p.257-258) ----
+E = K.T @ F @ K
+U, S, Vt = svd(E)
+# Enforce E constraint: two equal singular values, one zero
+E_corrected = U @ np.diag([1.0, 1.0, 0.0]) @ Vt
+
+# Decompose E to get R and t (4 possible solutions)
+W = np.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]])
+R1 = U @ W @ Vt
+R2 = U @ W.T @ Vt
+
+if np.linalg.det(R1) &lt; 0:
+    R1 *= -1
+if np.linalg.det(R2) &lt; 0:
+    R2 *= -1
+
+t = U[:, 2]  # Translation (up to scale)
+
+# Build camera matrices
+P1 = K @ np.hstack([np.eye(3), np.zeros((3, 1))])
+P2 = K @ np.hstack([R1, t.reshape(3, 1)])
+
+# ---- 5. Triangulate 3D points (H&amp;Z section 10.1, p.262-264) ----
+points_3d_h = cv2.triangulatePoints(P1, P2,
+                                     pts1_in[:20].T,
+                                     pts2_in[:20].T)
+points_3d = points_3d_h[:3] / points_3d_h[3]  # Homogeneous -&gt; Euclidean
+
+# ---- 6. Estimate real-world scale ----
+# Compute distances between 3D points
+distances = []
+for i in range(len(points_3d.T)):
+    for j in range(i + 1, len(points_3d.T)):
+        dist = norm(points_3d[:, i] - points_3d[:, j])
+        distances.append(dist)
+
+print(f"3D point cloud has {len(points_3d.T)} points")
+print(f"Pairwise distances (unscaled): {np.sort(distances)[::-1][:5]}")
+
+# ---- 7. Recover scale from a known measurement ----
+# Measure one known distance (e.g., table width = 1.2 meters)
+# known_pair = (point_i, point_j)  # Find which points correspond
+# scale = 1.2 / norm(points_3d[:, known_pair[0]] - points_3d[:, known_pair[1]])
+# points_3d_scaled = points_3d * scale
+# print(f"Recovered scale factor: {scale:.3f}")
+# print(f"Table width from 3D: {norm(points_3d_scaled[:, known_pair[0]] - points_3d_scaled[:, known_pair[1]]):.3f} m")
+</code></pre>
+<blockquote>
+<p>这个案例的核心启发是：从两张手机照片恢复桌子的 3D 尺寸，<strong>不需要激光雷达、不需要深度传感器、不需要昂贵的设备</strong>——只需要基础的射影几何知识和 Python。你的手机相机内参 K 是标定一次就复用的；SIFT 匹配是自动的；RANSAC 帮你剔除错配；几何优化如果不用也可以得到不错的结果（尤其是用了 8 点法 + 归一化之后）。实际操作中，最大的误差来源通常是<strong>对应点的精度</strong>和<strong>尺度恢复</strong>——这也是后续实战模块要解决的问题。</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="01-相机模型三维世界如何变成二维图像"><a class="header" href="#01-相机模型三维世界如何变成二维图像">01 相机模型：三维世界如何变成二维图像</a></h1>
+<blockquote>
+<p>预计阅读时间：40 分钟
+前置知识：无（本篇第 01 节）
+读完本节后，你可以：写出完整的投影公式 <code>P = K[R|t]</code>，理解内参和外参的区别，用 OpenCV 标定自己的手机相机。</p>
+</blockquote>
+<hr>
+<h2 id="第一阶直观理解"><a class="header" href="#第一阶直观理解">第一阶：直观理解</a></h2>
+<h3 id="一个场景"><a class="header" href="#一个场景">一个场景</a></h3>
+<p>你拿起手机拍了张照片。真实世界是三维的——有远近、有高低、有前后。照片是二维的——只有宽和高。三维怎么变成二维的？这个“压扁“的过程就是<strong>投影</strong>。相机就是用来做这件事的，而理解相机如何做投影，是理解一切 3D 视觉算法的起点。</p>
+<h3 id="核心直觉小孔成像"><a class="header" href="#核心直觉小孔成像">核心直觉：小孔成像</a></h3>
+<p>想象一个完全不透光的盒子，只在正面扎一个针尖大的孔。盒子背面贴一张感光胶片。外面有一棵树，阳光照在树上，反射的光线穿过小孔，在胶片上留下倒立的树影。</p>
+<p>这就是<strong>针孔相机模型</strong>。它只有三个要素：</p>
+<ol>
+<li><strong>三维世界中的一个点</strong>（比如树顶的某片叶子）</li>
+<li><strong>一个小孔</strong>（光线只能从这里穿过）</li>
+<li><strong>一个成像平面</strong>（胶片、CMOS 传感器）</li>
+</ol>
+<p>从那个三维点出发的光线，穿过小孔，直直地打在成像平面上。这个点落在成像平面上的位置，就是<strong>投影点</strong>。所有三维点的投影点合在一起，就是你的照片。</p>
+<p>这个模型的妙处在于：它只用<strong>一条直线</strong>（光线）连接了三维世界和二维图像。没有复杂的折射、没有镜头畸变——就是一个简单的几何关系。理解了这个关系，你就能用数学精确描述“拍照片“这件事。</p>
+<h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
+<pre><code class="language-mermaid">mindmap
+  root((Camera Model))
+    针孔相机 Pinhole
+      中心投影 Central Projection
+      齐次坐标 Homogeneous Coordinates
+      投影矩阵 P 3x4 matrix
+    内参 Intrinsic K
+      焦距 focal length fx fy
+      主点 principal point cx cy
+      像素纵横比 aspect ratio
+      偏斜 skew s
+    外参 Extrinsic R t
+      旋转矩阵 rotation 3x3
+      平移向量 translation 3x1
+      相机中心 camera center C
+    分解 Decomposition
+      RQ decomposition
+      从 P 恢复 K R t
+    相机类型
+      透视相机 perspective
+      仿射相机 affine
+      正射投影 orthographic
+    标定 Calibration
+      Zhang's method
+      棋盘格 chessboard
+      重投影误差 reprojection error
+</code></pre>
+<h3 id="mini-case用-opencv-捕捉一帧并查看像素坐标"><a class="header" href="#mini-case用-opencv-捕捉一帧并查看像素坐标">Mini Case：用 OpenCV 捕捉一帧并查看像素坐标</a></h3>
+<p>打开你的电脑摄像头，捕捉一帧，看看每个像素的坐标是什么样的。</p>
+<pre><code class="language-python">import cv2
+import numpy as np
+
+# Open the default camera
+cap = cv2.VideoCapture(0)
+if not cap.isOpened():
+    raise RuntimeError("Cannot open camera")
+
+ret, frame = cap.read()
+cap.release()
+
+if not ret:
+    raise RuntimeError("Cannot read frame")
+
+h, w = frame.shape[:2]
+print(f"Image size: {w} x {h}")
+print(f"Top-left pixel coordinate:    (0, 0)")
+print(f"Top-right pixel coordinate:   ({w-1}, 0)")
+print(f"Bottom-left pixel coordinate: (0, {h-1})")
+print(f"Center pixel coordinate:      ({w//2}, {h//2})")
+print(f"Bottom-right pixel coordinate: ({w-1}, {h-1})")
+
+# Save and display
+cv2.imwrite("/tmp/capture_test.jpg", frame)
+print("\nFrame saved to /tmp/capture_test.jpg")
+print("Now imagine: each of these pixels corresponds to a 3D point")
+print("in the real world. The camera model tells you exactly which one.")
+</code></pre>
+<p>这段代码没有做任何视觉处理。它只是告诉你：你看到的每一帧图像，本质上就是一个二维数组——每个位置 <code>(u, v)</code> 记录了一个颜色值。相机模型的全部工作，就是告诉你：<strong>三维世界中的点 <code>(X, Y, Z)</code> 会落在图像上的哪个位置 <code>(u, v)</code></strong>。</p>
+<hr>
+<h2 id="第二阶原理解析"><a class="header" href="#第二阶原理解析">第二阶：原理解析</a></h2>
+<h3 id="第一性原理中心投影"><a class="header" href="#第一性原理中心投影">第一性原理：中心投影</a></h3>
+<p>针孔相机做的事情，用一句话说：<strong>将三维空间中的点，沿着穿过一个固定点（相机中心）的直线，映射到一个平面上</strong>。这在几何上称为<strong>中心投影（central projection）</strong>，是从三维射影空间 <code>IP^3</code> 到二维射影平面 <code>IP^2</code> 的映射。（H&amp;Z section 6.1, p.154）</p>
+<h3 id="从三维点到像素坐标完整推导"><a class="header" href="#从三维点到像素坐标完整推导">从三维点到像素坐标——完整推导</a></h3>
+<h4 id="step-1最简单的针孔没有主点偏移"><a class="header" href="#step-1最简单的针孔没有主点偏移">Step 1：最简单的针孔——没有主点偏移</a></h4>
+<p>假设小孔（相机中心）位于原点，相机朝向 Z 轴正方向，成像平面在距离 f 处（f 是焦距）。根据相似三角形：</p>
+<pre><code>X/Z = x/f   →   x = fX / Z
+Y/Z = y/f   →   y = fY / Z
+</code></pre>
+<p>中心投影公式（H&amp;Z 6.1, p.154）：
+$$(X, Y, Z)^T \rightarrow (fX/Z, fY/Z)^T$$</p>
+<p>这个映射是<strong>非线性的</strong>——除以 Z 使得远处的物体看起来更小（近大远小）。</p>
+<h4 id="step-2用齐次坐标线性化"><a class="header" href="#step-2用齐次坐标线性化">Step 2：用齐次坐标线性化</a></h4>
+<p>引入齐次坐标后，这个非线性映射变成了线性矩阵乘法（H&amp;Z 6.2, p.154）：</p>
+<p>$$x = P X$$</p>
+<p>其中 $P = \text{diag}(f, f, 1)[I;|;0]$，展开为：</p>
+<p>$$\begin{pmatrix} u \ v \ w \end{pmatrix} =
+\begin{pmatrix} f &amp; 0 &amp; 0 &amp; 0 \ 0 &amp; f &amp; 0 &amp; 0 \ 0 &amp; 0 &amp; 1 &amp; 0 \end{pmatrix}
+\begin{pmatrix} X \ Y \ Z \ 1 \end{pmatrix}$$</p>
+<p>从齐次坐标回到像素坐标只需除以第三分量：$(u/w, v/w)$。这就是齐次坐标的核心魅力——用多一维的代价换来线性的简洁。</p>
+<h4 id="step-3加入主点偏移"><a class="header" href="#step-3加入主点偏移">Step 3：加入主点偏移</a></h4>
+<p>真实的相机传感器未必以光轴为中心。设主点（principal point）为 $(p_x, p_y)$——即光轴打在传感器上的位置（H&amp;Z 6.3, p.155）：</p>
+<p>$$(X, Y, Z)^T \rightarrow (fX/Z + p_x, fY/Z + p_y)^T$$</p>
+<p>在齐次形式下，这等价于在投影矩阵中嵌入标定矩阵 K（H&amp;Z 6.4, p.155）：</p>
+<p>$$K = \begin{pmatrix} f &amp; 0 &amp; p_x \ 0 &amp; f &amp; p_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$$</p>
+<p>此时投影变为 $x = K[I;|;0]X_{cam}$。</p>
+<h4 id="step-4ccd-像素从毫米到像素"><a class="header" href="#step-4ccd-像素从毫米到像素">Step 4：CCD 像素——从毫米到像素</a></h4>
+<p>真正的数码相机使用 CCD/CMOS 传感器，像素可能不是正方形，且 x 和 y 方向的像素密度可能不同。因此需要将焦距从毫米转换为像素单位（H&amp;Z 6.9, p.157）：</p>
+<p>$$\alpha_x = f \cdot m_x, \quad \alpha_y = f \cdot m_y$$</p>
+<p>其中 $m_x, m_y$ 是单位距离内的像素数。最通用的 K 矩阵还包含一个偏斜参数 $s$，表示像素的歪斜程度（H&amp;Z 6.10, p.157）：</p>
+<p>$$K = \begin{pmatrix} \alpha_x &amp; s &amp; x_0 \ 0 &amp; \alpha_y &amp; y_0 \ 0 &amp; 0 &amp; 1 \end{pmatrix}$$</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>参数</th><th>含义</th><th>物理意义</th></tr>
+</thead>
+<tbody>
+<tr><td>$\alpha_x, \alpha_y$</td><td>横向/纵向焦距（像素单位）</td><td>决定了视场角的大小</td></tr>
+<tr><td>$x_0, y_0$</td><td>主点坐标</td><td>光轴打在 sensor 的位置，通常在图像中心附近</td></tr>
+<tr><td>$s$</td><td>偏斜参数</td><td>像素是否“歪“了——现代相机基本为 0</td></tr>
+</tbody>
+</table>
+</div>
+<p>内参 K 从 3 DOF（$f, p_x, p_y$）到 5 DOF（$\alpha_x, \alpha_y, s, x_0, y_0$），每增加一个参数就多描述一种物理上的不完美。</p>
+<h4 id="step-5世界坐标系到相机坐标系外参-r-t"><a class="header" href="#step-5世界坐标系到相机坐标系外参-r-t">Step 5：世界坐标系到相机坐标系——外参 R, t</a></h4>
+<p>前面的推导假设三维点已经在相机坐标系下。但现实中，物体在世界坐标系中，相机可以摆在任意位置。需要先做一次三维刚体变换（H&amp;Z 6.6, p.156）：</p>
+<p>$$X_{cam} = R(X - \tilde{C})$$</p>
+<p>其中 $R$ 是 3x3 旋转矩阵（旋转由谁承担什么坐标系的意义），$\tilde{C}$ 是相机中心在世界坐标系中的坐标。</p>
+<p>在齐次坐标下，这写成（H&amp;Z 6.8, p.156）：</p>
+<p>$$X_{cam} = \begin{pmatrix} R &amp; -R\tilde{C} \ 0 &amp; 1 \end{pmatrix} X_{world}$$</p>
+<p>定义 $t = -R\tilde{C}$，于是：</p>
+<p>$$X_{cam} = [R;|;t];X_{world}$$</p>
+<h4 id="核心公式p--krt"><a class="header" href="#核心公式p--krt">核心公式：P = K[R|t]</a></h4>
+<p>将内参和外参合并，得到完整的相机投影矩阵（H&amp;Z 6.8, p.156）：</p>
+<p>$$P = K[R;|;t]$$</p>
+<p>其中 $t = -R\tilde{C}$。</p>
+<p>展开：</p>
+<p>$$\underbrace{\begin{pmatrix} \alpha_x &amp; s &amp; x_0 \ 0 &amp; \alpha_y &amp; y_0 \ 0 &amp; 0 &amp; 1 \end{pmatrix}}<em>{K}
+\underbrace{\begin{pmatrix} r</em>{11} &amp; r_{12} &amp; r_{13} &amp; t_1 \ r_{21} &amp; r_{22} &amp; r_{23} &amp; t_2 \ r_{31} &amp; r_{32} &amp; r_{33} &amp; t_3 \end{pmatrix}}_{[R|t]}$$</p>
+<p><strong>P 是一个 3x4 矩阵，秩为 3，有 11 个自由度</strong>（5 个内参 + 3 个旋转 + 3 个平移）。</p>
+<p>用人话总结：</p>
+<blockquote>
+<p>一个三维世界点要变成像素坐标，经历两步：</p>
+<ol>
+<li><strong>外参变换</strong>：把世界坐标系下的点转到相机坐标系下——$[R|t]$ 告诉你相机“在哪“和“朝哪看“。</li>
+<li><strong>内参投影</strong>：把相机坐标系下的点投影到像素平面上——K 告诉你相机的“个性“（焦距多长、主点在哪）。</li>
+</ol>
+<p><code>P = K[R|t]</code> 这个公式是整本书最重要的公式之一。</p>
+</blockquote>
+<h3 id="投影管线全景"><a class="header" href="#投影管线全景">投影管线全景</a></h3>
+<pre><code class="language-mermaid">flowchart TD
+    A["3D World Point (X_w, Y_w, Z_w)"] --&gt; B["Apply Extrinsic [R|t]: convert to camera coordinates"]
+    B --&gt; C["3D Camera Point (X_c, Y_c, Z_c)"]
+    C --&gt; D["Apply Intrinsic K: project to image plane"]
+    D --&gt; E["Homogeneous Image Point (u, v, w)"]
+    E --&gt; F["Dehomogenize: divide by w"]
+    F --&gt; G["Pixel Coordinate (u/w, v/w)"]
+    
+    subgraph Extrinsic_Params["Extrinsic Parameters: 6 DOF"]
+        B
+    end
+    
+    subgraph Intrinsic_Params["Intrinsic Parameters: 5 DOF"]
+        D
+    end
+    
+    subgraph Result["Image Result"]
+        G
+    end
+</code></pre>
+<h3 id="p-矩阵的几何解读"><a class="header" href="#p-矩阵的几何解读">P 矩阵的几何解读</a></h3>
+<p>相机矩阵 P 不仅是一个计算工具——它的每一行、每一列都有明确的几何意义（H&amp;Z section 6.2, p.158-162）：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>P 的组成部分</th><th>几何意义</th></tr>
+</thead>
+<tbody>
+<tr><td>左边 3x3 块 M</td><td>$M = KR$，包含了 K 和 R 的信息</td></tr>
+<tr><td>第四列 $p_4$</td><td>与相机中心相关</td></tr>
+<tr><td>P 的行向量</td><td>世界空间中的平面（主平面、X/Y 轴平面）</td></tr>
+<tr><td>P 的列向量</td><td>图像点——前三个列是消失点（vanishing points）</td></tr>
+</tbody>
+</table>
+</div>
+<p>关键性质：</p>
+<ul>
+<li><strong>相机中心 C</strong>：P 的一维右零空间，即 $P C = 0$——这是一个纯代数定义的几何量，极其优雅（H&amp;Z p.158）。</li>
+<li><strong>主平面</strong>：P 的最后一行所定义的世界平面，这个平面上的所有点被投影到无穷远（H&amp;Z p.160）。</li>
+<li><strong>主点</strong>：$x_0 = M m^3$，其中 $m^3$ 是 M 的第三行（H&amp;Z p.160-161）。</li>
+<li><strong>深度</strong>（H&amp;Z 6.15, p.162）：
+$$\text{depth}(X; P) = \text{sign}(\det M) \cdot \frac{w}{T \cdot |m^3|}$$
+可以判断一个三维点在相机前面还是后面。</li>
+</ul>
+<blockquote>
+<p>一个 3x4 的相机矩阵 P 本身就是一个宝藏——你能从中直接读出相机中心在哪（$PC=0$）、主光轴方向（$m^3$）、主点位置（$Mm^3$）。所有的几何信息都“编码“在这个 12 个数字的矩阵里。</p>
+</blockquote>
+<h3 id="从-p-中拆解-k-和-rrq-分解"><a class="header" href="#从-p-中拆解-k-和-rrq-分解">从 P 中拆解 K 和 R——RQ 分解</a></h3>
+<p>如果你有一个相机矩阵 P，但不知道它的内参和外参，如何把它们拆出来？</p>
+<p>记 M 为 P 的左 3x3 块。由 $M = KR$，其中 K 是上三角矩阵，R 是正交矩阵（H&amp;Z section 6.2.4, p.163）。这就是经典的 <strong>RQ 分解</strong>——将矩阵分解为一个上三角矩阵（R 在 QR 分解中，但这里是 RQ，上三角在左）和一个正交矩阵的乘积。</p>
+<p>数值实现：对 M 的行向量（从下往上）做 Gram-Schmidt 正交化（H&amp;Z A4.1.1, p.579）：</p>
+<ol>
+<li>$r_3 = M_{2} / |M_{2}|$ → 得到 $K[2,2]$</li>
+<li>$r_2 = (M_{1} - K[1,2] \cdot r_3) / |\ldots|$ → 得到 $K[1,1], K[1,2]$</li>
+<li>$r_1 = (M_{0} - K[0,1] \cdot r_2 - K[0,2] \cdot r_3) / |\ldots|$ → 得到 $K[0,0], K[0,1], K[0,2]$</li>
+</ol>
+<p>RQ 分解后，K 需要归一化使得 $K[2,2] = 1$ 来消除尺度歧义。相机中心 C 则通过 SVD 求 P 的零空间得到，然后 $t = -R C$（H&amp;Z p.163-165）。</p>
+<h3 id="code-lens用-numpy-实现投影"><a class="header" href="#code-lens用-numpy-实现投影">Code Lens：用 NumPy 实现投影</a></h3>
+<p>以下代码直接验证 <code>P = K[R|t]</code> 的投影过程，基于 <code>code_verify.py</code> 的核心逻辑。</p>
+<pre><code class="language-python">import numpy as np
+
+
+def build_camera_matrix(fx, fy, cx, cy, R, t):
+    """
+    Build finite projective camera matrix P = K [R | t].
+    Reference: H&amp;Z (6.8, p.156), K matrix: H&amp;Z (6.10, p.157).
+
+    Parameters
+    ----------
+    fx, fy : float
+        Focal lengths in pixels (alpha_x, alpha_y in H&amp;Z notation).
+    cx, cy : float
+        Principal point coordinates in pixels.
+    R : np.ndarray, shape (3, 3)
+        Rotation matrix (orthogonal, det=1).
+    t : np.ndarray, shape (3,)
+        Translation vector.
+
+    Returns
+    -------
+    P : np.ndarray, shape (3, 4)
+        Camera projection matrix.
+    """
+    # H&amp;Z (6.10, p.157): K matrix (assume zero skew)
+    K = np.array([
+        [fx, 0, cx],
+        [0, fy, cy],
+        [0,  0,  1]
+    ], dtype=np.float64)
+
+    # H&amp;Z (6.8, p.156): P = K [R | t]
+    Rt = np.hstack([R, t.reshape(3, 1)])
+    P = K @ Rt
+    return P
+
+
+def project(P, X_world):
+    """
+    Project 3D world points to 2D pixel coordinates.
+    H&amp;Z (6.1, p.154): (X,Y,Z)^T -&gt; (fX/Z, fY/Z)^T
+    H&amp;Z (6.2, p.154): x = P X in homogeneous coordinates.
+    """
+    if X_world.ndim == 1:
+        X_world = X_world.reshape(1, -1)
+
+    if X_world.shape[1] == 3:
+        ones = np.ones((X_world.shape[0], 1))
+        X_homo = np.hstack([X_world, ones])
+    else:
+        X_homo = X_world
+
+    # H&amp;Z (6.2, p.154): x = P X
+    x_homo = P @ X_homo.T  # shape (3, N)
+
+    # Dehomogenize (H&amp;Z p.154)
+    w = x_homo[2, :]
+    u = x_homo[0, :] / w
+    v = x_homo[1, :] / w
+
+    return np.column_stack([u, v])
+
+
+# --- Example usage ---
+fx, fy = 800.0, 800.0   # focal length in pixels
+cx, cy = 320.0, 240.0   # principal point (640x480 image center)
+
+# Camera at world origin, looking along +Z
+R = np.eye(3)
+t = np.array([0.0, 0.0, 0.0])
+
+P = build_camera_matrix(fx, fy, cx, cy, R, t)
+
+# 3D points at varying depths
+points_3d = np.array([
+    [0.0,  0.0,  5.0],   # on optical axis, 5m away
+    [1.0,  1.0,  5.0],   # off-axis, 5m away
+    [2.0, -1.0, 10.0],   # off-axis, 10m away
+])
+
+pixels = project(P, points_3d)
+print("3D point -&gt; 2D pixel")
+for i, (pt, (u, v)) in enumerate(zip(points_3d, pixels)):
+    print(f"  ({pt[0]:.1f}, {pt[1]:.1f}, {pt[2]:.1f}) -&gt; ({u:.1f}, {v:.1f})")
+
+# Manual verification: H&amp;Z (6.1, p.154)
+# (X,Y,Z) -&gt; (f*X/Z + cx, f*Y/Z + cy)
+for pt in points_3d:
+    X, Y, Z = pt
+    u_man = fx * X / Z + cx
+    v_man = fy * Y / Z + cy
+    assert np.allclose([u_man, v_man],
+                       project(P, pt)[0], atol=1e-6)
+print("Manual formula check passed.")
+</code></pre>
+<p><strong>代码解读</strong>：</p>
+<ol>
+<li><code>build_camera_matrix</code> 构建 $P = K[R|t]$：先用 <code>np.hstack</code> 将 R 和 t 拼成 3x4 的 $[R|t]$ 块，再左乘 K（H&amp;Z 6.8, p.156）。</li>
+<li><code>project</code> 完成 $x = PX$ 的矩阵乘法后，除以第三分量 w 做去齐次化——这正是 $X/Z, Y/Z$ 的非线性来源（H&amp;Z 6.1, p.154）。</li>
+<li>手动验证直接使用公式 $(fX/Z + cx, fY/Z + cy)$ 计算，与矩阵形式等价。齐次坐标的妙处就是把非线性除法“隐藏“在矩阵乘法的第三步中。</li>
+</ol>
+<hr>
+<h2 id="第三阶部署实战"><a class="header" href="#第三阶部署实战">第三阶：部署实战</a></h2>
+<h3 id="透视相机-vs-仿射相机"><a class="header" href="#透视相机-vs-仿射相机">透视相机 vs 仿射相机</a></h3>
+<p>真实相机是透视的——远处的物体看起来更小，平行线在远处交汇。但有时候，这个“近大远小“的效果可以忽略。</p>
+<p><strong>仿射相机</strong>是透视相机在极端条件下的近似：当焦距 $f \rightarrow \infty$ 且物体到相机的距离也 $\rightarrow \infty$ 时，透视效应消失。在数学上，仿射相机矩阵的最后一行是 $(0, 0, 0, 1)$（H&amp;Z section 6.3, p.166-173）。</p>
+<p>对比：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>特性</th><th>透视相机 (Finite)</th><th>仿射相机 (Affine)</th></tr>
+</thead>
+<tbody>
+<tr><td>最后一行</td><td>$(r_{31}, r_{32}, r_{33}, t_3)$</td><td>$(0, 0, 0, 1)$</td></tr>
+<tr><td>平行线</td><td>交汇于消失点</td><td>始终保持平行</td></tr>
+<tr><td>DOF</td><td>11</td><td>8</td></tr>
+<tr><td>相机中心</td><td>有限远处</td><td>无穷远处</td></tr>
+<tr><td>主点</td><td>有定义</td><td><strong>无定义</strong></td></tr>
+</tbody>
+</table>
+</div>
+<p>仿射相机的三个子类型（H&amp;Z p.171-172）：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>类型</th><th>DOF</th><th>说明</th></tr>
+</thead>
+<tbody>
+<tr><td>正射投影 Orthographic</td><td>3</td><td>最简单的仿射，不缩放（H&amp;Z 6.22, p.171）</td></tr>
+<tr><td>缩放正射投影 Scaled Orthographic</td><td>5</td><td>加了一个均匀缩放（H&amp;Z 6.24, p.171）</td></tr>
+<tr><td>弱透视投影 Weak Perspective</td><td>7</td><td>允许不同的 x/y 缩放（H&amp;Z 6.25, p.171）</td></tr>
+<tr><td>通用仿射相机 General Affine</td><td>8</td><td>$x = M_{2\times3}X + t$（H&amp;Z 6.26, p.172）</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="什么时候用仿射相机"><a class="header" href="#什么时候用仿射相机">什么时候用仿射相机？</a></h3>
+<ul>
+<li><strong>远距离长焦摄影</strong>：你站在远处用长焦拍建筑，建筑上各点到相机的距离差异远小于到相机的平均距离——透视效应几乎消失。</li>
+<li><strong>卫星/航拍图像</strong>：卫星离地面几百公里，地面高度变化几十米，深度变化相对极小。</li>
+<li><strong>显微镜成像</strong>：被观测物体非常小，景深变化可忽略。</li>
+</ul>
+<p>一个实用的判断标准：如果场景中所有点到相机的距离变化 $\Delta Z$ 远小于平均距离 $\bar{Z}$（即 $\Delta Z / \bar{Z} \ll 1$），仿射近似就成立。此时使用仿射相机可以显著减少待估计的参数数量（8 vs 11），简化重建算法（比如用因子分解法——后面章节会讲）。</p>
+<h3 id="实战用-opencv-标定你的相机"><a class="header" href="#实战用-opencv-标定你的相机">实战：用 OpenCV 标定你的相机</a></h3>
+<p>相机标定是要解决的问题是：给定一个相机，如何找出它的 $K$ 矩阵和畸变参数？</p>
+<p><strong>标定原理</strong>（Zhang’s method）：拍摄多张不同角度的棋盘格照片。棋盘格上每个角点的三维坐标已知（因为棋盘格是平面的，Z=0），在图像中检测角点得到二维坐标。对于每张图像，棋盘格平面和图像平面之间存在一个单应矩阵 H。利用 H 和旋转矩阵的正交性约束（$r_1 \cdot r_2 = 0$, $|r_1| = |r_2| = 1$），每张图像提供两个关于 K 的约束方程。K 有 5 个自由度（不统计畸变），所以至少需要 3 张图像。</p>
+<pre><code class="language-python">import cv2
+import numpy as np
+import glob
+
+# Chessboard dimensions (inner corners)
+pattern_size = (9, 6)  # 9x6 inner corners
+square_size = 25.0     # square size in mm
+
+# Prepare object points (Z=0 since chessboard is planar)
+objp = np.zeros((pattern_size[0] * pattern_size[1], 3), np.float32)
+objp[:, :2] = np.mgrid[0:pattern_size[0],
+                        0:pattern_size[1]].T.reshape(-1, 2)
+objp *= square_size
+
+obj_points = []   # 3D points in world coordinates
+img_points = []   # 2D points in image coordinates
+
+images = sorted(glob.glob("calibration_images/*.jpg"))
+if not images:
+    raise RuntimeError(
+        "No calibration images found. Please capture 10-20 images "
+        "of a chessboard from different angles."
+    )
+
+grabbed_shape = None
+for fname in images:
+    img = cv2.imread(fname)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    grabbed_shape = gray.shape[::-1]
+
+    # Find chessboard corners
+    ret, corners = cv2.findChessboardCorners(
+        gray, pattern_size,
+        cv2.CALIB_CB_ADAPTIVE_THRESH +
+        cv2.CALIB_CB_FAST_CHECK +
+        cv2.CALIB_CB_NORMALIZE_IMAGE
+    )
+
+    if ret:
+        # Refine corner positions to sub-pixel accuracy
+        corners_sub = cv2.cornerSubPix(
+            gray, corners, (11, 11), (-1, -1),
+            (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+        )
+        obj_points.append(objp)
+        img_points.append(corners_sub)
+
+print(f"Used {len(obj_points)} / {len(images)} images for calibration")
+
+# Calibrate
+ret, K, dist, rvecs, tvecs = cv2.calibrateCamera(
+    obj_points, img_points, grabbed_shape, None, None
+)
+
+print(f"\nReprojection error (RMSE): {ret:.4f} px")
+print(f"\nIntrinsic matrix K:\n{K}")
+print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
+</code></pre>
+<p><strong>输出解读</strong>：</p>
+<ul>
+<li><code>K</code> 矩阵的 $K[0,0]$ 和 $K[1,1]$ 是 $\alpha_x, \alpha_y$（像素单位的焦距）。如果它们是 800，在 640x480 图像上意味着视场角约为 <code>2 * arctan(240/800) ≈ 33.4°</code>（垂直）。</li>
+<li>主点 $K[0,2], K[1,2]$ 应该在图像中心附近（如 320, 240），如果偏离太远可能说明 sensor 装配有问题。</li>
+<li><code>dist</code> 是镜头畸变系数，包含径向畸变 $(k_1, k_2, k_3)$ 和切向畸变 $(p_1, p_2)$。</li>
+</ul>
+<h3 id="标定中的常见问题"><a class="header" href="#标定中的常见问题">标定中的常见问题</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>问题</th><th>原因</th><th>解决方案</th></tr>
+</thead>
+<tbody>
+<tr><td>重投影误差居高不下（&gt;1 px）</td><td>棋盘格角点检测不准或图像模糊</td><td>确保光照均匀、对焦清晰、棋盘格平整</td></tr>
+<tr><td>标定结果每次跑都不同</td><td>图像数量太少，姿态覆盖不足</td><td>至少 10-15 张图，覆盖图像四角和不同倾斜角度</td></tr>
+<tr><td>K 矩阵主点偏到天边</td><td>棋盘格始终在图像同一区域，外参退化</td><td>棋盘格需要覆盖图像各个区域</td></tr>
+<tr><td>畸变系数符号奇怪</td><td>部分图像角点检测有系统偏差</td><td>用 <code>cv2.drawChessboardCorners</code> 可视化检查每张图的角点是否正确</td></tr>
+<tr><td>仅返回很少几张有效图</td><td>棋盘格有反光、局部过曝</td><td>用哑光棋盘格，避免强光直射</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="苏格拉底时刻"><a class="header" href="#苏格拉底时刻">苏格拉底时刻</a></h2>
+<ol>
+<li>
+<p><strong>如果相机矩阵 P 有 11 个自由度，为什么我们只用 9 个就能标定？那两个“多余“的自由度去哪了？</strong></p>
+<p>（提示：回想最简单的针孔模型——如果我们假设像素是正方形的、没有偏斜，K 矩阵的自由度从 5 降到了 3，加上外参的 6 个自由度，恰好就是 9。那两个“消失“的自由度被物理假设“吃掉了“——它们对应的是偏斜参数 s 和像素纵横比，在现代相机中几乎为常数。）</p>
+</li>
+<li>
+<p><strong>如果我把世界坐标系的原点往左移一米，P 矩阵会变吗？会变多少？</strong></p>
+<p>（提示：这相当于对世界做了一个平移变换，等价于修改了 t。但反过来说，如果你拿到一个 P 矩阵，你能区分它是“相机在原点往右看“还是“相机在左边往原点看“吗？这引出一个深层问题：仅凭一张图像，我们无法区分场景的位移和相机的反向位移——这正是多视图几何要解决的根本歧义。）</p>
+</li>
+</ol>
+<hr>
+<h2 id="关键论文清单"><a class="header" href="#关键论文清单">关键论文清单</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>年份</th><th>论文/书籍</th><th>一句话贡献</th></tr>
+</thead>
+<tbody>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry in Computer Vision</em> (2nd Ed.)</td><td>多视图几何的圣经，定义了 P=K[R|t] 框架，本章主要参考 Ch.6</td></tr>
+<tr><td>2000</td><td>Z. Zhang, “A Flexible New Technique for Camera Calibration”, IEEE TPAMI</td><td>Zhang 标定法——用平面棋盘格标定相机，极大降低了标定门槛</td></tr>
+<tr><td>1999</td><td>P. Sturm &amp; S. Maybank, “On Plane-Based Camera Calibration”, CVPR</td><td>平面标定的理论基础</td></tr>
+<tr><td>1987</td><td>R. Tsai, “A Versatile Camera Calibration Technique”, IEEE JRA</td><td>经典两步标定法，影响了后续所有标定方法</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="实操练习"><a class="header" href="#实操练习">实操练习</a></h2>
+<p><strong>练习 1：标定你的手机相机</strong></p>
+<ol>
+<li>在网上找一张棋盘格图片（或打印出来），用手机从 10-15 个不同角度拍摄（不要移动棋盘格，移动手机）。</li>
+<li>用上面的 OpenCV 代码跑一次标定。</li>
+<li>记录你的 $K$ 矩阵。用 $K[0,0]$ 和图像宽度估算水平视场角。</li>
+<li>回答：你的手机 camera 的像素是正方形的吗？（看 $K[0,0]$ 和 $K[1,1]$ 的比值）</li>
+</ol>
+<p><strong>练习 2：体验“近大远小“与仿射近似</strong></p>
+<ol>
+<li>找一面有水平纹理的墙（如砖墙），分别在 0.5 米和 5 米处拍照。</li>
+<li>观察两张图里平行线的表现：近处拍照时，砖缝明显交汇（有消失点）；远处拍照时，砖缝近似平行。</li>
+<li>思考：如果要知道做 Structure from Motion 时该用透视模型还是仿射模型，要看什么条件？</li>
+</ol>
+<hr>
+<h2 id="延伸阅读"><a class="header" href="#延伸阅读">延伸阅读</a></h2>
+<ul>
+<li>本书内：[[02 投影几何]] · [[03 多视图几何入门]] · [[05 坐标系转换]]</li>
+<li>H&amp;Z 原书 Ch.6：完整覆盖有限相机、无限相机、相机标定矩阵的代数性质</li>
+<li>OpenCV Camera Calibration Tutorial：https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html</li>
+<li>Zhang 标定论文：https://www.microsoft.com/en-us/research/publication/a-flexible-new-technique-for-camera-calibration/</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="02-投影几何透视变换的数学语言"><a class="header" href="#02-投影几何透视变换的数学语言">02 投影几何：透视变换的数学语言</a></h1>
+<blockquote>
+<p>预计阅读时间：45 分钟
+前置知识：本篇第 01 节（相机模型）
+读完本节后，你可以：用齐次坐标描述二维平面上的点和线，理解单应矩阵 H 的 8 个自由度从哪来，说出射影/仿射/相似/欧几里得四层变换各保持什么性质，并对一张歪斜的照片做“去透视“矫正。</p>
+</blockquote>
+<hr>
+<h2 id="第一阶直观理解-1"><a class="header" href="#第一阶直观理解-1">第一阶：直观理解</a></h2>
+<h3 id="一个场景-1"><a class="header" href="#一个场景-1">一个场景</a></h3>
+<p>你用投影仪把 PPT 投到幕布上。幕布不平整，画面会变形——正方形变成了任意四边形，圆形变成了椭圆。但这个变形不是随机的：原来在同一条直线上的内容，变形后依然在同一条直线上。从某个角度看，它“乱了“；从另一个角度看，它又“有规律“。</p>
+<p>三维世界变成二维照片，本质上也是这样一种投影——只不过方向相反。世界是三维的，照片是二维的。你需要一种数学语言，精确地描述“什么变了，什么没变“。</p>
+<p>**射影几何（Projective Geometry）**就是这门语言。</p>
+<h3 id="核心直觉为什么需要齐次坐标"><a class="header" href="#核心直觉为什么需要齐次坐标">核心直觉：为什么需要齐次坐标？</a></h3>
+<p>高中几何课上你学过：平面上任意两条直线有一个交点——除非它们平行。平行线的“例外“让几何证明变得繁琐：每次你都要分“相交“和“平行“两种情况讨论。</p>
+<p>再举一个场景：你站在铁轨中间往前看，两条平行的铁轨在远处交汇于一点。这一点在现实世界中并不存在，但在你的照片里它确实有坐标。它叫什么？它在哪？</p>
+<p>齐次坐标的回答是：<strong>给每个普通点加一个“第三维“坐标</strong>。普通坐标 $(x, y)$ 的齐次形式是 $(x, y, 1)$。平行线不是没有交点——它们的交点是 $(a, b, 0)$，即第三维坐标为零的点，称为<strong>无穷远点（ideal point）</strong>。所有无穷远点躺在一条**无穷远线（line at infinity）**上——它是世界的“地平线“。</p>
+<p>这样一来，几何学中一个最令人舒服的性质恢复了：</p>
+<blockquote>
+<p><strong>两点定一直线，两线定一点——不再有例外。</strong></p>
+</blockquote>
+<p>这就是齐次坐标的核心动机：它把透视几何从一个“到处是例外“的体系，变成一个统一、简洁的体系。</p>
+<p>齐次坐标还带来了另一个好处：透视投影中那个讨厌的“除以 Z“（$x = fX/Z$, $y = fY/Z$），在齐次坐标下变成了纯粹的线性矩阵乘法——做完矩阵乘法之后，只要把结果的前两个分量除以第三个分量即可。用一个额外的维度，换来了线性的优雅。</p>
+<h3 id="技术全景-1"><a class="header" href="#技术全景-1">技术全景</a></h3>
+<pre><code class="language-mermaid">mindmap
+  root((Projective Geometry 2D))
+    Homogeneous Coordinates
+      Points as 3-vectors
+      Scale equivalence
+      Ideal points w=0
+      Line at infinity l_inf
+    Lines and Conics
+      Line representation l
+      Point-line incidence x^T l = 0
+      Intersection via cross product
+      Conic C 5 DOF
+    Projective Transformation H
+      3x3 matrix 8 DOF
+      Point mapping x' = Hx
+      Line mapping l' = H^{-T}l
+      Homography estimation DLT
+    Transformation Hierarchy
+      Projective 8 DOF
+      Affine 6 DOF
+      Similarity 4 DOF
+      Euclidean 3 DOF
+    Metric Recovery
+      Circular points I J
+      Absolute conic dual C*_inf
+      Affine rectification
+      Metric rectification
+    Applications
+      Image rectification
+      Panorama stitching
+      Planar metrology
+      Augmented reality
+</code></pre>
+<h3 id="十年关键突破"><a class="header" href="#十年关键突破">十年关键突破</a></h3>
+<pre><code class="language-mermaid">flowchart LR
+    A["~1500&lt;br/&gt;Perspective Art&lt;br/&gt;Brunelleschi, da Vinci"] --&gt; B["1822&lt;br/&gt;Projective Geometry&lt;br/&gt;Poncelet"]
+    B --&gt; C["1971&lt;br/&gt;DLT Algorithm&lt;br/&gt;Abdel-Aziz &amp; Karara"]
+    C --&gt; D["1981&lt;br/&gt;RANSAC&lt;br/&gt;Fischler &amp; Bolles"]
+    D --&gt; E["1998&lt;br/&gt;Plane Rectification&lt;br/&gt;Liebowitz &amp; Zisserman"]
+    E --&gt; F["2004&lt;br/&gt;H&amp;Z Book&lt;br/&gt;Unified Framework"]
+</code></pre>
+<p>从文艺复兴时期的透视绘画，到 19 世纪的抽象几何体系，再到现代计算机视觉的算法工具箱——射影几何是一根贯穿了 500 年的线。</p>
+<hr>
+<h2 id="第二阶原理解析-1"><a class="header" href="#第二阶原理解析-1">第二阶：原理解析</a></h2>
+<h3 id="第一性原理齐次坐标用三维向量表示二维点"><a class="header" href="#第一性原理齐次坐标用三维向量表示二维点">第一性原理：齐次坐标——用三维向量表示二维点</a></h3>
+<p>二维平面上的一个点 $(x, y)$，在齐次坐标下写成三维向量 $(x_1, x_2, x_3)^T$。从齐次坐标回到笛卡尔坐标只需除以第三个分量（H&amp;Z section 2.2.1, p.26）：</p>
+<p>$$(x, y) = \left(\frac{x_1}{x_3}, \frac{x_2}{x_3}\right)$$</p>
+<p>这里有三个关键性质：</p>
+<p><strong>性质 1：尺度等价。</strong> $(x_1, x_2, x_3)^T$ 和 $k(x_1, x_2, x_3)^T$（$k \neq 0$）代表同一个点。这是齐次坐标最核心的特性——因为当你做除法 $x_1/x_3$ 和 $x_2/x_3$ 时，因子 $k$ 会被约掉。</p>
+<p><strong>性质 2：点和线的对偶性。</strong> 一条直线 $l$ 也是一个三维向量 $l = (a, b, c)^T$。方程 $ax + by + c = 0$ 在齐次坐标下写成（H&amp;Z p.27）：</p>
+<p>$$x^T l = 0$$</p>
+<p>这个等式对称到了令人愉悦的程度——你把点换成线、线换成点，等式不变。这就是射影几何中的“对偶原理“（duality）：点和线互换后，所有定理依然成立。</p>
+<p><strong>性质 3：交点和连线都用叉积。</strong>（H&amp;Z p.27-28）</p>
+<ul>
+<li>两条直线 $l$ 和 $l’$ 的交点：$x = l \times l’$</li>
+<li>两个点 $x$ 和 $x’$ 的连线：$l = x \times x’$</li>
+</ul>
+<p>这种简洁对称在非齐次坐标下是不可能的。</p>
+<h3 id="无穷远点与无穷远线平行线的归宿"><a class="header" href="#无穷远点与无穷远线平行线的归宿">无穷远点与无穷远线——平行线的归宿</a></h3>
+<p>当齐次坐标的第三个分量为零，即 $(x_1, x_2, 0)^T$，这个点对应的笛卡尔坐标是 $(x_1/0, x_2/0)$——无穷远。这种点称为<strong>理想点（ideal point）<strong>或</strong>无穷远点（point at infinity）</strong>（H&amp;Z section 2.2.2, p.28）。</p>
+<p>理想点的几何意义是方向。$(1, 0, 0)^T$ 代表横向无穷远（x 轴方向），$(0, 1, 0)^T$ 代表纵向无穷远（y 轴方向），$(a, b, 0)^T$ 代表斜向无穷远——所有斜率为 $b/a$ 的平行线都交汇于此。</p>
+<p>所有理想点的集合构成一条直线：<strong>无穷远线（line at infinity）</strong>（H&amp;Z p.28）：</p>
+<p>$$l_\infty = (0, 0, 1)^T$$</p>
+<p>验证：任意理想点 $(x_1, x_2, 0)^T$ 都满足 $(x_1, x_2, 0)(0, 0, 1)^T = 0$。</p>
+<blockquote>
+<p><strong>人话翻译</strong>：无穷远线就是世界的“地平线“——所有方向的“尽头“都在上面。两条平行线不是不相交，而是交在这条线上（用同一个理想点表征线的方向）。站在铁轨中间拍照时，两条铁轨在远处汇聚到的那一点，就是铁轨方向对应的理想点在照片上的像。</p>
+</blockquote>
+<p>$l_\infty$ 是区分<strong>仿射几何</strong>和<strong>射影几何</strong>的关键：在仿射变换下，$l_\infty$ 保持不变（作为集合）；在射影变换下，$l_\infty$ 可能被映射到有限远的位置。这就是为什么透视照片中平行线会“交汇“——无穷远线被“拉“到了有限远。</p>
+<h3 id="射影变换-h平面到平面的透视映射"><a class="header" href="#射影变换-h平面到平面的透视映射">射影变换 H——平面到平面的透视映射</a></h3>
+<h4 id="定义与自由度"><a class="header" href="#定义与自由度">定义与自由度</a></h4>
+<p>射影变换（projectivity / homography）是一个从 $\mathbb{P}^2$ 到 $\mathbb{P}^2$ 的可逆映射，由一个 $3 \times 3$ 非奇异矩阵 $H$ 表示（H&amp;Z section 2.3, p.33）：</p>
+<p>$$x’ = Hx$$</p>
+<p>其中 $x$ 和 $x’$ 是变换前后的齐次坐标。$H$ 有 9 个元素，但只有 8 个自由度——因为整体缩放不影响映射结果（$H$ 和 $kH$ 代表同一个变换）。</p>
+<p><strong>H 就是“平面到平面的透视变换“</strong>。你拍了一本书的封面（本来是一个矩形），书在照片里是歪的（变成了任意四边形）。封面平面和图像平面之间的几何关系，就是一个 H。</p>
+<h4 id="不同几何对象的变换规则"><a class="header" href="#不同几何对象的变换规则">不同几何对象的变换规则</a></h4>
+<p>同一变换 H 对不同几何对象有不同的作用方式（H&amp;Z p.36-37）：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>对象</th><th>变换规则</th><th>H&amp;Z 出处</th></tr>
+</thead>
+<tbody>
+<tr><td>点 $x$</td><td>$x’ = Hx$</td><td>(2.5), p.33</td></tr>
+<tr><td>直线 $l$</td><td>$l’ = H^{-T} l$</td><td>(2.6), p.36</td></tr>
+<tr><td>圆锥曲线 $C$</td><td>$C’ = H^{-T} C H^{-1}$</td><td>p.37</td></tr>
+<tr><td>对偶圆锥 $C^*$</td><td>$C^{<em>\prime} = H C^</em> H^T$</td><td>p.37</td></tr>
+</tbody>
+</table>
+</div>
+<p>直线的逆转置变换 $H^{-T}$ 保证了点在直线上这个关系在变换后依然成立：$x^T l = 0 \iff x’^T l’ = 0$。</p>
+<blockquote>
+<p><strong>人话翻译</strong>：如果你拿到了 H，你就拿到了“变形秘籍“——不光知道点怎么变，还知道线怎么变、椭圆怎么变。这意味着你可以把歪扭扭的照片里的任何几何元素“矫正“回正视图。</p>
+</blockquote>
+<h4 id="用-dlt-从点对应求解-h"><a class="header" href="#用-dlt-从点对应求解-h">用 DLT 从点对应求解 H</a></h4>
+<p>给定四对对应点 $x_i \leftrightarrow x’_i$，如何计算它们之间的 H？（H&amp;Z section 4.1, p.88-91）</p>
+<p>约束来源于：$x’_i$ 和 $Hx_i$ 方向相同，即 $x’_i \times Hx_i = 0$。将 H 展开为一个 9 维向量 $h = (h_1, h_2, \dots, h_9)^T$，每个点对应提供两个线性独立的方程。4 个点对应恰好提供 8 个方程，求解超定齐次方程组 $Ah = 0$（通过 SVD 取最小奇异值对应的向量），即得到 H。</p>
+<p>这就是 <strong>DLT（Direct Linear Transformation）算法</strong>——最直接、最常用的 H 求解方法。它的优点是简单到只需要一次 SVD；缺点是它最小化的是代数误差（没有几何意义），通常只用作初值。（H&amp;Z section 4.1, p.88-91）</p>
+<h3 id="变换分层从捏橡皮泥到拼积木"><a class="header" href="#变换分层从捏橡皮泥到拼积木">变换分层：从捏橡皮泥到拼积木</a></h3>
+<p>射影变换是最一般的二维映射——它把正方形变成任意四边形。但在很多实际问题中，我们不需要这么“自由“的变换。根据我们保留了哪些约束，可以定义四个层级（H&amp;Z section 2.4, p.37-44）：</p>
+<pre><code class="language-mermaid">flowchart TD
+    P["Projective&lt;br/&gt;8 DOF&lt;br/&gt;h11 to h33 minus scale&lt;br/&gt;Preserves: collinearity, cross-ratio"]
+    A["Affine&lt;br/&gt;6 DOF&lt;br/&gt;H_affine: last row = 0 0 1&lt;br/&gt;Preserves: parallelism, area ratio, parallel length ratio"]
+    S["Similarity&lt;br/&gt;4 DOF&lt;br/&gt;H_sim = [sR | t]&lt;br/&gt;Preserves: angles, length ratio"]
+    E["Euclidean&lt;br/&gt;3 DOF&lt;br/&gt;H_euc = [R | t]&lt;br/&gt;Preserves: length, area"]
+    
+    P --&gt;|"Fix l_inf&lt;br/&gt;lose 2 DOF"| A
+    A --&gt;|"Fix circular points&lt;br/&gt;lose 2 DOF"| S
+    S --&gt;|"Fix scale&lt;br/&gt;lose 1 DOF"| E
+</code></pre>
+<p><strong>各层级的形式和约束</strong>（H&amp;Z Table 2.1, p.44）：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>变换类型</th><th>矩阵形式</th><th>DOF</th><th>保持不变的性质</th><th>丢失的性质</th></tr>
+</thead>
+<tbody>
+<tr><td>射影 Projective</td><td>$\begin{pmatrix} h_{11} &amp; h_{12} &amp; h_{13} \ h_{21} &amp; h_{22} &amp; h_{23} \ h_{31} &amp; h_{32} &amp; h_{33} \end{pmatrix}$</td><td>8</td><td>共线性（collinearity）、交比（cross-ratio）</td><td>平行性、角度、长度</td></tr>
+<tr><td>仿射 Affine</td><td>$\begin{pmatrix} a_{11} &amp; a_{12} &amp; t_x \ a_{21} &amp; a_{22} &amp; t_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$</td><td>6</td><td>平行性、面积比、平行线段长度比</td><td>角度、绝对长度</td></tr>
+<tr><td>相似 Similarity</td><td>$\begin{pmatrix} s r_{11} &amp; s r_{12} &amp; t_x \ s r_{21} &amp; s r_{22} &amp; t_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$</td><td>4</td><td>角度、任意线段长度比</td><td>绝对长度</td></tr>
+<tr><td>欧几里得 Euclidean</td><td>$\begin{pmatrix} r_{11} &amp; r_{12} &amp; t_x \ r_{21} &amp; r_{22} &amp; t_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$</td><td>3</td><td>长度、面积、角度</td><td>—</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p><strong>人话翻译</strong>：这四个层级就像从“自由到严格“的变形操作：</p>
+<ul>
+<li><strong>射影变换</strong>：像捏橡皮泥——正方形可以变任意四边形，直线还是直线，但平行线可能相交，角度全乱。</li>
+<li><strong>仿射变换</strong>：正方形可以变平行四边形，但梯形不行——平行线始终平行。最后一行固定为 $(0,0,1)$，即固定了 $l_\infty$。</li>
+<li><strong>相似变换</strong>：正方形只能变正方形——旋转、平移、均匀缩放。角度完全保留，形状不变。</li>
+<li><strong>欧几里得变换</strong>：连缩放都不能——只能旋转和平移。对刚体最准确的描述。</li>
+</ul>
+<p>从射影降到欧几里得，靠的是<strong>逐步添加约束</strong>：先固定 $l_\infty$（2 个约束），再固定圆环点（2 个约束），最后固定绝对尺度（1 个约束）。</p>
+</blockquote>
+<h3 id="从图像恢复仿射和度量性质"><a class="header" href="#从图像恢复仿射和度量性质">从图像恢复仿射和度量性质</a></h3>
+<p>一张透视照片里的世界是“射影层面“的——正方形变成了梯形，角度和长度都被扭曲。但照片里仍然藏着真实世界的“度量线索“。如何把它们恢复出来？（H&amp;Z section 2.7, p.47-58）</p>
+<h4 id="分层矫正策略"><a class="header" href="#分层矫正策略">分层矫正策略</a></h4>
+<p><strong>第一步：仿射矫正——找回平行性。</strong> 只要你能在图像中识别出 $l_\infty$ 的像，就能用一个射影变换把它“送回“它应该在的位置 $(0, 0, 1)^T$（H&amp;Z 2.19, p.49）。</p>
+<p>在照片中如何找到 $l_\infty$？利用一个事实：两组平行线的两个消失点确定了 $l_\infty$ 的方向。实践中，找到照片里两组原本平行的线（如建筑物立面的水平线和竖直线），每组的交点就是一个消失点。两个消失点的连线，就是 $l_\infty$ 在图像中的位置。</p>
+<p><strong>第二步：度量矫正——找回角度和比例。</strong> 仿射矫正之后，平行线恢复了平行，但角度依然不对（正方形可以变菱形）。要进一步矫正到相似变换，需要识别<strong>圆环点（circular points）</strong>（H&amp;Z p.52）：</p>
+<p>$$I = (1, i, 0)^T, \quad J = (1, -i, 0)^T$$</p>
+<p>这两个点位于 $l_\infty$ 上，是所有圆的交点。一旦在图像中识别了它们的位置，就能完成度量矫正。</p>
+<p>但 I 和 J 的坐标含复数，不直观。更实用的工具是它们的“打包形式“——<strong>绝对二次曲线的对偶 $C^*_\infty$</strong>（H&amp;Z 2.20, p.53）：</p>
+<p>$$C^*_\infty = IJ^T + JI^T$$</p>
+<p>在欧几里得坐标系下，$C^*_\infty = \text{diag}(1, 1, 0)$。在射影框架下，可以用它来测量任意两条直线 $l$ 和 $m$ 之间的角度（H&amp;Z 2.22, p.54）：</p>
+<p>$$\cos\theta = \frac{l^T C^<em>_\infty m}{\sqrt{(l^T C^</em><em>\infty l)(m^T C^*</em>\infty m)}}$$</p>
+<blockquote>
+<p><strong>人话翻译</strong>：一张歪歪扭扭的建筑物照片，要把它“校正“成正视图，分两步走：</p>
+<ol>
+<li>找到两条水平平行线的消失点 + 两条垂直平行线的消失点 → 连起来就是 $l_\infty$ → 做仿射矫正。此时梯形变成平行四边形。</li>
+<li>如果你知道照片里哪些线原本是正交的（如门的横边和竖边），就可以确定 $C^*_\infty$ → 做度量矫正。平行四边形最终变成真正的矩形。</li>
+</ol>
+<p>$l_\infty$（2 个约束）决定仿射矫正；$C^*_\infty$（2 个约束）决定度量矫正。加起来 4 个约束，刚好把 8 DOF 的射影变换拉到 4 DOF 的相似变换。</p>
+</blockquote>
+<h3 id="圆锥曲线在射影几何中的统一视角"><a class="header" href="#圆锥曲线在射影几何中的统一视角">圆锥曲线在射影几何中的统一视角</a></h3>
+<p>在高中数学中，椭圆、抛物线、双曲线是不同的东西。但在射影几何中，它们是同一个东西——都是<strong>圆经过射影变换后的像</strong>（H&amp;Z section 2.2.3, p.30-32）。</p>
+<p>圆锥曲线由一个 $3 \times 3$ 对称矩阵 $C$ 表示，方程 $x^T C x = 0$，有 5 个自由度。圆锥的类型由它与 $l_\infty$ 的交点数量决定（H&amp;Z p.31）：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>与 $l_\infty$ 的交点</th><th>圆锥类型</th><th>举例</th></tr>
+</thead>
+<tbody>
+<tr><td>0 个（实交点）</td><td>椭圆 Ellipse</td><td>圆</td></tr>
+<tr><td>1 个（相切）</td><td>抛物线 Parabola</td><td>$y = x^2$</td></tr>
+<tr><td>2 个（实交点）</td><td>双曲线 Hyperbola</td><td>$xy = 1$</td></tr>
+</tbody>
+</table>
+</div>
+<p>圆经过射影变换变成椭圆——圆与 $l_\infty$ 交于 I 和 J（两个虚点），变换后的椭圆与变换后的 $l_\infty$ 仍然交于变换后的 I 和 J。</p>
+<blockquote>
+<p><strong>人话翻译</strong>：你透过玻璃窗看桌面上的一个圆形杯垫——因为视角倾斜，你看到的是一个椭圆。你换个角度看，椭圆的长短轴比例会变。极端情况下，如果杯垫的边缘与你的视线方向平行，你会看到一条线段。圆、椭圆、抛物线、双曲线本质上都是“同一个东西在不同视角下的形状“。区别只是它们跟无穷远线怎么相交。</p>
+</blockquote>
+<h3 id="code-lens用-opencv-计算和应用单应矩阵"><a class="header" href="#code-lens用-opencv-计算和应用单应矩阵">Code Lens：用 OpenCV 计算和应用单应矩阵</a></h3>
+<p>以下代码演示了从 4 个点对应计算 H，然后对整张图像做透视变换：</p>
+<pre><code class="language-python">import cv2
+import numpy as np
+
+
+def compute_homography(src_pts, dst_pts):
+    """
+    Compute homography H from &gt;= 4 point correspondences.
+    H&amp;Z section 4.1 (p.88-91): DLT algorithm via SVD.
+    x' = Hx  -&gt;  x'_i x H x_i = 0 (cross product constraint).
+
+    Parameters
+    ----------
+    src_pts, dst_pts : np.ndarray, shape (N, 2)
+        Corresponding points in source and destination images.
+
+    Returns
+    -------
+    H : np.ndarray, shape (3, 3)
+        Homography matrix.
+    """
+    # OpenCV's findHomography wraps DLT + RANSAC
+    H, mask = cv2.findHomography(
+        src_pts, dst_pts, method=cv2.RANSAC, ransacReprojThreshold=3.0
+    )
+    return H
+
+
+def apply_homography(image, H, output_size):
+    """
+    Apply a homography to warp an image.
+    H&amp;Z (2.5, p.33): x' = Hx.
+
+    For each pixel (u',v') in the output, its source location is
+    computed via H^{-1}, then bilinear interpolation is used.
+    """
+    warped = cv2.warpPerspective(image, H, output_size)
+    return warped
+
+
+# --- Example: rectify a slanted book cover ---
+# Suppose you have a photo of a book cover that should be a
+# rectangle in the rectified view.
+# Four corners of the book cover in the original photo (source):
+src_points = np.array([
+    [120,  80],   # top-left
+    [580, 100],   # top-right
+    [100, 420],   # bottom-left
+    [560, 440],   # bottom-right
+], dtype=np.float32)
+
+# Corresponding corners in the desired rectified view (destination):
+# e.g. a 400x300 rectangle
+dst_points = np.array([
+    [0,   0],
+    [400, 0],
+    [0, 300],
+    [400, 300],
+], dtype=np.float32)
+
+H = compute_homography(src_points, dst_points)
+print("Homography H (8 DOF, scale-normalized):")
+print(H)
+print(f"Rank: {np.linalg.matrix_rank(H)}")  # should be 3
+
+# --- Verify: H maps source corners to destination corners ---
+for i, (s, d) in enumerate(zip(src_points, dst_points)):
+    s_homo = np.array([s[0], s[1], 1.0])
+    d_pred = H @ s_homo
+    d_pred = d_pred / d_pred[2]  # dehomogenize (H&amp;Z p.26)
+    print(f"  Corner {i}: ({s[0]:.0f},{s[1]:.0f}) "
+          f"-&gt; predicted ({d_pred[0]:.1f},{d_pred[1]:.1f}), "
+          f"expected ({d[0]:.0f},{d[1]:.0f})")
+
+# To actually warp: apply_homography(image, H, (400, 300))
+</code></pre>
+<p><strong>代码解读</strong>：</p>
+<ol>
+<li><code>cv2.findHomography</code> 内部实现了 DLT（H&amp;Z section 4.1, p.88-91）：将 $x’_i \times Hx_i = 0$ 展开成线性方程组 $Ah = 0$，通过 SVD 求解。<code>RANSAC</code> 参数让它能抵抗错误匹配点（H&amp;Z section 4.7, p.116-123）。</li>
+<li><code>cv2.warpPerspective</code> 对每个输出像素，用 $H^{-1}$ 反算出它在原图中的位置，然后用双线性插值获取颜色值。</li>
+<li>验证步骤确认了 4 个角点的映射关系——它们被精确地映射到了目标位置。因为 4 个点对恰好约束了 H 的 8 个自由度，所以是“刚好确定“的解。</li>
+</ol>
+<hr>
+<h2 id="第三阶部署实战-1"><a class="header" href="#第三阶部署实战-1">第三阶：部署实战</a></h2>
+<h3 id="为什么这套东西能工作"><a class="header" href="#为什么这套东西能工作">为什么这套东西能工作？</a></h3>
+<p>一套纯几何的理论，为什么在计算机视觉中如此重要？两个标志性应用：</p>
+<p><strong>1. 图像矫正（Image Rectification）。</strong> 你拍了一张歪歪扭扭的建筑立面照片，想得到正视图——找四个角，算 H，做变换。这就是 Google Street View 中建筑立面“摆正“的数学基础。</p>
+<p><strong>2. 全景拼接（Panorama Stitching）。</strong> 你手持相机旋转拍摄一组照片，相邻两张图之间相机的运动是一个纯旋转（没有平移）。纯旋转下，两张图像之间的几何关系正好是一个单应矩阵 H。把每张图用对应的 H 变换到同一个参考平面，就完成了拼接。</p>
+<h3 id="实战纯-numpy-实现-dlt"><a class="header" href="#实战纯-numpy-实现-dlt">实战：纯 Numpy 实现 DLT</a></h3>
+<p>以下是 DLT 的“裸写“实现——不用 OpenCV 的高级封装，看清求解过程每一步：</p>
+<pre><code class="language-python">import numpy as np
+
+
+def dlt_homography(src, dst):
+    """
+    Direct Linear Transform for homography estimation.
+    H&amp;Z Algorithm 4.1 (p.89): build A matrix, solve Ah = 0 via SVD.
+
+    Each point correspondence (x, y) &lt;-&gt; (x', y') gives two equations:
+      [0^T  -w'*x^T   y'*x^T ] h = 0
+      [w'*x^T  0^T    -x'*x^T] h = 0
+
+    Parameters
+    ----------
+    src, dst : np.ndarray, shape (N, 2)
+        N &gt;= 4 point correspondences.
+
+    Returns
+    -------
+    H : np.ndarray, shape (3, 3)
+        Homography matrix.
+    """
+    N = src.shape[0]
+    A = np.zeros((2 * N, 9))
+
+    for i in range(N):
+        x, y = src[i]
+        xp, yp = dst[i]
+        # Each row uses homogeneous representation w=1 (H&amp;Z p.89)
+        A[2 * i]     = [0, 0, 0, -x, -y, -1,  yp * x,  yp * y,  yp]
+        A[2 * i + 1] = [x, y, 1,  0,  0,  0, -xp * x, -xp * y, -xp]
+
+    # Solve Ah = 0 via SVD: h is the last column of V
+    # (singular vector with smallest singular value)
+    _, _, Vt = np.linalg.svd(A)
+    h = Vt[-1]            # last row of Vt = last column of V
+    H = h.reshape(3, 3)
+
+    # Normalize so H[2,2] = 1 for readability
+    H = H / H[2, 2]
+    return H
+
+
+# --- Test with the same 4-point example ---
+src = np.array([[120, 80], [580, 100], [100, 420], [560, 440]],
+               dtype=np.float64)
+dst = np.array([[0, 0], [400, 0], [0, 300], [400, 300]],
+               dtype=np.float64)
+
+H_dlt = dlt_homography(src, dst)
+print("DLT Homography:")
+print(np.round(H_dlt, 4))
+
+# Verify
+for (s, d) in zip(src, dst):
+    s_h = np.array([s[0], s[1], 1.0])
+    d_h = H_dlt @ s_h
+    d_h = d_h / d_h[2]
+    print(f"  ({s[0]:.0f},{s[1]:.0f}) -&gt; "
+          f"({d_h[0]:.2f},{d_h[1]:.2f}), expected ({d[0]:.0f},{d[1]:.0f})")
+</code></pre>
+<p>这段代码比 <code>cv2.findHomography</code> 慢（没做归一化），而且没有 RANSAC 去外点——但它让你看到 DLT 的本质：<strong>9 个未知数，每个点给 2 个方程，至少 4 个点，解超定齐次方程组，一把 SVD 出结果</strong>。</p>
+<h3 id="常见陷阱退化配置"><a class="header" href="#常见陷阱退化配置">常见陷阱：退化配置</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>陷阱</th><th>原因</th><th>解决方案</th></tr>
+</thead>
+<tbody>
+<tr><td>4 个点中有 3 个共线</td><td>三个共线点提供的 6 个方程中包含冗余约束，方程组秩不足，H 退化</td><td>确保 4 个点中任意 3 个不共线——理想情况是选择矩形的四个角</td></tr>
+<tr><td>点在图像边缘+噪声大</td><td>边缘点的坐标对噪声更敏感（梯度变化大），导致 H 不稳定</td><td>对坐标做归一化（平移使质心在原点 + 缩放到平均距离 sqrt(2)），即归一化 DLT（H&amp;Z section 4.4, p.107）</td></tr>
+<tr><td>所有点在同一个小平面上</td><td>当物体自身三维起伏相对于到相机的距离不可忽略时，H 假设（平面到平面）被破坏</td><td>H 仅适用于<strong>平面场景</strong>或<strong>纯旋转相机运动</strong>。三维场景需要基础矩阵 F（后续章节）</td></tr>
+<tr><td>4 对点中有错误匹配</td><td>一个 outlier 的破坏力极强——DLT 对 outlier 零容忍</td><td>使用 RANSAC：随机抽 4 对 → 算 H → 数 inlier → 选最多 inlier 的 H → 用所有 inlier 精修 H（H&amp;Z section 4.7, p.116-123）</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="归一化-dlt-的必要性"><a class="header" href="#归一化-dlt-的必要性">归一化 DLT 的必要性</a></h3>
+<p>原始 DLT 对坐标系敏感——如果点的坐标很大（比如像素坐标 1000+），构建出的矩阵 A 的各行可能相差几个数量级，导致 SVD 的数值精度下降。<strong>归一化 DLT</strong>（H&amp;Z section 4.4, p.107-110）是实践中不可缺少的一步：</p>
+<ol>
+<li>将源点平移，使质心位于原点</li>
+<li>缩放到平均距离为 $\sqrt{2}$</li>
+<li>对目标点做同样的归一化</li>
+<li>在这两个归一化坐标系下求 $\tilde{H}$</li>
+<li>撤销归一化：$H = T’^{-1} \tilde{H} T$</li>
+</ol>
+<p>这一步让 DLT 的数值稳定性提升数个数量级——本质上是对数据做“白化“预处理。</p>
+<hr>
+<h2 id="苏格拉底时刻-1"><a class="header" href="#苏格拉底时刻-1">苏格拉底时刻</a></h2>
+<ol>
+<li>
+<p><strong>如果投影变换丢失了长度和角度信息，那计算机视觉中那些需要“测量“的任务（如单目深度估计、三维测距）是在什么假设下工作的？</strong></p>
+<p>（提示：思考相机标定——标定之后，K 是已知的，这恰好固定了 $C^*_\infty$ 的像。已知 K 等价于已知 5 个内参约束，把射影重建变成了度量重建。换句话说，“测量“类任务不是在射影空间中做的——它们要么依赖已知的相机内参（校准过的相机），要么依赖已知的场景约束（如“这面墙是竖直的”、“这两条边是正交的”）。这些额外信息恰好弥补了投影变换丢失的那 4 个自由度。）</p>
+</li>
+<li>
+<p><strong>你给朋友发了一张照片，照片里有一把尺子。朋友能量出尺子的真实长度吗？如果不能，他还需要什么信息？</strong></p>
+<p>（提示：一张照片只有射影信息——从像素坐标可以推断出“尺子的两个端点在空间中的方向“，但绝对尺度（尺子到底多长）完全丢失。即便知道相机内参 K，也只能恢复到相似重建——知道“这根尺子的两倍长“、“这根尺子跟那张桌子一样长“这类相对关系。要得到绝对长度，必须知道一个参考物——尺子旁边有一个已知尺寸的物体，或者知道尺子到相机的精确距离。这个事实引出了计算机视觉中一个最根本的定理：<strong>单目图像的无歧义度量重建不可能</strong>——除非你有额外的尺度信息。）</p>
+</li>
+</ol>
+<hr>
+<h2 id="关键论文清单-1"><a class="header" href="#关键论文清单-1">关键论文清单</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>年份</th><th>论文/书籍</th><th>一句话贡献</th></tr>
+</thead>
+<tbody>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry in Computer Vision</em> (2nd Ed.)</td><td>本章主要参考 Ch.2（投影几何）和 Ch.4（估计），建立了变换分层与 DLT 的完整框架</td></tr>
+<tr><td>1971</td><td>Y. I. Abdel-Aziz &amp; H. M. Karara, “Direct Linear Transformation from Comparator Coordinates into Object Space Coordinates”, ASP/UI Symposium</td><td>DLT 算法的原始提出——用线性方法求解摄影测量中的投影关系</td></tr>
+<tr><td>1981</td><td>M. A. Fischler &amp; R. C. Bolles, “Random Sample Consensus: A Paradigm for Model Fitting”, Comm. ACM</td><td>RANSAC——对抗 outlier 的经典方法，成为所有几何估计算法的标配</td></tr>
+<tr><td>1998</td><td>D. Liebowitz &amp; A. Zisserman, “Metric Rectification for Perspective Images of Planes”, CVPR</td><td>平面图像的度量矫正——从单张照片恢复真实世界的角度和比例</td></tr>
+<tr><td>1999</td><td>P. Sturm &amp; S. Maybank, “On Plane-Based Camera Calibration: A General Algorithm, Singularities and Applications”, CVPR</td><td>平面标定的理论基础，利用平面场景中的 H 矩阵推导相机内参</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="实操练习-1"><a class="header" href="#实操练习-1">实操练习</a></h2>
+<p><strong>练习 1：亲手验证齐次坐标的对偶性</strong></p>
+<ol>
+<li>在纸上画两条不平行的直线，写出它们的非齐次方程，用叉积法求交点。</li>
+<li>再画两条平行线——在笛卡尔坐标中它们没有交点。写出它们的齐次方程并求交点。验证交点是否在 $l_\infty = (0,0,1)^T$ 上（即第三分量为 0）。</li>
+<li>思考：如果你把这两条平行线的方程中的常数项改成不同的值，交点会移到哪里？</li>
+</ol>
+<p><strong>练习 2：四角矫正——从照片出发的完整流程</strong></p>
+<ol>
+<li>用手机拍一本书的封面，保持书本与相机有一定倾斜角度（不要让书正对相机）。</li>
+<li>在代码中标注书中封面的四个角点的像素坐标。</li>
+<li>设定目标矩形的尺寸（比如 $400 \times 300$ 像素），用 DLT 计算 H。</li>
+<li>用 <code>cv2.warpPerspective</code> 做透视变换。观察矫正后的书封面是否接近正视图。</li>
+<li><strong>故意让 3 个角点共线</strong>（比如选择左上、左下、右下三个角，把第四个点放到这三点构成的直线上），重新计算 H——观察会发生什么？为什么 DLT 失败了？</li>
+</ol>
+<p><strong>练习 3：体验变换层级的区别</strong></p>
+<ol>
+<li>定义一个单位正方形 $[(0,0), (1,0), (1,1), (0,1)]$。</li>
+<li>自己构造一个仿射矩阵（最后一行是 $[0,0,1]$）和一个射影矩阵（最后一行不是 $[0,0,1]$），分别对四个角点做变换。</li>
+<li>比较结果：仿射变换后，原来平行的对边还是否平行？射影变换后呢？</li>
+<li>用这个直观结果，解释为什么仿射矩阵比射影矩阵少了 2 个自由度——那 2 个自由度对应了什么“变形能力“？</li>
+</ol>
+<hr>
+<h2 id="延伸阅读-1"><a class="header" href="#延伸阅读-1">延伸阅读</a></h2>
+<ul>
+<li>本书内：[[01 相机模型]] · [[03 多视图几何入门]] · [[06 优化基础]]</li>
+<li>H&amp;Z 原书 Ch.2：完整覆盖了从齐次坐标到度量矫正的所有细节，包括极点-极线关系（§2.8）</li>
+<li>H&amp;Z 原书 Ch.4：DLT 的数值细节、归一化、代价函数的选择、RANSAC 的完整推导</li>
+<li>Marc Pollefeys, “Visual 3D Modeling from Images” (Tutorial Notes): 分层重建策略的经典教程，将 Ch.2 → Ch.10 的链条串联起来讲</li>
+<li>OpenCV Homography Tutorial: https://docs.opencv.org/4.x/d9/dab/tutorial_homography.html</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="03-多视图几何入门两张照片如何重建三维世界"><a class="header" href="#03-多视图几何入门两张照片如何重建三维世界">03 多视图几何入门：两张照片如何重建三维世界</a></h1>
+<blockquote>
+<p>预计阅读时间：55 分钟
+前置知识：本篇第 01 节（相机模型）、第 02 节（投影几何）
+读完本节后，你可以：写出对极约束 $x’^T F x = 0$，理解 F 矩阵 7 个自由度从哪来，用 8 点法从两张图的对应点算出 F，区分 F 和 E（本质矩阵），并理解从两张照片重建三维场景的完整管线。</p>
+</blockquote>
+<hr>
+<h2 id="第一阶直观理解-2"><a class="header" href="#第一阶直观理解-2">第一阶：直观理解</a></h2>
+<h3 id="一个场景-2"><a class="header" href="#一个场景-2">一个场景</a></h3>
+<p>你有两只眼睛。闭上左眼，只用右眼看世界；再闭上右眼，只用左眼看——同一个场景，两幅不同的画面。你的大脑利用这两幅画面之间的微妙差异来判断物体的远近。这个差异就叫<strong>视差（parallax）</strong>，是人类立体视觉的基础。</p>
+<p>计算机视觉中的多视图几何，本质上是同一件事：用两台相机（或一台相机在不同位置拍的两张照片），从二维图像中恢复三维世界。两张图像的对应关系不是随机的——它们被一套严格的几何约束锁在一起。这套约束就是<strong>对极几何（Epipolar Geometry）</strong>。</p>
+<h3 id="核心直觉任何点都落在一条线上"><a class="header" href="#核心直觉任何点都落在一条线上">核心直觉：任何点都落在一条线上</a></h3>
+<p>想象两台相机对着同一个三维点 X 拍照。三个点——两台相机的中心和那个三维点——确定了一个平面，叫<strong>对极平面（epipolar plane）</strong>。</p>
+<p>这个平面与两张图像平面的交线，就是<strong>对极线（epipolar line）</strong>。</p>
+<p>这意味着：<strong>左图中的任意一个点 x，在右图中对应的点 x’ 一定落在某条确定的线上——这条线就是对极线。</strong> 你不需要在整个右图中搜索 x’，只需要沿着这条线找。搜索空间从“整个图“缩小到“一条线“——这是立体匹配最核心的加速原理。</p>
+<p>两台相机中心的连线与图像平面的交点，叫<strong>对极点（epipole）</strong>。在左图中，e 是右相机中心在左图中的投影（你看右眼时，左眼视野里那个“盲区“就是 e）；在右图中，e’ 是左相机中心在右图中的投影。所有对极线都经过对极点。</p>
+<p>对极几何最深刻的性质是：<strong>它与场景内容无关——只取决于两个相机的内参和相对位姿。</strong> 相机位置摆好，对极几何就固定了，无论你在拍一座山还是一杯咖啡。（H&amp;Z section 9.1, p.239-241）</p>
+<h3 id="技术全景-2"><a class="header" href="#技术全景-2">技术全景</a></h3>
+<pre><code class="language-mermaid">mindmap
+  root((Multi-View Geometry))
+    Epipolar Geometry
+      Epipolar plane
+      Epipolar lines l l'
+      Epipoles e e'
+      Baseline b
+    Fundamental Matrix F
+      3x3 rank-2 matrix
+      7 DOF
+      Correspondence condition x'^T F x = 0
+      Point-to-line mapping l' = Fx
+      Null spaces Fe = 0 F^T e' = 0
+    Essential Matrix E
+      5 DOF calibrated case
+      E = [t]_x R
+      F = K'^{-T} E K^{-1}
+      SVD U diag(1,1,0) V^T
+    Two-View Reconstruction
+      Correspondences -&gt; F
+      F -&gt; E (if K known)
+      E -&gt; [R|t] (4 solutions)
+      Triangulation -&gt; 3D points
+    Degenerate Cases
+      Pure rotation no 3D info
+      Planar scene F ambiguous
+      Pure translation F = [e]_x
+    Estimation Methods
+      8-point algorithm
+      Normalized 8-point Hartley 1997
+      RANSAC for outliers
+      findFundamentalMat OpenCV
+</code></pre>
+<h3 id="mini-case用-opencv-在一对立体图像上画对极线"><a class="header" href="#mini-case用-opencv-在一对立体图像上画对极线">Mini Case：用 OpenCV 在一对立体图像上画对极线</a></h3>
+<p>以下代码在一对立体图像中选取关键点，计算基础矩阵，然后画出对应的对极线：</p>
+<pre><code class="language-python">import cv2
+import numpy as np
+
+# Read stereo pair
+imgL = cv2.imread("stereo_left.jpg")
+imgR = cv2.imread("stereo_right.jpg")
+
+# Detect SIFT features and compute matches
+sift = cv2.SIFT_create()
+kpL, desL = sift.detectAndCompute(imgL, None)
+kpR, desR = sift.detectAndCompute(imgR, None)
+
+bf = cv2.BFMatcher()
+matches = bf.knnMatch(desL, desR, k=2)
+
+# Lowe's ratio test
+good_matches = []
+for m, n in matches:
+    if m.distance &lt; 0.75 * n.distance:
+        good_matches.append(m)
+
+# Extract point correspondences
+ptsL = np.float32([kpL[m.queryIdx].pt for m in good_matches])
+ptsR = np.float32([kpR[m.trainIdx].pt for m in good_matches])
+
+# Compute Fundamental Matrix with RANSAC
+F, mask = cv2.findFundamentalMat(ptsL, ptsR, method=cv2.FM_RANSAC,
+                                  ransacReprojThreshold=1.0, confidence=0.99)
+print("Fundamental Matrix F:\n", F)
+print("Rank of F:", np.linalg.matrix_rank(F))  # should be 2
+
+# Select inlier points only
+inlier_ptsL = ptsL[mask.ravel() == 1]
+inlier_ptsR = ptsR[mask.ravel() == 1]
+print(f"Inliers: {len(inlier_ptsL)} / {len(ptsL)}")
+
+# Draw epipolar lines for a chosen point
+def draw_epipolar_lines(imgL, imgR, F, ptL):
+    """Draw the epipolar line corresponding to ptL on the right image."""
+    imgR_lines = imgR.copy()
+    ptL_homo = np.array([ptL[0], ptL[1], 1.0])
+    lR = F @ ptL_homo   # epipolar line in right image (H&amp;Z p.245)
+    # Normalize for visible line drawing
+    a, b, c = lR
+    h, w = imgR_lines.shape[:2]
+    # Draw line: ax + by + c = 0
+    x0, y0 = 0, int(-c / b) if b != 0 else 0
+    x1, y1 = w, int(-(c + a * w) / b) if b != 0 else h
+    cv2.line(imgR_lines, (x0, y0), (x1, y1), (0, 255, 0), 2)
+    return imgR_lines
+
+# Pick 5 inlier points and visualize their epipolar lines
+for i in range(min(5, len(inlier_ptsL))):
+    pt = inlier_ptsL[i]
+    pt_disp = imgL.copy()
+    cv2.circle(pt_disp, (int(pt[0]), int(pt[1])), 8, (0, 0, 255), -1)
+    cv2.putText(pt_disp, f"pt {i}", (int(pt[0])+10, int(pt[1])-10),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+    imgR_epi = draw_epipolar_lines(imgL, imgR, F, pt)
+    combined = np.hstack([pt_disp, imgR_epi])
+    cv2.imshow(f"Epipolar line {i}", combined)
+    cv2.waitKey(0)
+cv2.destroyAllWindows()
+</code></pre>
+<p>这段代码让你看到对极几何的物理表现：左图选一个点，右图出现一条绿色直线——右图中匹配点一定落在这条线上（或非常接近，因为噪声）。</p>
+<hr>
+<h2 id="第二阶原理解析-2"><a class="header" href="#第二阶原理解析-2">第二阶：原理解析</a></h2>
+<h3 id="第一性原理两个投影射线的共面约束"><a class="header" href="#第一性原理两个投影射线的共面约束">第一性原理：两个投影射线的共面约束</a></h3>
+<p>对极几何的本质可以用一句话概括：<strong>两个相机中心和它们看到的那个三维点，三点确定一个平面。</strong> 这个物理事实翻译成代数，就是对极约束。</p>
+<p>考虑两台相机，投影矩阵分别为 $P$ 和 $P’$。设它们的相机中心为 $C$ 和 $C’$（$PC = 0$, $P’C’ = 0$）。三维点 $X$ 在左图投影在 $x$，在右图投影在 $x’$。</p>
+<p>从 $C$ 出发穿过 $x$ 的射线，其上的点表示为：</p>
+<p>$$X(\lambda) = P^+ x + \lambda C$$</p>
+<p>其中 $P^+$ 是 $P$ 的伪逆。这两条射线在右图中的投影——$P’P^+ x$ 和 $P’C = e’$，恰好定义一个对极点 $e’$。$x’$ 必须落在 $e’$ 和 $P’P^+ x$ 的连线上——这条线就是对极线 $l’$（H&amp;Z section 9.1, p.239-241）。</p>
+<p>所有的代数都在描述同一个几何事实：</p>
+<blockquote>
+<p><strong>从两个不同位置看同一个点，这两条视线必须在空间中相交——不能交错。</strong> 这个“必须相交“的约束，就是 $x’^T F x = 0$。</p>
+</blockquote>
+<h3 id="对极几何的五个关键元素"><a class="header" href="#对极几何的五个关键元素">对极几何的五个关键元素</a></h3>
+<p>设两台相机的相机中心分别为 $C$ 和 $C’$，三维点为 $X$：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>元素</th><th>记法</th><th>定义</th><th>H&amp;Z 出处</th></tr>
+</thead>
+<tbody>
+<tr><td>基线 baseline</td><td>$b$</td><td>连接 $C$ 和 $C’$ 的直线</td><td>p.239</td></tr>
+<tr><td>对极点 epipole</td><td>$e$, $e’$</td><td>$C’$ 在左图的投影（$e = PC’$），$C$ 在右图的投影（$e’ = P’C$）</td><td>p.239</td></tr>
+<tr><td>对极平面 epipolar plane</td><td>$\pi$</td><td>由 $C$, $C’$, $X$ 三点确定的平面</td><td>p.240</td></tr>
+<tr><td>对极线 epipolar line</td><td>$l$, $l’$</td><td>对极平面与左图/右图像平面的交线</td><td>p.240</td></tr>
+<tr><td>点对应 correspondence</td><td>$x \leftrightarrow x’$</td><td>同一个三维点 $X$ 在两个图像中的投影</td><td>p.240</td></tr>
+</tbody>
+</table>
+</div>
+<p>关键约束：<strong>所有对极线都经过对极点</strong>——相当于纸扇的扇骨汇聚于扇轴。</p>
+<h3 id="基础矩阵-f两张图的关系证明书"><a class="header" href="#基础矩阵-f两张图的关系证明书">基础矩阵 F——两张图的“关系证明书“</a></h3>
+<h4 id="定义与几何推导"><a class="header" href="#定义与几何推导">定义与几何推导</a></h4>
+<p>基础矩阵 $F$ 是一个 $3 \times 3$ 矩阵，满足（H&amp;Z 9.5, p.245）：</p>
+<p>$$\boxed{x’^T F x = 0}$$</p>
+<p>这是<strong>对极约束（epipolar constraint）</strong> 的核心方程：左图的点 $x$ 和右图的对应点 $x’$ 必须满足这个等式。注意 $x$ 和 $x’$ 都是齐次坐标（3-向量）。</p>
+<p>$F$ 的几何推导：通过空间中任意平面 $\pi$ 的二维单应 $H_\pi$，可以将 $x$ 映射到右图中的点 $H_\pi x$。在这个点和 $e’$ 的连线上，$x’$ 必定存在——因此 $x’$ 落在以 $e’$ 和 $H_\pi x$ 为端点的直线上。用叉积表示这条线，得到（H&amp;Z p.243）：</p>
+<p>$$F = [e’]<em>\times H</em>\pi$$</p>
+<p>其中 $[e’]_\times$ 是 $e’$ 的反对称矩阵。</p>
+<h4 id="f-的核心功能"><a class="header" href="#f-的核心功能">F 的核心功能</a></h4>
+<p><strong>功能 1：点-点约束。</strong> $x’^T F x = 0$——判断两个点是不是同一个三维点的投影（H&amp;Z 9.5, p.245）。</p>
+<p><strong>功能 2：点-线映射。</strong> $F$ 将点 $x$ 映射到对极线 $l’$（H&amp;Z p.245）：</p>
+<p>$$l’ = Fx \quad \text{（右图中的对极线，对应左图的点 x）}$$
+$$l = F^T x’ \quad \text{（左图中的对极线，对应右图的点 x’）}$$</p>
+<p>这是 $F$ 最强大的功能：给定左图的一个点，$F$ 直接告诉你右图中这条线——匹配点一定在这条线上。</p>
+<p><strong>功能 3：对极点的零空间。</strong> 对极点 $e$ 和 $e’$ 分别藏在 $F$ 的零空间中（H&amp;Z p.245）：</p>
+<p>$$Fe = 0, \quad F^T e’ = 0$$</p>
+<p>因为对极点是 $F$ 的左右零向量，可以直接通过 SVD 从 $F$ 中提取它们——不需要知道相机参数。</p>
+<h4 id="f-的自由度为什么是-7"><a class="header" href="#f-的自由度为什么是-7">F 的自由度：为什么是 7？</a></h4>
+<p>$F$ 是一个 $3 \times 3$ 矩阵，有 9 个元素。但只有 <strong>7 个自由度</strong>（H&amp;Z section 9.2.4, p.245-246）：</p>
+<ul>
+<li>减去 1：齐次矩阵的<strong>整体缩放等价</strong>——$F$ 和 $kF$（$k \neq 0$）代表同一个对极约束。</li>
+<li>减去 1：$\det(F) = 0$——$F$ 必须是<strong>秩为 2</strong> 的矩阵。这是一个内约束——不是数据约束，而是对极几何本身要求的。</li>
+</ul>
+<p>秩为 2 意味着 $F$ 有一个零空间，而这个零空间恰好是对极点所在——物理上对应“一个相机中心在另一个图像上的投影“。</p>
+<blockquote>
+<p><strong>人话翻译</strong>：基础矩阵 F 就像一个两口之家的“户口本“——它编码了两个相机之间的所有几何关系。你能从中读出：(1) 每张图的“盲区“（对极点，零空间方向）；(2) 任意一个点在另一张图中对应的“搜索线“（对极线）；(3) 两个相机之间的相对射影关系。而且这一切都不需要知道相机的焦距、主点等参数——只要有足够多的匹配点对就能算出来。</p>
+</blockquote>
+<h3 id="本质矩阵-e戴了眼镜的-f"><a class="header" href="#本质矩阵-e戴了眼镜的-f">本质矩阵 E——戴了眼镜的 F</a></h3>
+<h4 id="校准坐标系下的对极约束"><a class="header" href="#校准坐标系下的对极约束">校准坐标系下的对极约束</a></h4>
+<p>当两个相机都经过校准（内参矩阵 $K$ 和 $K’$ 已知），我们可以将图像坐标 $x$ 转换到“归一化坐标“：</p>
+<p>$$\hat{x} = K^{-1} x, \quad \hat{x}’ = K’^{-1} x’$$</p>
+<p>归一化坐标可以理解为“在焦距为 1 的理想相机下，三维点在图像平面上的坐标“。</p>
+<p>在归一化坐标系下，对极约束变为（H&amp;Z section 9.6, p.257）：</p>
+<p>$$\boxed{\hat{x}’^T E \hat{x} = 0}$$</p>
+<p>这就是<strong>本质矩阵 $E$（Essential Matrix）</strong>。</p>
+<h4 id="f-与-e-的关系"><a class="header" href="#f-与-e-的关系">F 与 E 的关系</a></h4>
+<p>将 $\hat{x} = K^{-1} x$, $\hat{x}’ = K’^{-1} x’$ 代入 $\hat{x}’^T E \hat{x} = 0$：</p>
+<p>$$(K’^{-1} x’)^T E (K^{-1} x) = 0$$
+$$x’^T (K’^{-T} E K^{-1}) x = 0$$</p>
+<p>因此（H&amp;Z p.257）：</p>
+<p>$$\boxed{F = K’^{-T} E K^{-1}}$$</p>
+<p>等价地：</p>
+<p>$$E = K’^T F K$$</p>
+<h4 id="e-的定义与性质"><a class="header" href="#e-的定义与性质">E 的定义与性质</a></h4>
+<p>$E$ 的定义为（H&amp;Z p.257）：</p>
+<p>$$E = [t]_\times R$$</p>
+<p>其中 $R$ 和 $t$ 是两台相机之间的旋转和平移。$[t]_\times$ 是 $t$ 的反对称矩阵。</p>
+<p>$E$ 有 <strong>5 个自由度</strong>（3 个旋转 + 3 个平移 - 1 个整体尺度——平移向量的绝对长度无法恢复）。</p>
+<p>$E$ 的 SVD 形式（H&amp;Z p.258）：</p>
+<p>$$E = U \begin{bmatrix}1 &amp; 0 &amp; 0 \ 0 &amp; 1 &amp; 0 \ 0 &amp; 0 &amp; 0 \end{bmatrix} V^T$$</p>
+<p><strong>核心约束</strong>：$E$ 的两个非零奇异值<strong>相等</strong>。这个约束比 $\det(F) = 0$ 更强——它反映了校准后的几何关系。</p>
+<blockquote>
+<p><strong>人话翻译</strong>：F 和 E 的关系就像“近视眼看世界“和“戴了眼镜看世界“。F 是未校准相机的产物——你不知道焦距、主点等参数，所以 F 含混一些（7 DOF）。E 是校准后的产物——你知道 K 和 K’，可以从像素坐标反推出归一化坐标，得到的 E 干净很多（5 DOF）。最少只需 5 个点对应就能唯一确定 E，而 F 最少要 7 个。</p>
+</blockquote>
+<h4 id="从-e-恢复相机运动四个解只有一个在相机前面"><a class="header" href="#从-e-恢复相机运动四个解只有一个在相机前面">从 E 恢复相机运动——四个解只有一个在相机前面</a></h4>
+<p>给定 $E = U \text{diag}(1,1,0) V^T$，两台相机的投影矩阵有两种可能的旋转和两种可能的平移方向，组合出四种可能解（H&amp;Z section 9.6.2, p.258-259）：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>解</th><th>R</th><th>t</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>$U W V^T$</td><td>$+u_3$</td></tr>
+<tr><td>2</td><td>$U W V^T$</td><td>$-u_3$</td></tr>
+<tr><td>3</td><td>$U W^T V^T$</td><td>$+u_3$</td></tr>
+<tr><td>4</td><td>$U W^T V^T$</td><td>$-u_3$</td></tr>
+</tbody>
+</table>
+</div>
+<p>其中 $W = \begin{bmatrix} 0 &amp; -1 &amp; 0 \ 1 &amp; 0 &amp; 0 \ 0 &amp; 0 &amp; 1 \end{bmatrix}$，$u_3$ 是 $U$ 的第三列。</p>
+<p>四个解对应四种相机几何配置。<strong>只有一种解让重建出的三维点同时出现在两个相机前面</strong>（深度为正）。这提供了一个自然的选解准则：对每一对相机，三角化一个测试点，检查它的深度在两个相机中是否都为正（H&amp;Z p.259）。</p>
+<h3 id="从-fe-构造相机矩阵"><a class="header" href="#从-fe-构造相机矩阵">从 F/E 构造相机矩阵</a></h3>
+<h4 id="未校准情形从-f-构造射影重建"><a class="header" href="#未校准情形从-f-构造射影重建">未校准情形：从 F 构造射影重建</a></h4>
+<p>给定 $F$，可以选择一个规范形式（H&amp;Z Result 9.14, p.255）：</p>
+<p>$$P = [I \mid 0], \quad P’ = [[e’]_\times F \mid e’]$$</p>
+<p>这构造了一对相机，其基础矩阵恰好是 $F$。这对相机与真实的相机只差一个三维射影变换——这正是<strong>射影重建定理</strong>的基础（见下方）。</p>
+<h4 id="校准情形从-e-构造度量重建"><a class="header" href="#校准情形从-e-构造度量重建">校准情形：从 E 构造度量重建</a></h4>
+<p>给定 $E$ 并选择了正确的 $(R, t)$ 解后：</p>
+<p>$$P = K[I \mid 0], \quad P’ = K’[R \mid t]$$</p>
+<p>这给出的是度量重建——保留了角度和相对比例。</p>
+<h3 id="三角测量从两条射线反推三维点"><a class="header" href="#三角测量从两条射线反推三维点">三角测量——从两条射线反推三维点</a></h3>
+<p>有了相机矩阵 $P$ 和 $P’$，以及对应点 $x \leftrightarrow x’$，如何恢复三维点 $X$？</p>
+<p>从 $x = PX$ 可得 $x \times PX = 0$，每个相机提供两个线性独立方程，两个相机共四个方程，求解三个未知数（$X$ 的齐次坐标，3 DOF）——过约束但可解（H&amp;Z section 10.1, p.262-264）。</p>
+<p>如果对极约束 $x’^T F x = 0$ 严格满足，两条反向投影射线在空间中相交于一点。实际操作中由于噪声，两条射线不严格相交——需要用最小二乘法找最优近似交点。</p>
+<pre><code class="language-mermaid">flowchart TD
+    A["Feature Matches&lt;br/&gt;x_i &amp;lt;-&amp;gt; x'_i"] --&gt; B["Compute F&lt;br/&gt;8-point + RANSAC&lt;br/&gt;H&amp;Z section 9.2"]
+    B --&gt; C["F: rank-2, 7 DOF&lt;br/&gt;x'^T F x = 0"]
+    C --&gt; D{"Calibrated&lt;br/&gt;cameras?"}
+    D --&gt;|"Yes: K, K' known"| E["E = K'^T F K&lt;br/&gt;H&amp;Z section 9.6, p.257"]
+    D --&gt;|"No"| F["Canonical cameras&lt;br/&gt;P=[I|0], P'=[[e']_x F | e']&lt;br/&gt;H&amp;Z Result 9.14, p.255"]
+    E --&gt; G["SVD of E&lt;br/&gt;E = U diag(1,1,0) V^T&lt;br/&gt;H&amp;Z p.258"]
+    G --&gt; H["4 (R,t) solutions&lt;br/&gt;select by positive depth&lt;br/&gt;H&amp;Z p.258-259"]
+    H --&gt; I["Metric cameras&lt;br/&gt;P=K[I|0], P'=K'[R|t]"]
+    F --&gt; J["Projective reconstruction&lt;br/&gt;up to 3D homography"]
+    I --&gt; K["Triangulation&lt;br/&gt;back-project rays, solve for X&lt;br/&gt;H&amp;Z section 10.1, p.262"]
+    J --&gt; K
+    K --&gt; L["3D Point Cloud&lt;br/&gt;X_1, X_2, ..., X_n"]
+    L --&gt; M["Bundle Adjustment&lt;br/&gt;jointly optimize all P^i and X_j&lt;br/&gt;H&amp;Z section 18.1, p.434"]
+    M --&gt; N["Final Reconstruction"]
+</code></pre>
+<h3 id="射影重建定理不需要标定也能重建三维"><a class="header" href="#射影重建定理不需要标定也能重建三维">射影重建定理——不需要标定也能重建三维</a></h3>
+<p>这是未校准多视图几何中最重要的结果（H&amp;Z Theorem 10.1, p.266）：</p>
+<blockquote>
+<p>如果从点对应中唯一确定了基础矩阵 $F$，那么场景和相机可以从这些对应中重建出来。任何两个这样的重建之间只差一个三维射影变换。</p>
+</blockquote>
+<p>这意味着：<strong>即使你完全不知道相机参数——焦距多少、主点在哪——只要你有足够多的匹配点对，你就能重建场景的三维结构。</strong> 当然，这个重建是“射影层面“的——像被哈哈镜扭曲过，但共线性、相交性等射影性质都被保留了。</p>
+<p>通过添加额外约束，可以将射影重建逐步升级：</p>
+<ul>
+<li><strong>射影 → 仿射</strong>：识别无穷远平面 $\pi_\infty$（如通过纯平移运动或已知的三组平行线）（H&amp;Z p.267）</li>
+<li><strong>仿射 → 度量</strong>：识别绝对二次曲面 $\Omega_\infty$ 的像（如已知相机内参或正交场景约束）（H&amp;Z p.270）</li>
+</ul>
+<p>这就是<strong>分层重建策略</strong>（Projective → Affine → Metric）（H&amp;Z section 10.4, p.267-273）。</p>
+<h3 id="特殊运动退化和简化"><a class="header" href="#特殊运动退化和简化">特殊运动——退化和简化</a></h3>
+<p>两种特殊的相机运动产生简化的对极几何（H&amp;Z section 9.3, p.247-250）：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>运动类型</th><th>F 的性质</th><th>对极线的表现</th><th>三维重建</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>纯平移</strong> Pure translation</td><td>$F = [e]<em>\times = [e’]</em>\times$（反对称矩阵）</td><td>所有对极线平行，交于同一个方向上的无穷远点</td><td>可重建，但对极点退化为无穷远——仿射重建</td></tr>
+<tr><td><strong>纯旋转</strong> Pure rotation</td><td>$F$ 无法从点对应计算</td><td>无对极线</td><td><strong>不可能做三角测量</strong>——因为没有视差</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>直觉解读</strong>：</p>
+<ul>
+<li>纯平移（如你在火车上朝侧面拍照）：两张图之间的变换是一个反对称映射，对极线会变成平行线——这就是为什么在某种情况下它变成了仿射问题。</li>
+<li>纯旋转（你原地转圈拍照）：两张图像之间实际上是一个单应变换（H 矩阵），没有三维信息——因为相机没移动，就没有视差。这就是为什么全景拼接用 H 矩阵就够了——纯旋转情况下不需要 F。</li>
+</ul>
+<h3 id="code-lens用-numpy-实现归一化-8-点算法"><a class="header" href="#code-lens用-numpy-实现归一化-8-点算法">Code Lens：用 NumPy 实现归一化 8 点算法</a></h3>
+<p>以下代码从至少 8 个点对应计算基础矩阵 $F$，基于 Hartley 1997 的归一化 8 点算法：</p>
+<pre><code class="language-python">import numpy as np
+
+
+def normalize_points(pts):
+    """
+    Normalize points so centroid is at origin and RMS distance = sqrt(2).
+    Hartley 1997: normalized 8-point algorithm.
+    H&amp;Z section 4.4 (p.107-110): normalization improves numerical stability.
+    """
+    centroid = pts.mean(axis=0)
+    shifted = pts - centroid
+    rms = np.sqrt(np.mean(shifted[:, 0]**2 + shifted[:, 1]**2))
+    scale = np.sqrt(2) / rms
+
+    T = np.array([
+        [scale, 0,      -scale * centroid[0]],
+        [0,     scale,  -scale * centroid[1]],
+        [0,     0,       1]
+    ])
+    pts_homo = np.column_stack([pts, np.ones(len(pts))])
+    pts_norm = (T @ pts_homo.T).T
+    return pts_norm[:, :2], T
+
+
+def compute_fundamental_matrix_8pt(ptsL, ptsR):
+    """
+    Compute Fundamental Matrix F using normalized 8-point algorithm.
+    Hartley 1997; H&amp;Z Algorithm 9.1 (p.262) for normalized 8-point.
+
+    Constraint: x'^T F x = 0  (H&amp;Z 9.5, p.245)
+    F: 3x3, rank 2, 7 DOF (H&amp;Z section 9.2.4, p.245-246)
+
+    Parameters
+    ----------
+    ptsL, ptsR : np.ndarray, shape (N, 2)
+        N &gt;= 8 point correspondences.
+
+    Returns
+    -------
+    F : np.ndarray, shape (3, 3)
+        Fundamental matrix.
+    """
+    assert len(ptsL) &gt;= 8 and len(ptsR) &gt;= 8
+
+    # Step 1: Normalize point coordinates (Hartley 1997)
+    ptsL_norm, TL = normalize_points(ptsL)
+    ptsR_norm, TR = normalize_points(ptsR)
+
+    # Step 2: Build the design matrix A from x'^T F x = 0
+    # Each correspondence (x,y,1) &lt;-&gt; (x',y',1) gives one equation:
+    #   x'*x*f11 + x'*y*f12 + x'*f13 + y'*x*f21 + y'*y*f22
+    #   + y'*f23 + x*f31 + y*f32 + f33 = 0
+    N = len(ptsL_norm)
+    A = np.zeros((N, 9))
+    for i in range(N):
+        x, y = ptsL_norm[i]
+        xp, yp = ptsR_norm[i]
+        A[i] = [xp*x, xp*y, xp,  yp*x, yp*y, yp,  x, y, 1]
+
+    # Step 3: Solve Af = 0 via SVD
+    # f is the singular vector corresponding to smallest singular value
+    _, _, Vt = np.linalg.svd(A)
+    f = Vt[-1]  # last row of Vt = last column of V
+    F_norm = f.reshape(3, 3)
+
+    # Step 4: Enforce rank-2 constraint (H&amp;Z section 9.2.4, p.245-246)
+    # Replace F with closest rank-2 matrix by zeroing smallest singular value
+    U, S_diag, Vt_F = np.linalg.svd(F_norm)
+    S_diag[2] = 0  # det(F) = 0
+    F_norm = U @ np.diag(S_diag) @ Vt_F
+
+    # Step 5: Denormalize
+    F = TR.T @ F_norm @ TL
+
+    # Optional: normalize so F[2,2] = 1 or ||F|| = 1
+    return F / np.linalg.norm(F)
+
+
+def epipolar_error(F, ptsL, ptsR):
+    """
+    Compute Sampson error (first-order geometric error) for F.
+    H&amp;Z (4.10, p.99).
+    """
+    N = len(ptsL)
+    ptsL_h = np.column_stack([ptsL, np.ones(N)])
+    ptsR_h = np.column_stack([ptsR, np.ones(N)])
+
+    errors = []
+    for i in range(N):
+        x = ptsL_h[i]
+        xp = ptsR_h[i]
+        grad = F @ x
+        grad_t = F.T @ xp
+        error = (xp @ F @ x)**2 / (grad[0]**2 + grad[1]**2 +
+                                    grad_t[0]**2 + grad_t[1]**2)
+        errors.append(error)
+    return np.array(errors)
+
+
+# --- Example: 8 synthetic correspondences ---
+np.random.seed(42)
+# Generate a random ground-truth F (rank 2)
+F_true = np.random.randn(3, 3)
+U, S, Vt = np.linalg.svd(F_true)
+S[2] = 0
+F_true = U @ np.diag(S) @ Vt
+F_true = F_true / np.linalg.norm(F_true)
+
+# Generate 20 random point pairs satisfying x'^T F x = 0
+N = 20
+ptsL_true = np.random.rand(N, 2) * 500
+ptsR_true = np.zeros((N, 2))
+for i in range(N):
+    x_homo = np.array([ptsL_true[i][0], ptsL_true[i][1], 1.0])
+    lR = F_true @ x_homo  # epipolar line in right image
+    # Choose a point on this line
+    a, b, c = lR
+    xp = -c / a if abs(a) &gt; 1e-6 else 0
+    ptsR_true[i] = [xp, 0]
+    # Add small noise
+    ptsR_true[i] += np.random.randn(2) * 0.5
+
+F_est = compute_fundamental_matrix_8pt(ptsL_true, ptsR_true)
+print("Estimated F:\n", np.round(F_est, 4))
+print("Rank of estimated F:", np.linalg.matrix_rank(F_est))
+
+# Verify epipolar constraint on data
+errs = epipolar_error(F_est, ptsL_true, ptsR_true)
+print(f"Mean Sampson error: {np.mean(errs):.6f}")
+
+# Verify Fe = 0 (left epipole is null space of F)
+_, _, Vt_F = np.linalg.svd(F_est)
+e = Vt_F[-1]  # right null vector
+e = e / e[2] if abs(e[2]) &gt; 1e-6 else e
+print(f"Left epipole e (null space of F): ({e[0]:.1f}, {e[1]:.1f})")
+print(f"F @ e =\n{np.round(F_est @ e, 6)}")
+</code></pre>
+<p><strong>代码解读</strong>：</p>
+<ol>
+<li>
+<p><strong>归一化</strong>（<code>normalize_points</code>）：将点平移到质心在原点、缩放到 RMS 距离为 $\sqrt{2}$。这是 Hartley 1997 的核心贡献——不做这一步，8 点算法在数值上极不稳定（H&amp;Z section 4.4, p.107-110）。</p>
+</li>
+<li>
+<p><strong>构建矩阵 A</strong>：从 $x’^T F x = 0$ 展开，每个点对给一行方程，$N$ 个点对给出 $N \times 9$ 的矩阵 $A$，求解 $Af = 0$（H&amp;Z 9.5, p.245）。</p>
+</li>
+<li>
+<p><strong>秩二约束</strong>：SVD 解法得到的 $\tilde{F}$ 通常是满秩的（秩为 3）。将对角矩阵 $S$ 的最小奇异值设为零，再重组，得到最近的秩二矩阵——强制 $\det(F) = 0$（H&amp;Z section 9.2.4, p.245-246）。</p>
+</li>
+<li>
+<p><strong>去归一化</strong>：$F = T’^T \tilde{F} T$——因为 $\tilde{F}$ 是在归一化坐标系下计算的，需要变换回原始坐标系。</p>
+</li>
+<li>
+<p><strong>零空间验证</strong>：$F$ 的右零空间向量 $e$ 就是左图的対极点——右相机中心在左图的投影。</p>
+</li>
+</ol>
+<hr>
+<h2 id="第三阶部署实战-2"><a class="header" href="#第三阶部署实战-2">第三阶：部署实战</a></h2>
+<h3 id="从点对应到-f完整实战流程"><a class="header" href="#从点对应到-f完整实战流程">从点对应到 F——完整实战流程</a></h3>
+<p>在实际项目中，计算 $F$ 的标准流程为：</p>
+<ol>
+<li><strong>特征提取与匹配</strong>：SIFT / ORB / SuperPoint 提取特征点 + 匹配器（BFMatcher 或 FLANN）建立初步对应。</li>
+<li><strong>比率测试（Lowe’s ratio test）</strong>：剔除模糊匹配——最近邻与次近邻距离比 &gt; 0.75 的匹配被丢弃。</li>
+<li><strong>RANSAC 鲁棒估计</strong>：用 <code>cv2.findFundamentalMat</code> 的 <code>FM_RANSAC</code> 模式。随机抽取 8 对点 → 计算 F → 统计内点（Sampson 误差 &lt; 阈值的匹配）→ 选内点最多的 F → 用所有内点精修 F。</li>
+<li><strong>秩二强制</strong>：RANSAC 初解后，OpenCV 内部会用所有内点精修，并强制 $\det(F) = 0$。</li>
+<li><strong>对极线验证</strong>：对采样点画出对极线，目视检查——匹配点是否确实在对极线上。</li>
+</ol>
+<h3 id="opencv-关键-api"><a class="header" href="#opencv-关键-api">OpenCV 关键 API</a></h3>
+<pre><code class="language-python"># Compute F with RANSAC
+F, mask = cv2.findFundamentalMat(
+    ptsL, ptsR,
+    method=cv2.FM_RANSAC,
+    ransacReprojThreshold=1.0,  # Sampson error threshold (pixels)
+    confidence=0.99              # RANSAC confidence level
+)
+
+# Compute Essential Matrix (requires camera matrices K1, K2)
+E, mask_E = cv2.findEssentialMat(
+    ptsL, ptsR,
+    cameraMatrix1=K1,
+    cameraMatrix2=K2,
+    method=cv2.RANSAC,
+    prob=0.999,
+    threshold=1.0
+)
+
+# Recover relative camera pose from E
+_, R, t, mask_pose = cv2.recoverPose(
+    E, ptsL, ptsR,
+    cameraMatrix1=K1,
+    cameraMatrix2=K2
+)
+
+# Draw epipolar lines for a given point
+lines = cv2.computeCorrespondEpilines(
+    ptsL.reshape(-1, 1, 2), whichImage=1, F=F
+)
+</code></pre>
+<h3 id="立体矫正stereo-rectification"><a class="header" href="#立体矫正stereo-rectification">立体矫正（Stereo Rectification）</a></h3>
+<p>对极几何的一个直接应用是<strong>立体矫正</strong>：将一对图像变形，使得所有对极线变成水平且共线。矫正后，对应点在两张图的行坐标相同——立体匹配从二维搜索变成一维搜索。</p>
+<pre><code class="language-python"># Stereo rectification (requires both camera matrices and distortion coeffs)
+R1, R2, P1, P2, Q, _, _ = cv2.stereoRectify(
+    K1, dist1, K2, dist2, img_size,
+    R, T,  # relative rotation and translation between cameras
+    flags=cv2.CALIB_ZERO_DISPARITY, alpha=0
+)
+
+# Compute rectification maps
+map1x, map1y = cv2.initUndistortRectifyMap(
+    K1, dist1, R1, P1, img_size, cv2.CV_32FC1
+)
+map2x, map2y = cv2.initUndistortRectifyMap(
+    K2, dist2, R2, P2, img_size, cv2.CV_32FC1
+)
+
+# Apply rectification
+rectL = cv2.remap(imgL, map1x, map1y, cv2.INTER_LINEAR)
+rectR = cv2.remap(imgR, map2x, map2y, cv2.INTER_LINEAR)
+</code></pre>
+<p>矫正后图像的特点：任意一个三维点在左图和右图中的投影<strong>在同一个水平行上</strong>——这意味着你可以逐行做立体匹配，而不需要在整个图像中搜索。</p>
+<h3 id="常见陷阱与对策"><a class="header" href="#常见陷阱与对策">常见陷阱与对策</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>陷阱</th><th>表现</th><th>原因</th><th>解决方案</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>平面场景</strong> Planar scene</td><td>任意三个点对都能满足某个 F，F 不唯一</td><td>所有三维点在一个平面上时，点对应之间满足一个 H 关系，H 与 F 退化解耦合</td><td>检测场景是否退化：尝试用 H 拟合内点。如果 H 的内点几乎和 F 一样多，场景可能是平面的。在场景中引入非平面特征</td></tr>
+<tr><td><strong>纯旋转</strong> Pure rotation</td><td><code>findFundamentalMat</code> 返回的 F 内点数极低；三角测量失败（所有点深度接近零）</td><td>相机没有平移就没有视差，两张图之间是单应关系（H），不存在对极约束</td><td>检查相机是否移动：如果连续两帧之间旋转大而平移小，跳过这帧对。使用 IMU 辅助判断</td></tr>
+<tr><td><strong>特征点集中在图像一隅</strong></td><td>F 的零空间（対极点）不稳定，偏到天边</td><td>点对分布不覆盖足够的图像区域，A 矩阵的行高度相关</td><td>确保特征点覆盖整个图像区域——特别是四个角。如果用 SIFT/ORB，调整检测参数以获得更均匀的分布</td></tr>
+<tr><td><strong>匹配中有大量 outlier</strong></td><td>RANSAC 后内点率极低（&lt; 30%）</td><td>纹理重复区域（如砖墙、草地）产生大量错误匹配</td><td>1) 降低比率测试阈值（如 0.6）；2) 使用交叉验证匹配（cross-check）；3) 使用更好的特征（SuperPoint + LightGlue）</td></tr>
+<tr><td><strong>使用原始像素坐标</strong></td><td>F 估计极不稳定，每次运行结果差异大</td><td>像素坐标可达数千，矩阵 A 的列范数差异巨大，SVD 数值精度崩塌</td><td><strong>永远使用归一化 8 点算法</strong>。或直接用 <code>cv2.findFundamentalMat</code>——OpenCV 内部已经做了归一化</td></tr>
+<tr><td><strong>未强制秩二约束</strong></td><td>$\det(F) \neq 0$，对极线不经过对极点</td><td>SVD 初始解通常满秩</td><td>计算 F 后手动验证 $\det(F)$ 是否接近 0。如果不，用 SVD 将最小奇异值置零后重组</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="ransac-的参数怎么调"><a class="header" href="#ransac-的参数怎么调">RANSAC 的参数怎么调？</a></h3>
+<p>RANSAC 是计算 F 时对抗 outlier 的核心手段（H&amp;Z section 4.7, p.116-123）：</p>
+<ul>
+<li><strong>距离阈值 $t$（ransacReprojThreshold）</strong>：判断一个点对是内点的 Sampson 误差上限。典型值 1.0-3.0 像素。太小 → 内点太少；太大 → outlier 混入。</li>
+<li><strong>置信度（confidence）</strong>：RANSAC 至少采样一次的保证概率。典型值 0.99-0.999。越高 → 迭代次数越多。</li>
+<li><strong>最少采样数</strong>：对于 F，最少 8 个点对（8 点算法）。也可以用 7 个（7 点算法，F 的极小配置）——7 个点更省迭代，但对噪声更敏感。</li>
+</ul>
+<p>RANSAC 会基于置信度和期望内点比例自动计算迭代次数。如果内点率太低，迭代次数可能不够——观察到内点率 &lt; 30% 时，考虑提高置信度到 0.999 或更多。</p>
+<hr>
+<h2 id="苏格拉底时刻-2"><a class="header" href="#苏格拉底时刻-2">苏格拉底时刻</a></h2>
+<ol>
+<li>
+<p><strong>F 矩阵的秩为 2 意味着什么物理约束？如果三维世界中的一个物体刚好在一个平面上，F 矩阵还能唯一确定吗？</strong></p>
+<p>（提示：秩为 2 意味着 F 有一个零空间——这个零空间恰好对应一个相机的中心在另一个图像上的投影（対极点）。物理上，秩二对应的是“两条反向投影射线必须相交“——当两条射线共面且不平行时它们必然相交于一点。秩二不是额外的数据约束，而是对极几何本身的内部一致性要求。当所有三维点在一个平面上时，点对应的约束退化——任意多个点对都可能满足不同的 F，因为此时点对应首先满足一个单应矩阵 H，而 H 无法唯一约束 F。这在工程上表现为：<code>findFundamentalMat</code> 的 F 矩阵每次跑都不一样，但它们在数据上的拟合误差都很低。这就是为什么立体匹配算法通常要求场景有足够的深度变化。）</p>
+</li>
+<li>
+<p><strong>如果你用校准过的相机拍了两张照片，但没有做任何特征匹配，你还能恢复两张照片之间的对极几何吗？</strong></p>
+<p>（提示：不能。校准让你知道每个像素在归一化坐标下的位置（$K^{-1} x$），但归一化坐标的物理意义是“从相机中心出发的方向向量“。你知道了每个像素对应现实中哪个方向，但不知道左图的哪个像素和右图的哪个像素对应同一个三维点。换句话说，校准让你知道了“可能的关系“（即 $E$ 的约束形式），但要算出具体的 $E$，还是需要点对应来“填数“。如果你完全不做特征匹配，你只是在不同方向拍了两张无关联的照片——就像你左眼和右眼看到的东西如果不做“大脑融合“，就只是两张不相关的图。）</p>
+</li>
+</ol>
+<hr>
+<h2 id="关键论文清单-2"><a class="header" href="#关键论文清单-2">关键论文清单</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>年份</th><th>论文/书籍</th><th>一句话贡献</th></tr>
+</thead>
+<tbody>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry in Computer Vision</em> (2nd Ed.)</td><td>本章主要参考 Ch.9（对极几何与 F 矩阵）、Ch.10（三维重建）、Ch.4（估计），建立了多视图几何的理论框架</td></tr>
+<tr><td>1981</td><td>H. C. Longuet-Higgins, “A Computer Algorithm for Reconstructing a Scene from Two Projections”, <em>Nature</em></td><td><strong>本质矩阵的原始提出</strong>——首次揭示了校准后两视图之间 3x3 矩阵约束，5 DOF 的性质</td></tr>
+<tr><td>1997</td><td>R. Hartley, “In Defense of the Eight-Point Algorithm”, <em>IEEE TPAMI</em></td><td><strong>归一化 8 点算法</strong>——证明了 8 点算法在坐标归一化后数值稳定性可与迭代法媲美，使 F 的鲁棒估计成为可能</td></tr>
+<tr><td>1981</td><td>M. A. Fischler &amp; R. C. Bolles, “Random Sample Consensus”, <em>Comm. ACM</em></td><td>RANSAC 的原始提出——使得在有大量错误匹配的现实中计算 F 成为可能</td></tr>
+<tr><td>1992</td><td>R. Hartley, “Estimation of Relative Camera Positions for Uncalibrated Cameras”, <em>ECCV</em></td><td>首次证明：未校准相机也能从 F 中恢复射影重建——奠定了未校准 3D 重建的基础</td></tr>
+<tr><td>2002</td><td>D. Nister, “An Efficient Solution to the Five-Point Relative Pose Problem”, <em>IEEE TPAMI</em></td><td>5 点算法——从 5 个点对应直接求解 E（校准情形的极小配置），被 OpenCV 的 <code>findEssentialMat</code> 采用</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="实操练习-2"><a class="header" href="#实操练习-2">实操练习</a></h2>
+<p><strong>练习 1：亲手体验 F 的 8 点法</strong></p>
+<ol>
+<li>用手机在同一个场景拍两张照片，确保相机有足够平移（移动 10-20 厘米），且两张照片有足够重叠（至少 60% 的景物重叠）。</li>
+<li>用 SIFT 或 ORB 提取特征点并做匹配。画出 20 对匹配点。</li>
+<li>用上面的 NumPy 归一化 8 点算法计算 F。验证 <code>np.linalg.matrix_rank(F)</code> 是否为 2。</li>
+<li>选 5 个左图的关键点，画出它们在右图中的对极线。检查——右图中的匹配点是否确实在对极线上？</li>
+<li><strong>让相机原地旋转（不移动）再拍两张。</strong> 用同样的流程计算 F——会发生什么？<code>findFundamentalMat</code> 能成功吗？内点率高吗？这验证了什么退化条件？</li>
+</ol>
+<p><strong>练习 2：用立体矫正做视差估计</strong></p>
+<ol>
+<li>用 OpenCV 的 <code>stereoRectify</code> 对一对立体图像做矫正。</li>
+<li>矫正后，在左图选一个点（比如花瓶的边缘），用鼠标悬停在右图的同一行上——看看对应点是否确实大约在同一行？</li>
+<li>思考：为什么立体矫正后的图像中，视差（同一三维点在左右图中的列坐标差）与深度成反比？</li>
+</ol>
+<p><strong>练习 3：从 E 恢复相机运动</strong></p>
+<ol>
+<li>假设你的手机相机已经标定（可以用第 01 节的标定方法得到 K 矩阵）。</li>
+<li>拍摄两张不同位置的照片。用 <code>cv2.findEssentialMat</code> 计算 E。</li>
+<li>用 <code>cv2.recoverPose</code> 恢复 R 和 t。t 向量的绝对长度是多少？（提示：是 1——平移的绝对尺度无法从两张图像中恢复。）</li>
+<li>用恢复的 R 和 t，结合 K 矩阵，对一对匹配点做三角测量。验证重建出的三维点的深度是否在两张图中都为正。</li>
+</ol>
+<hr>
+<h2 id="延伸阅读-2"><a class="header" href="#延伸阅读-2">延伸阅读</a></h2>
+<ul>
+<li>本书内：[[01 相机模型]] · [[02 投影几何]] · [[04 特征点与匹配]]</li>
+<li>H&amp;Z 原书 Ch.9：对极几何的完整推导，包括代数推导（p.242-243）和几何推导（p.243-244）、F 的 7 DOF 参数化（p.245-246）、退化配置</li>
+<li>H&amp;Z 原书 Ch.10：三角测量、射影重建定理、分层重建策略</li>
+<li>H&amp;Z 原书 Ch.11：三视图张量（Trifocal Tensor）——从两视图扩展到三视图</li>
+<li>R. Hartley, “In Defense of the Eight-Point Algorithm” (1997)：归一化 8 点算法的必读论文——理解为什么“简单的归一化“能拯救整个算法</li>
+<li>OpenCV Epipolar Geometry Tutorial：https://docs.opencv.org/4.x/da/de9/tutorial_py_epipolar_geometry.html</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="04-深度表示三维数据到底长什么样"><a class="header" href="#04-深度表示三维数据到底长什么样">04 深度表示：三维数据到底长什么样</a></h1>
+<blockquote>
+<p>预计阅读时间：35 分钟
+前置知识：本篇第 01 节（相机模型）、第 03 节（多视图几何入门）
+读完本节后，你可以：区分视差图、深度图和点云，理解三者之间的转换关系，用 NumPy 实现深度图与点云的互转，知道什么场景用哪种表示。</p>
+</blockquote>
+<hr>
+<h2 id="第一阶直观理解-3"><a class="header" href="#第一阶直观理解-3">第一阶：直观理解</a></h2>
+<h3 id="一个场景-3"><a class="header" href="#一个场景-3">一个场景</a></h3>
+<p>你已经学会了从两张照片算出三维点——三角测量的原理、基础矩阵的作用，你都清楚了。但算出来的这个“三维“到底长什么样？</p>
+<p>是一张图？一堆点？还是一串数字？</p>
+<p>答案是：三种形式都有，而且它们是同一份信息的不同“容器“。你在论文里看到的“深度估计“、在数据集里下载的 <code>.ply</code> 文件、在 ROS 里订阅的 <code>/depth_image</code> 话题——本质上都是三维几何的不同表达。搞清楚它们的区别和联系，是进入 3D 视觉工程实践的第一步。</p>
+<h3 id="核心直觉深度可以是一张图也可以是一团点"><a class="header" href="#核心直觉深度可以是一张图也可以是一团点">核心直觉：“深度“可以是一张图，也可以是一团点</a></h3>
+<p>想象你站在窗前看外面的建筑。你感知到的“远近“有两种自然的表达方式：</p>
+<ol>
+<li><strong>画在地面上</strong>——把建筑物每个位置离你有多远，画成一张图。近处偏暗，远处偏亮。这就是<strong>深度图</strong>。</li>
+<li><strong>撒在空中</strong>——把建筑物表面每个可见点独立标注为 $(X,Y,Z)$ 坐标，像一团悬浮的粉尘。这就是<strong>点云</strong>。</li>
+</ol>
+<p>这两种表达之间，靠相机的几何关系来转换——知道焦距和主点位置，就能把深度图的每个像素“反投影“成三维空间的一个点。反之，把点云“投影“回图像平面，就得到深度图。</p>
+<p>它们之间的第三种表示——<strong>视差图</strong>——只在双目/多目系统中有意义。它是左图和右图中对应点之间的像素偏移量。视差越大，物体越近；视差越小，物体越远。</p>
+<h3 id="技术全景-3"><a class="header" href="#技术全景-3">技术全景</a></h3>
+<pre><code class="language-mermaid">mindmap
+  root((Depth Representation))
+    Disparity Map
+      Left-right pixel shifts
+      Inverse proportion to depth
+      Unit: pixels
+      Stereo matching output
+    Depth Map
+      2D image of distances
+      Each pixel = Z value
+      Unit: meters or millimeters
+      .png .exr .npy formats
+    Point Cloud
+      Unordered set of (X,Y,Z)
+      Optionally colored RGB
+      .ply .pcd .las formats
+      Open3D / PCL libraries
+    Conversion Pipeline
+      Disparity -&gt; Depth: Z = f*b / d
+      Depth -&gt; Point Cloud: back-projection
+      Point Cloud -&gt; Depth: rasterization
+</code></pre>
+<h3 id="三种表示对比"><a class="header" href="#三种表示对比">三种表示对比</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>表示</th><th>数据类型</th><th>存储开销</th><th>优点</th><th>缺点</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>视差图 Disparity Map</strong></td><td>2D 图像，像素值 = 左右图列坐标差</td><td>低（单通道图像）</td><td>立体匹配算法的直接输出；在矫正过的双目对中，视差与深度呈简单反比</td><td>无相机参数时自身无物理意义；受遮挡影响（左图看得到右图看不到的地方没有视差）</td></tr>
+<tr><td><strong>深度图 Depth Map</strong></td><td>2D 图像，像素值 = 沿光轴的距离 Z</td><td>低（单通道图像）</td><td>物理意义明确（单位是米）；与 RGB 图像天然对齐（逐像素对应）；便于送入 CNN</td><td>2.5D 表示——只能看到相机前方的表面，背面/侧面不可见；单张深度图不包含完整的物体背面信息</td></tr>
+<tr><td><strong>点云 Point Cloud</strong></td><td>无序 $(X,Y,Z)$ 点集，可能带 RGB</td><td>高（每个点需 3-4 个 float）</td><td>完整的 3D 表达——可以在空间中任意旋转、剖切；适合几何处理（配准、分割、曲面重建）</td><td>无拓扑信息（点之间没有连接关系）；点数多时计算开销大；不是规则网格，CNN 不能直接用</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="mini-case加载一张深度图用热力图和点云两种方式看它"><a class="header" href="#mini-case加载一张深度图用热力图和点云两种方式看它">Mini Case：加载一张深度图，用热力图和点云两种方式看它</a></h3>
+<pre><code class="language-python">import numpy as np
+from PIL import Image
+import matplotlib.pyplot as plt
+
+# Load a 16-bit depth map (Middlebury or any dataset)
+# 16-bit PNG: pixel values in millimeters
+depth_png = np.array(Image.open("depth_map.png")).astype(np.float32)
+
+# Convert to meters
+depth_meters = depth_png / 1000.0
+
+# --- Visualization 1: Heatmap ---
+plt.figure(figsize=(12, 5))
+plt.subplot(1, 2, 1)
+plt.imshow(depth_meters, cmap='plasma')
+plt.colorbar(label='Depth (meters)')
+plt.title('Depth Map as Heatmap')
+
+# Mask out zero/invalid depths
+valid_mask = depth_meters &gt; 0
+
+plt.subplot(1, 2, 2)
+plt.hist(depth_meters[valid_mask].ravel(), bins=100, color='steelblue', edgecolor='white')
+plt.xlabel('Depth (meters)')
+plt.ylabel('Pixel Count')
+plt.title('Depth Distribution')
+plt.tight_layout()
+plt.show()
+
+# --- Visualization 2: Convert to point cloud ---
+H, W = depth_meters.shape
+fx, fy = 525.0, 525.0   # example focal lengths (pixels)
+cx, cy = W / 2, H / 2   # principal point at image center
+
+u, v = np.meshgrid(np.arange(W), np.arange(H))
+u = u[valid_mask]
+v = v[valid_mask]
+Z = depth_meters[valid_mask]
+
+X = (u - cx) * Z / fx
+Y = (v - cy) * Z / fy
+
+points = np.stack([X, Y, Z], axis=-1)
+print(f"Point cloud: {points.shape[0]} points")
+print(f"X range: [{X.min():.2f}, {X.max():.2f}] m")
+print(f"Y range: [{Y.min():.2f}, {Y.max():.2f}] m")
+print(f"Z range: [{Z.min():.2f}, {Z.max():.2f}] m")
+
+# Optional: view in Open3D
+# import open3d as o3d
+# pcd = o3d.geometry.PointCloud()
+# pcd.points = o3d.utility.Vector3dVector(points)
+# o3d.visualization.draw_geometries([pcd])
+</code></pre>
+<p>这段代码让你看到：同一份三维数据，既可以是色彩斑斓的热力图（一眼看出远近分布），也可以是悬浮在空间中的点团（旋转视角观察完整形状）。两种表示之间的桥梁，就是相机的内参。</p>
+<hr>
+<h2 id="第二阶原理解析-3"><a class="header" href="#第二阶原理解析-3">第二阶：原理解析</a></h2>
+<h3 id="视差图从两张照片到距离"><a class="header" href="#视差图从两张照片到距离">视差图——从两张照片到距离</a></h3>
+<p>在<strong>矫正过的双目系统</strong>中，左图和右图的对极线被对齐为水平行。同一个三维点在左图和右图中的投影，行坐标相同（$v_L = v_R$），只有列坐标不同。这个列坐标之差就是<strong>视差（disparity）</strong>：</p>
+<p>$$d = u_L - u_R$$</p>
+<p>视差 $d$ 与深度 $Z$ 呈反比例关系。由相似三角形可得：</p>
+<p>$$\boxed{Z = \frac{f \cdot b}{d}}$$</p>
+<p>其中 $f$ 是矫正后的焦距（像素单位），$b$ 是两台相机光心之间的距离（基线，单位米）。这个公式是所有双目深度计算的基础。</p>
+<p><strong>直觉</strong>：把手指放在鼻子前，交替闭左右眼——手指“跳来跳去“的幅度很大（视差大）。把手指伸到手臂远处再试——跳动的幅度变小了（视差小）。这就是 $Z = fb/d$ 的物理直觉：<strong>近处物体视差大，远处物体视差小。</strong> 当物体在无穷远处（如天上的云），左右眼的视差趋近于零——相机位置的变化对无穷远物体的投影位置几乎无影响。</p>
+<p>公式还揭示了一个工程约束：在给定焦距和基线时，视差每减小 1 个像素，对应的深度变化是不同的。设 $d=16$ 像素和 $d=15$ 像素分别对应 $Z_1$ 和 $Z_2$，则 $\Delta Z = Z_2 - Z_1 = fb/(15) - fb/(16) = fb/240$。设 $d=4$ 像素和 $d=3$ 像素分别对应 $Z_3$ 和 $Z_4$，则 $\Delta Z = fb/(3) - fb/(4) = fb/12$——相差 20 倍。这意味着<strong>双目系统对近处物体的深度分辨率远高于远处</strong>。这是几何本质决定的，不是工程缺陷。</p>
+<h3 id="深度图每个像素都是一把尺子"><a class="header" href="#深度图每个像素都是一把尺子">深度图——每个像素都是一把“尺子“</a></h3>
+<p>深度图（depth map）是一张二维图像。但跟普通照片记录颜色不同，深度图的每个像素记录的不是 RGB，而是一个距离值——从相机光心出发、沿光轴方向、到该像素对应的三维表面的距离。</p>
+<p>在透视相机模型下，这个“沿着光轴的距离“就是三维点 $X$ 在相机坐标系下的 $Z$ 坐标。因此深度图的数学定义极其简洁：</p>
+<p>$$\text{DepthMap}(u, v) = Z_{\text{cam}}$$</p>
+<p>其中 $(u, v)$ 是像素坐标，$Z_{\text{cam}}$ 是该像素对应的三维点在相机坐标系下的 $Z$ 分量。深度图与 RGB 图逐像素对齐——第 $i$ 行第 $j$ 列的 RGB 像素和第 $i$ 行第 $j$ 列的深度值，描述的是同一个表面点的颜色和距离。</p>
+<p><strong>单位约定</strong>：</p>
+<ul>
+<li><strong>毫米（mm）</strong> 用于 16 位无符号整数存储（$\text{uint16}$，范围 0-65535，覆盖 0-65.5 米）——几乎所有消费级深度相机（Kinect、RealSense）都用这个约定</li>
+<li><strong>米（m）</strong> 用于 32 位浮点数存储（$\text{float32}$）——精度更高，计算中无需单位换算</li>
+</ul>
+<p><strong>工程约定</strong>：深度值为 0 通常表示“无效深度“（如超出量程、被遮挡、或落在天空等无穷远区域）。处理深度图时，应在所有计算前先做 <code>mask = depth &gt; 0</code>。</p>
+<h3 id="点云三维点的不羁集合"><a class="header" href="#点云三维点的不羁集合">点云——三维点的不羁集合</a></h3>
+<p>点云（point cloud）是无序的 $(X, Y, Z)$ 点的集合，可选地携带颜色 $(R, G, B)$、法向量 $(n_x, n_y, n_z)$ 等属性。每个点独立存在——没有“谁在谁上面“的网格拓扑，没有“谁连着谁“的邻接关系。</p>
+<h4 id="从深度图到点云反投影back-projection"><a class="header" href="#从深度图到点云反投影back-projection">从深度图到点云：反投影（Back-Projection）</a></h4>
+<p>给定深度图 $D(u, v)$ 和相机内参矩阵 $K$，每个像素可以反投影为一个三维点。这是透视投影的逆运算（H&amp;Z section 6.1, p.154-155）：</p>
+<p>$$\boxed{X = \frac{(u - c_x) \cdot Z}{f_x}, \quad Y = \frac{(v - c_y) \cdot Z}{f_y}, \quad Z = D(u, v)}$$</p>
+<p>其中 $f_x, f_y$ 是像素单位的焦距（$\alpha_x, \alpha_y$，来自 $K$ 矩阵的前两个对角元——H&amp;Z 6.9, p.157），$c_x, c_y$ 是主点坐标。</p>
+<p><strong>推导</strong>：从透视投影公式 $(u, v) = (\frac{f_x X}{Z} + c_x, \frac{f_y Y}{Z} + c_y)$ 反解即可。反投影的本质是：已知深度 $Z$ 和投影几何，倒推 $X$ 和 $Y$。</p>
+<h4 id="从点云到深度图光栅化rasterization"><a class="header" href="#从点云到深度图光栅化rasterization">从点云到深度图：光栅化（Rasterization）</a></h4>
+<p>反向操作需要“把三维点画回二维网格“——对每个 $(X,Y,Z)$ 点，计算其像素坐标 $(u,v)$：</p>
+<p>$$u = \frac{f_x X}{Z} + c_x, \quad v = \frac{f_y Y}{Z} + c_y$$</p>
+<p>然后把深度值 $Z$ 填入 $(u,v)$ 位置。这里有一个工程细节：多个三维点可能落在同一个像素（前景遮挡背景时）——此时应取最小 $Z$（最近的那个），因为只有它能被相机看到。这也暴露了深度图的 2.5D 本质：点云中相机看不到的那些背面、侧面点，无法被存入深度图。</p>
+<h3 id="25d-的宿命深度图看得到什么看不到什么"><a class="header" href="#25d-的宿命深度图看得到什么看不到什么">2.5D 的宿命：深度图看得到什么，看不到什么</a></h3>
+<p>深度图被称为 <strong>2.5D 表示</strong>——不是完全的二维（它有距离信息），也不是真正的三维（它只能从一个视角记录可见表面）。</p>
+<p>在一张深度图中：</p>
+<ul>
+<li>你能看到一个立方体的<strong>正面</strong>——那是朝向相机的面</li>
+<li>你看不到它的<strong>背面</strong>——相机拍不到</li>
+<li>它的<strong>侧面</strong>落在深度图的边缘，与背景混在一起</li>
+</ul>
+<p>这个限制不是工程实现的问题，而是透视投影本身的物理事实：每个像素对应一条从相机中心出发的射线，这条射线击中场景的第一个表面后就被遮挡了——射线背后的一切都不可见。因此，单张深度图完全无法推理出完整的三维几何——就像你看着一个人的正面照片，不可能知道他后脑勺长什么样。</p>
+<p>这对下游任务有直接影响：如果需要从任意角度观察一个物体，或者需要知道物体背面的几何（如机器人从不同方向抓取），单张深度图是不够的。多视角深度图融合（TSDF、Surfel）或直接输出完整几何的表示（如 NeRF、3DGS）才能解决这个问题。</p>
+<h3 id="code-lens深度图与点云的-numpy-互转"><a class="header" href="#code-lens深度图与点云的-numpy-互转">Code Lens：深度图与点云的 NumPy 互转</a></h3>
+<p>以下代码实现了深度图到点云的转换（带颜色），以及点到点云到深度图的投影（光栅化）：</p>
+<pre><code class="language-python">import numpy as np
+
+
+def depth_to_pointcloud(depth, K, rgb=None):
+    """
+    Convert a depth map to a point cloud in camera coordinate frame.
+
+    Parameters
+    ----------
+    depth : np.ndarray, shape (H, W), float32
+        Depth map in meters. Zeros treated as invalid.
+    K : np.ndarray, shape (3, 3), float32
+        Camera intrinsic matrix: [[fx, 0, cx], [0, fy, cy], [0, 0, 1]]
+        H&amp;Z (6.9, p.157)
+    rgb : np.ndarray, shape (H, W, 3), optional
+        Aligned RGB image for colored point cloud.
+
+    Returns
+    -------
+    points : np.ndarray, shape (N, 3), float32
+        (X, Y, Z) coordinates in camera frame.
+    colors : np.ndarray, shape (N, 3), float32, or None
+        (R, G, B) values if rgb provided.
+    """
+    fx, fy = K[0, 0], K[1, 1]
+    cx, cy = K[0, 2], K[1, 2]
+    H, W = depth.shape
+
+    u, v = np.meshgrid(np.arange(W), np.arange(H))
+    valid = depth &gt; 0
+
+    Z = depth[valid]
+    X = (u[valid] - cx) * Z / fx   # H&amp;Z (6.1, p.154) inverted
+    Y = (v[valid] - cy) * Z / fy
+
+    points = np.stack([X, Y, Z], axis=-1)
+    colors = rgb[valid] if rgb is not None else None
+    return points, colors
+
+
+def pointcloud_to_depth(points, K, H, W):
+    """
+    Project a point cloud back to a depth map (rasterization).
+
+    Parameters
+    ----------
+    points : np.ndarray, shape (N, 3), float32
+        (X, Y, Z) in camera frame.
+    K : np.ndarray, shape (3, 3), float32
+        Camera intrinsic matrix.
+    H, W : int
+        Image height and width.
+
+    Returns
+    -------
+    depth : np.ndarray, shape (H, W), float32
+        Rasterized depth map. When multiple points project to the
+        same pixel, the minimum depth (closest to camera) is kept.
+    """
+    fx, fy = K[0, 0], K[1, 1]
+    cx, cy = K[0, 2], K[1, 2]
+
+    X, Y, Z = points[:, 0], points[:, 1], points[:, 2]
+    mask = Z &gt; 0  # points behind camera are invalid
+
+    u = np.round(fx * X[mask] / Z[mask] + cx).astype(np.int32)
+    v = np.round(fy * Y[mask] / Z[mask] + cy).astype(np.int32)
+    Z_valid = Z[mask]
+
+    in_bounds = (u &gt;= 0) &amp; (u &lt; W) &amp; (v &gt;= 0) &amp; (v &lt; H)
+    u, v, Z_valid = u[in_bounds], v[in_bounds], Z_valid[in_bounds]
+
+    depth = np.zeros((H, W), dtype=np.float32)
+    # For pixels with multiple projections, keep the smallest Z
+    for i in range(len(u)):
+        ui, vi = u[i], v[i]
+        if depth[vi, ui] == 0 or Z_valid[i] &lt; depth[vi, ui]:
+            depth[vi, ui] = Z_valid[i]
+
+    return depth
+</code></pre>
+<h3 id="坐标约定哪个轴是前方"><a class="header" href="#坐标约定哪个轴是前方">坐标约定：哪个轴是“前方“？</a></h3>
+<p>三种常见的坐标约定：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>坐标约定</th><th>X 轴</th><th>Y 轴</th><th>Z 轴（深度/前方）</th><th>手掌定则</th><th>使用场景</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>OpenCV</strong></td><td>右</td><td>下</td><td>前</td><td>右手</td><td>OpenCV, COLMAP, 多数学术代码</td></tr>
+<tr><td><strong>OpenGL</strong></td><td>右</td><td>上</td><td>后（或前，可配置）</td><td>右手</td><td>渲染引擎、3DGS 可视化</td></tr>
+<tr><td><strong>Unity</strong></td><td>右</td><td>上</td><td>前</td><td>左手</td><td>Unity 游戏引擎</td></tr>
+</tbody>
+</table>
+</div>
+<p>不一致的坐标约定是多传感器融合中最常见的 bug 来源之一。把 LiDAR 坐标系的点和相机坐标系的点画在一起之前，先确认 Z 轴的方向和左右手定则是否一致。</p>
+<hr>
+<h2 id="第三阶部署实战-3"><a class="header" href="#第三阶部署实战-3">第三阶：部署实战</a></h2>
+<h3 id="文件格式三维数据怎么存"><a class="header" href="#文件格式三维数据怎么存">文件格式——三维数据怎么存</a></h3>
+<p><strong>深度图文件格式</strong>：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>格式</th><th>数据类型</th><th>典型用途</th><th>注意事项</th></tr>
+</thead>
+<tbody>
+<tr><td>16-bit PNG</td><td>uint16, mm 单位</td><td>数据集发布（Middlebury, NYUv2）</td><td>范围 0-65535 mm；0 = 无效。精度 1 mm</td></tr>
+<tr><td>EXR</td><td>float32 或 float16</td><td>高质量合成数据、Blender 渲染输出</td><td>支持 HDR，存储真实米制深度</td></tr>
+<tr><td>NPY/NPZ</td><td>float32</td><td>Python 生态中间存储</td><td>原始数组，无压缩，无元数据</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>点云文件格式</strong>：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>格式</th><th>二进制/文本</th><th>扩展性</th><th>使用场景</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>PLY</strong> (Stanford)</td><td>两者皆可</td><td>好——可存储 RGB、法向量、自定义属性</td><td>学术研究、3D 重建输出。Open3D 原生支持</td></tr>
+<tr><td><strong>PCD</strong> (PCL)</td><td>两者皆可</td><td>好——PCL 功能矩阵（滤波、配准、分割）全面</td><td>PCL 生态。ROS 中常用 <code>sensor_msgs::PointCloud2</code></td></tr>
+<tr><td><strong>LAS/LAZ</strong></td><td>二进制</td><td>可存储分类、强度、回波数</td><td>测绘/遥感领域 LiDAR 标准格式</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="什么时候用哪种表示"><a class="header" href="#什么时候用哪种表示">什么时候用哪种表示？</a></h3>
+<pre><code class="language-mermaid">flowchart TD
+    A["I have 3D data"] --&gt; B{"Dense, regular&lt;br/&gt;grid structure?"}
+    B --&gt;|"Yes&lt;br/&gt;Depth camera / stereo output"| C{"Need per-pixel&lt;br/&gt;neighbor ops?"}
+    C --&gt;|"Yes&lt;br/&gt;CNN / filtering"| D["Depth Map&lt;br/&gt;.png / .npy"]
+    C --&gt;|"No&lt;br/&gt;3D geometry ops"| E{"RAM / speed&lt;br/&gt;constraints?"}
+    B --&gt;|"No&lt;br/&gt;LiDAR / SfM output"| F["Point Cloud&lt;br/&gt;.ply / .pcd"]
+    E --&gt;|"Tight"| D
+    E --&gt;|"Relaxed"| F
+</code></pre>
+<p><strong>经验法则</strong>：</p>
+<ul>
+<li>输入是深度相机 → 保持深度图，直到需要 3D 变换</li>
+<li>需要对距离做 CNN → 深度图（规则网格）</li>
+<li>需要旋转、配准、切割 → 点云</li>
+<li>需要发布到 ROS → <code>PointCloud2</code> 消息</li>
+<li>多帧融合 → 先转点云，配准后转 TSDF 体素网格</li>
+</ul>
+<h3 id="常见工具"><a class="header" href="#常见工具">常见工具</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>工具</th><th>语言</th><th>核心能力</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Open3D</strong></td><td>Python/C++</td><td>点云读写、可视化、配准（ICP）、体素降采样、法向量估计、三角面重建</td></tr>
+<tr><td><strong>PCL</strong> (Point Cloud Library)</td><td>C++</td><td>滤波、特征提取、分割、配准、曲面重建——点云处理的“OpenCV“</td></tr>
+<tr><td><strong>CloudCompare</strong></td><td>GUI</td><td>点云和网格的可视化对比、差异分析、手动对齐——质检神器</td></tr>
+<tr><td><strong>PDAL</strong></td><td>C++/Python</td><td>面向地理空间点云数据的流式处理管道</td></tr>
+</tbody>
+</table>
+</div>
+<pre><code class="language-python"># Open3D quick start
+import open3d as o3d
+
+# Read a point cloud
+pcd = o3d.io.read_point_cloud("scene.ply")
+print(f"Loaded {len(pcd.points)} points")
+
+# Downsample with voxel grid
+pcd_down = pcd.voxel_down_sample(voxel_size=0.01)
+
+# Estimate normals (needed for many algorithms)
+pcd_down.estimate_normals(
+    o3d.geometry.KDTreeSearchParamHybrid(radius=0.02, max_nn=30)
+)
+
+# Visualize
+o3d.visualization.draw_geometries([pcd_down])
+</code></pre>
+<hr>
+<h2 id="苏格拉底时刻-3"><a class="header" href="#苏格拉底时刻-3">苏格拉底时刻</a></h2>
+<ol>
+<li><strong>深度图本质上是一个 2.5D 表示——它只能看到相机前方的表面。如果一个机器人抓取系统使用深度图作为唯一的三维输入，它永远无法推理物体背面。这对抓取策略意味着什么？它需要满足什么条件才能成功抓取？</strong></li>
+</ol>
+<p>（提示：机器人需要从多个角度拍摄深度图并融合成完整的三维模型；或者依赖先验知识（如“杯子总是有一个背面，即使我看不到“）来补全几何。这正是为什么现代机器人系统使用 TSDF 融合或 NeRF 类方法来做完整的三维重建——而不是依赖单帧深度图。但也存在例外：对于平放在桌上的扁平物体（如信用卡、盘子），单张深度图足以确定抓取点的三维坐标——因为抓取点就在可见表面上。）</p>
+<ol start="2">
+<li><strong>视差 = 0 意味着什么？深度 = 0 又意味着什么？这两个“零“分别对应什么物理情况？</strong></li>
+</ol>
+<p>（提示：视差 = 0 意味着物体在无穷远处——平行光路，立体基线失去作用。深度 = 0 在工程约定中通常表示“无效深度“——可能是被遮挡区域、超出量程、或是天空/镜面等测距失效的表面。但在物理上，深度 = 0 意味着点在相机光心上——这不可能，因为物点不可能与光心重合。因此工程实践中深度 = 0 作为掩码标志，而非物理真实值。）</p>
+<hr>
+<h2 id="关键论文与文献清单"><a class="header" href="#关键论文与文献清单">关键论文与文献清单</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>年份</th><th>文献</th><th>一句话贡献</th></tr>
+</thead>
+<tbody>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry</em>, Ch.10</td><td>三角测量原理、射影重建定理、分层重建策略——从两视图恢复到三维点的理论框架（p.262-273）</td></tr>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry</em>, Ch.6</td><td>深度公式 $\text{depth}(X; P)$（6.15, p.162），相机内参矩阵 K 的定义与参数化（p.155-157）</td></tr>
+<tr><td>2012</td><td>D. Scharstein &amp; R. Szeliski, “A Taxonomy and Evaluation of Dense Two-Frame Stereo Correspondence Algorithms”, <em>IJCV</em></td><td>Middlebury 立体评估基准——定义了视差图/深度图的标准化评测方法，建立了从视差到深度的转换管道</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="实操练习-3"><a class="header" href="#实操练习-3">实操练习</a></h2>
+<ol>
+<li><strong>深度图 → 点云 → 深度图往返</strong>：下载 Middlebury 数据集的任意一张深度图，用 <code>depth_to_pointcloud</code> 转成点云，再用 <code>pointcloud_to_depth</code> 投影回来。比较原始深度图和往返后深度图的差异——哪些位置的深度值丢失了？为什么？</li>
+<li><strong>多视角融合的直观实验</strong>：用手机（或模拟数据）从两个不同角度拍同一场景的深度图，都转成点云，在 Open3D 中同时可视化两个点云——观察两个视角如何互补地覆盖物体的不同表面。然后尝试用 ICP（<code>pcd.icp()</code>）把它们对齐。</li>
+<li><strong>用 CloudCompare 做质检</strong>：下载两个重建方法（如 COLMAP 和 NeRF）对同一场景产生的点云，在 CloudCompare 中加载，计算它们之间的点到点距离——哪些区域差异最大？（提示：通常是边缘和纹理稀疏的区域。）</li>
+</ol>
+<hr>
+<h2 id="延伸阅读-3"><a class="header" href="#延伸阅读-3">延伸阅读</a></h2>
+<ul>
+<li>本书内：[[03 多视图几何入门]] · [[05 坐标系转换]] · [[06 优化基础]]</li>
+<li>H&amp;Z 原书 Ch.10：三角测量（p.262-264）、射影重建定理（p.266-267）、分层重建（p.267-273）——深度表示的两视图几何理论基础</li>
+<li>H&amp;Z 原书 Ch.6.2.3：深度公式 $\text{depth}(X; P)$（p.162-163）——从相机矩阵直接读出深度</li>
+<li>Middlebury Stereo Evaluation: https://vision.middlebury.edu/stereo/ —— 视差图/深度图的标准评测平台与数据集</li>
+<li>Open3D 教程: http://www.open3d.org/docs/release/tutorial/geometry/pointcloud.html</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="05-坐标系转换从世界到像素的完整旅程"><a class="header" href="#05-坐标系转换从世界到像素的完整旅程">05 坐标系转换：从世界到像素的完整旅程</a></h1>
+<blockquote>
+<p>预计阅读时间：35 分钟
+前置知识：本篇第 01 节（相机模型）、第 02 节（投影几何）、第 04 节（深度表示）
+读完本节后，你可以：写出世界坐标系→相机坐标系→图像坐标系→像素坐标系的完整变换链，理解齐次坐标如何让每一步都变成线性运算，在 OpenCV、OpenGL、Unity 三种坐标约定之间做转换。</p>
+</blockquote>
+<hr>
+<h2 id="第一阶直观理解-4"><a class="header" href="#第一阶直观理解-4">第一阶：直观理解</a></h2>
+<h3 id="一个场景-4"><a class="header" href="#一个场景-4">一个场景</a></h3>
+<p>你在玩 VR 游戏，伸出手去抓一个虚拟杯子。三个不同坐标系在你毫不知情的情况下高速运转：</p>
+<ul>
+<li>杯子的位置是<strong>世界坐标系</strong>下的——它在虚拟房间的哪个角落</li>
+<li>你手的位置是<strong>相机坐标系</strong>下的——相对于你头盔上的摄像头</li>
+<li>屏幕上显示的位置是<strong>像素坐标系</strong>下的——在 1920x1080 的显示器上，杯子该画在哪个 pixel？</li>
+</ul>
+<p>没有坐标系转换，这三者完全无法对话。杯子在世界坐标系里是 $(3, 0.5, 2)$，你的手在相机坐标系里是 $(0.1, -0.2, 0.8)$——两者不在同一个“参考系“里，你永远抓不到它。</p>
+<p>坐标系转换就是给每个参考系之间架一座桥。四座桥，四个变换，把一个三维点从世界坐标系一路护送到底——直到屏幕上那个发光的像素。</p>
+<h3 id="核心直觉四层翻译"><a class="header" href="#核心直觉四层翻译">核心直觉：四层“翻译“</a></h3>
+<p>想象你站在一个房间里，手里拿着相机拍一张桌子。</p>
+<ol>
+<li><strong>世界坐标系</strong>：以房间的某个角落为原点。桌子中心在 $(3, 0.8, 1.5)$——离墙角 3 米、高 0.8 米、离墙 1.5 米。</li>
+<li><strong>相机坐标系</strong>：以相机光心为原点，相机朝向为 Z 轴。桌子中心现在“看起来“在 $(0.5, -0.3, 2.1)$——在相机右前方偏下约 2 米处。这一步只需要旋转和平移——<strong>刚体变换</strong>。</li>
+<li><strong>图像坐标系</strong>：相机把三维世界“压扁“到它的成像平面上。桌子中心的 Z 坐标消失，只剩下 $(x, y)$——一个二维坐标。这是<strong>透视投影</strong>——不可逆的一步。</li>
+<li><strong>像素坐标系</strong>：CMOS 传感器把连续的光信号离散成像素格。$(x, y)$ 变成 $(u, v)$——第几行第几列。这是<strong>采样和缩放</strong>。</li>
+</ol>
+<p>每一步都是一次“翻译“，把同一个物理点的坐标从一种语言翻成另一种语言。整个链条合在一起，就是 $P = K[R|t]$——整本书最重要的公式之一。</p>
+<h3 id="技术全景-4"><a class="header" href="#技术全景-4">技术全景</a></h3>
+<pre><code class="language-mermaid">mindmap
+  root((Coordinate Systems))
+    World Frame
+      Arbitrary origin
+      3 DOF translation
+      Z-up or Y-up convention
+    Camera Frame
+      Origin at camera center C
+      Z = optical axis forward
+      X right Y down (OpenCV)
+    Image Frame
+      2D continuous coordinates
+      Origin at principal point
+      Unit: mm or normalized
+    Pixel Frame
+      2D discrete coordinates
+      Origin at top-left (0,0)
+      Unit: pixel integer
+    Transforms
+      World -&gt; Camera R t 6 DOF
+      Camera -&gt; Image perspective K
+      Image -&gt; Pixel affine scaling
+</code></pre>
+<h3 id="mini-case跟踪一个点的完整旅程"><a class="header" href="#mini-case跟踪一个点的完整旅程">Mini Case：跟踪一个点的完整旅程</a></h3>
+<pre><code class="language-python">import numpy as np
+
+# --- Define the scene ---
+# A 3D point in world coordinates: a cup on the table
+X_world = np.array([3.0, 0.8, 1.5, 1.0])  # homogeneous (H&amp;Z section 2.2.1, p.26)
+
+# Camera pose (where the camera is in the world)
+R = np.array([
+    [0.0,  0.0, -1.0],
+    [-1.0, 0.0,  0.0],
+    [0.0,  1.0,  0.0]
+])  # rotation matrix
+C = np.array([1.0, 0.5, 0.0])  # camera center in world coordinates
+
+# Camera intrinsics
+K = np.array([
+    [525.0,   0.0, 320.0],
+    [  0.0, 525.0, 240.0],
+    [  0.0,   0.0,   1.0]
+])
+
+# --- Step 1: World -&gt; Camera (rigid body, H&amp;Z 6.6, p.156) ---
+t = -R @ C   # t = -R*C (H&amp;Z p.156, Eq 6.6)
+Rt = np.column_stack([R, t])  # 3x4 extrinsic matrix
+X_cam = Rt @ X_world  # X_cam is 3x1: (X_c, Y_c, Z_c) in camera frame
+print(f"Camera coord: ({X_cam[0]:.2f}, {X_cam[1]:.2f}, {X_cam[2]:.2f})")
+
+# --- Step 2: Camera -&gt; Image (perspective projection, H&amp;Z 6.1, p.154) ---
+P = K @ Rt  # Full camera matrix (H&amp;Z 6.8, p.156)
+x_image = P @ X_world  # homogeneous pixel coord: (u*h, v*h, h)
+
+# --- Step 3: Image -&gt; Pixel (dehomogenize, H&amp;Z 6.1, p.155) ---
+u, v = x_image[0] / x_image[2], x_image[1] / x_image[2]
+print(f"Pixel coord: ({u:.1f}, {v:.1f})")
+
+# --- Recap: the entire chain in one line ---
+x_pixel = K @ Rt @ X_world
+print(f"One-liner verification: ({x_pixel[0]/x_pixel[2]:.1f}, "
+      f"{x_pixel[1]/x_pixel[2]:.1f})")
+</code></pre>
+<p>这段代码追踪了一个三维点从世界坐标系到像素坐标系的完整旅程——四个坐标系，三个变换，一步到位。每个变换都是线性的（在齐次坐标下），整条链就是 $3 \times 4$ 相机矩阵 $P = K[R|t]$ 的一次乘法。</p>
+<hr>
+<h2 id="第二阶原理解析-4"><a class="header" href="#第二阶原理解析-4">第二阶：原理解析</a></h2>
+<h3 id="变换链全景"><a class="header" href="#变换链全景">变换链全景</a></h3>
+<pre><code class="language-mermaid">flowchart LR
+    subgraph W["World Frame O_w"]
+        Xw["X_w = (X, Y, Z, 1)^T"]
+    end
+    subgraph C["Camera Frame O_c"]
+        Xc["X_c = R(X_w - C_tilde)"]
+    end
+    subgraph I["Image Frame"]
+        x["x = (fX_c/Z_c, fY_c/Z_c)^T"]
+    end
+    subgraph Px["Pixel Frame"]
+        uv["(u, v) = (alpha_x*x/Z + x0, alpha_y*y/Z + y0)"]
+    end
+    W --&gt;|"R, t&lt;br/&gt;6 DOF"| C
+    C --&gt;|"Perspective&lt;br/&gt;Projection&lt;br/&gt;3D -&gt; 2D lossy"| I
+    I --&gt;|"K matrix&lt;br/&gt;Scaling + Offset"| Px
+</code></pre>
+<p>每一步的矩阵维度和变换性质：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>变换</th><th>矩阵</th><th>维度</th><th>自由度</th><th>可逆？</th><th>H&amp;Z 出处</th></tr>
+</thead>
+<tbody>
+<tr><td>世界 → 相机</td><td>$[R \mid t]$</td><td>$3 \times 4$</td><td>6 (3 旋转 + 3 平移)</td><td>是（刚体变换）</td><td>6.6, p.156</td></tr>
+<tr><td>相机 → 图像</td><td>透视投影</td><td>$3 \times 4$</td><td>0（几何过程，无自由参数）</td><td><strong>否</strong>——Z 信息丢失</td><td>6.1, p.154</td></tr>
+<tr><td>图像 → 像素</td><td>$K$</td><td>$3 \times 3$</td><td>3-5（内参个数）</td><td>是（仿射变换）</td><td>6.4, p.155</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="第一步世界--相机刚体变换"><a class="header" href="#第一步世界--相机刚体变换">第一步：世界 → 相机（刚体变换）</a></h3>
+<p>这是最直观的一步：把一个点从一个坐标系平移到另一个坐标系。相机在世界空间中有一个位置 $\tilde{C}$（相机中心的 world 坐标）和一个朝向 $R$（旋转矩阵）。</p>
+<p>两种等价写法（H&amp;Z section 6.1, p.155-156）：</p>
+<p>$$X_{\text{cam}} = R(X_{\text{world}} - \tilde{C}) \quad \text{（直观：先平移世界点到相机原点，再旋转）}$$</p>
+<p>$$X_{\text{cam}} = R X_{\text{world}} + t \quad \text{其中 } t = -R\tilde{C} \quad \text{（H&amp;Z 6.6, p.156）}$$</p>
+<p>第二种写法在齐次坐标下最方便——直接拼成 $3 \times 4$ 矩阵 $[R \mid t]$：</p>
+<p>$$\begin{bmatrix} X_c \ Y_c \ Z_c \end{bmatrix} = \begin{bmatrix} R_{11} &amp; R_{12} &amp; R_{13} &amp; t_1 \ R_{21} &amp; R_{22} &amp; R_{23} &amp; t_2 \ R_{31} &amp; R_{32} &amp; R_{33} &amp; t_3 \end{bmatrix} \begin{bmatrix} X_w \ Y_w \ Z_w \ 1 \end{bmatrix}$$</p>
+<p>6 DOF：3 个旋转角度（R 的正交约束下） + 3 个平移分量。这是整个变换链中最“贵“的一步——相机位姿估计（PnP、标定、SLAM）主要就是在估计这 6 个参数。</p>
+<h3 id="第二步相机--图像透视投影不可逆的一步"><a class="header" href="#第二步相机--图像透视投影不可逆的一步">第二步：相机 → 图像（透视投影——不可逆的一步）</a></h3>
+<p>这是<strong>中心投影</strong>——三维点通过小孔投射到二维成像平面。它是整个链中唯一不可逆的步骤，因为 Z 坐标在这个过程里被“压缩“了（H&amp;Z section 6.1, p.154）：</p>
+<p>$$(X_c, Y_c, Z_c)^T \longmapsto \left(\frac{f X_c}{Z_c}, \frac{f Y_c}{Z_c}\right)^T$$</p>
+<p>其中 $f$ 是焦距（毫米）。除以 $Z_c$ 这一步就是“透视“的来源——同样的物体，远了三倍，在图像上就只剩三分之一大。</p>
+<p>在齐次坐标下，这一步可以写成矩阵形式（H&amp;Z 6.2, p.154）：</p>
+<p>$$x = \begin{bmatrix} f &amp; 0 &amp; 0 &amp; 0 \ 0 &amp; f &amp; 0 &amp; 0 \ 0 &amp; 0 &amp; 1 &amp; 0 \end{bmatrix} X_{\text{cam}} = \text{diag}(f, f, 1) [I \mid 0] , X_{\text{cam}}$$</p>
+<p>其中 $x = (u, v, w)^T$ 是齐次坐标，真实的图像坐标是 $(u/w, v/w)$。</p>
+<p><strong>关键洞察</strong>：从 $3 \times 4$ 的原生投影矩阵 $[I \mid 0]$ 可以看出——第四列全是 0。这意味着相机中心（第四列对应的世界坐标点 $(0,0,0,1)$ 在相机坐标系下的齐次形式）映射到 $(0,0,0)^T$——一个齐次坐标为零的向量，不对应任何有限的图像点。这正好印证了“相机中心本身不能被投影“的物理事实。</p>
+<h3 id="第三步图像--像素k-矩阵登场"><a class="header" href="#第三步图像--像素k-矩阵登场">第三步：图像 → 像素（K 矩阵登场）</a></h3>
+<p>图像坐标系里的 $(x, y)$ 是以主点（principal point，光轴与成像平面的交点）为原点、以毫米为单位的。但像素坐标系是以图像左上角为原点、以像素为单位的。两者之间是一个仿射变换（H&amp;Z section 6.1, p.155-157）：</p>
+<p>$$\begin{bmatrix} u \ v \ 1 \end{bmatrix} = \begin{bmatrix} \alpha_x &amp; 0 &amp; x_0 \ 0 &amp; \alpha_y &amp; y_0 \ 0 &amp; 0 &amp; 1 \end{bmatrix} \begin{bmatrix} x \ y \ 1 \end{bmatrix}$$</p>
+<p>其中：</p>
+<ul>
+<li>$\alpha_x = f \cdot m_x$：横向焦距（像素单位），$m_x$ 是传感器每毫米的像素数</li>
+<li>$\alpha_y = f \cdot m_y$：纵向焦距（像素单位）</li>
+<li>$x_0, y_0$：主点的像素坐标（通常接近图像中心）</li>
+<li>最通用的 $K$ 还包含偏斜参数 $s$（H&amp;Z 6.10, p.157），但现代相机 $s \approx 0$</li>
+</ul>
+<h3 id="完整链p--krt"><a class="header" href="#完整链p--krt">完整链：$P = K[R|t]$</a></h3>
+<p>将三步合并（H&amp;Z 6.8, p.156）：</p>
+<p>$$\boxed{x_{\text{pixel}} = K [R \mid t] X_{\text{world}} = P X_{\text{world}}}$$</p>
+<p>展开即：</p>
+<p>$$\begin{bmatrix} u \ v \ 1 \end{bmatrix} = \begin{bmatrix} \alpha_x &amp; 0 &amp; x_0 \ 0 &amp; \alpha_y &amp; y_0 \ 0 &amp; 0 &amp; 1 \end{bmatrix} \begin{bmatrix} R_{11} &amp; R_{12} &amp; R_{13} &amp; t_1 \ R_{21} &amp; R_{22} &amp; R_{23} &amp; t_2 \ R_{31} &amp; R_{32} &amp; R_{33} &amp; t_3 \end{bmatrix} \begin{bmatrix} X_w \ Y_w \ Z_w \ 1 \end{bmatrix}$$</p>
+<p>$P$ 是一个 $3 \times 4$ 矩阵，秩为 3，有 11 个自由度（5 内参 + 3 旋转 + 3 平移）。这个公式是多视图几何万神殿中的第一神祇——所有下游算法，从三角测量到 BA（Bundle Adjustment），都以它为起点。</p>
+<p><strong>齐次坐标的妙处</strong>：等式 $\lambda x = PX$ 中，尺度因子 $\lambda$ 可以任意缩放。这意味着 $P$ 也只在尺度上可定义——$P$ 和 $kP$（$k \neq 0$）对应同一个投影。因此 $P$ 有 11 个而非 12 个自由度。</p>
+<h3 id="code-lens实现完整变换链"><a class="header" href="#code-lens实现完整变换链">Code Lens：实现完整变换链</a></h3>
+<pre><code class="language-python">import numpy as np
+
+
+def world_to_camera(X_world, R, C):
+    """World to Camera: rigid body transformation.
+    H&amp;Z (6.6, p.156): X_cam = R(X_world - C_tilde)
+    Equivalent: X_cam = RX_world + t, where t = -RC_tilde
+    """
+    t = -R @ C
+    return R @ X_world + t
+
+
+def camera_to_image(X_cam, f=1.0):
+    """Camera to Image: perspective projection.
+    H&amp;Z (6.1, p.154): (x, y) = (f*X/Z, f*Y/Z)
+    Returns normalized image coordinates (f=1).
+    """
+    x = X_cam[0] / X_cam[2]
+    y = X_cam[1] / X_cam[2]
+    return x, y
+
+
+def image_to_pixel(x, y, K):
+    """Image to Pixel: affine scaling with K matrix.
+    H&amp;Z (6.9, p.157): (u,v) = (alpha_x * x + x0, alpha_y * y + y0)
+    """
+    u = K[0, 0] * x + K[0, 2]
+    v = K[1, 1] * y + K[1, 2]
+    return u, v
+
+
+def full_projection(X_world, K, R, C):
+    """Complete chain: World -&gt; Camera -&gt; Image -&gt; Pixel.
+    H&amp;Z (6.8, p.156): x_pixel = K[R|t] X_world
+    """
+    t = -R @ C
+    Rt = np.column_stack([R, t])
+    P = K @ Rt  # 3x4 camera matrix
+    x_homo = P @ X_world
+    u = x_homo[0] / x_homo[2]
+    v = x_homo[1] / x_homo[2]
+    return u, v
+
+
+# --- Step-by-step trace ---
+np.random.seed(42)
+X_world = np.array([5.0, 2.0, 10.0])
+
+# Create a random but valid camera pose
+from scipy.spatial.transform import Rotation
+rot = Rotation.from_euler('xyz', [15, -10, 5], degrees=True)
+R = rot.as_matrix()
+C = np.array([0.0, 0.0, 0.0])  # camera at world origin
+
+# Standard K
+K = np.array([[500.0, 0.0, 320.0],
+              [0.0, 500.0, 240.0],
+              [0.0, 0.0, 1.0]])
+
+# Step 1
+X_cam = world_to_camera(X_world, R, C)
+print(f"Camera coord: X_c={X_cam[0]:.2f}, Y_c={X_cam[1]:.2f}, Z_c={X_cam[2]:.2f}")
+
+# Step 2
+x, y = camera_to_image(X_cam)
+print(f"Image coord (normalized): x={x:.4f}, y={y:.4f}")
+
+# Step 3
+u, v = image_to_pixel(x, y, K)
+print(f"Pixel coord: u={u:.1f}, v={v:.1f}")
+
+# One-shot verification
+u_full, v_full = full_projection(
+    np.append(X_world, 1.0), K, R, C
+)
+print(f"Verification (one-shot): u={u_full:.1f}, v={v_full:.1f}")
+</code></pre>
+<h3 id="坐标系转换的逆方向从像素回到世界"><a class="header" href="#坐标系转换的逆方向从像素回到世界">坐标系转换的逆方向：从像素回到世界</a></h3>
+<p>理解了正向链后，反向链同样重要——许多任务需要从图像坐标推断三维位置：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>方向</th><th>可用信息</th><th>能恢复什么</th><th>不能恢复什么</th></tr>
+</thead>
+<tbody>
+<tr><td>Pixel → Image</td><td>K 已知</td><td>连续图像坐标 $(x, y)$</td><td>—（可逆仿射变换）</td></tr>
+<tr><td>Image → Camera</td><td>无深度信息</td><td>射线方向：$X/Z = x/f$，$Y/Z = y/f$</td><td>Z（深度）——一条射线上的所有点投影到同一个像素</td></tr>
+<tr><td>Camera → World</td><td>$R, t$ 已知</td><td>$X_w = R^{-1}(X_c - t) = R^T X_c - R^T t$</td><td>—（可逆刚体变换）</td></tr>
+</tbody>
+</table>
+</div>
+<p>要点：从像素反推到三维世界时，你只能恢复一条射线（方向知道，深度未知）——而不是一个确定的点。这正是三角测量需要第二台相机的原因。</p>
+<hr>
+<h2 id="第三阶部署实战-4"><a class="header" href="#第三阶部署实战-4">第三阶：部署实战</a></h2>
+<h3 id="opencv-坐标约定"><a class="header" href="#opencv-坐标约定">OpenCV 坐标约定</a></h3>
+<p>OpenCV 采用右手坐标系（H&amp;Z 全书统一使用）：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>轴</th><th>方向</th><th>备注</th></tr>
+</thead>
+<tbody>
+<tr><td>X</td><td>右</td><td>—</td></tr>
+<tr><td>Y</td><td>下</td><td>与像素行号增加方向一致</td></tr>
+<tr><td>Z</td><td>前（远离相机）</td><td>光轴方向（“深度”）</td></tr>
+</tbody>
+</table>
+</div>
+<p>右手定则：右手大拇指指向 X，食指指向 Y，中指自然指向 Z（前方）。这一定则在 OpenCV 的所有函数中一致——从 <code>solvePnP</code> 到 <code>projectPoints</code> 到 <code>stereoRectify</code>。</p>
+<h3 id="常见坐标系统对比"><a class="header" href="#常见坐标系统对比">常见坐标系统对比</a></h3>
+<pre><code class="language-mermaid">quadrantChart
+    title Coordinate System Comparison
+    x-axis "X Direction" --&gt; "Right"
+    y-axis "Y Direction" --&gt; "Up vs Down"
+    quadrant-1 "OpenCV&lt;br/&gt;X=Right, Y=Down, Z=Forward&lt;br/&gt;Right-Hand"
+    quadrant-2 "OpenGL&lt;br/&gt;X=Right, Y=Up, Z=Backward&lt;br/&gt;Right-Hand"
+    quadrant-3 "Unity&lt;br/&gt;X=Right, Y=Up, Z=Forward&lt;br/&gt;Left-Hand"
+    quadrant-4 "ROS Robot&lt;br/&gt;X=Forward, Y=Left, Z=Up&lt;br/&gt;Right-Hand"
+</code></pre>
+<p><strong>转换速查表</strong>：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>从</th><th>到</th><th>变换</th></tr>
+</thead>
+<tbody>
+<tr><td>OpenCV</td><td>OpenGL</td><td>$Y \to -Y$，$Z \to -Z$（$X$ 不变）</td></tr>
+<tr><td>OpenCV</td><td>Unity</td><td>$Y \to -Y$（$X$ 和 $Z$ 不变——注意左手系）</td></tr>
+<tr><td>OpenGL</td><td>Unity</td><td>$Z \to -Z$（绕 X 轴翻转 Z，左手变右手）</td></tr>
+<tr><td>ROS (robot)</td><td>OpenCV</td><td>$X \to Z$，$Y \to -X$，$Z \to -Y$（大旋转）</td></tr>
+</tbody>
+</table>
+</div>
+<p>记住一个检查方法：<strong>在原点放一个正方体，用两种约定分别计算八个顶点的坐标——哪个角在哪个约定下“飞“到了错误的位置，就说明转换错了。</strong></p>
+<h3 id="实战读取相机标定文件变换-lidar-点到相机帧"><a class="header" href="#实战读取相机标定文件变换-lidar-点到相机帧">实战：读取相机标定文件，变换 LiDAR 点到相机帧</a></h3>
+<pre><code class="language-python">import numpy as np
+import json
+
+
+def load_calibration(calib_path):
+    """Load camera calibration (K) and LiDAR-to-camera extrinsics."""
+    with open(calib_path) as f:
+        calib = json.load(f)
+    K = np.array(calib['K']).reshape(3, 3)
+    R_lidar_to_cam = np.array(calib['R_lidar2cam']).reshape(3, 3)
+    t_lidar_to_cam = np.array(calib['t_lidar2cam']).reshape(3, 1)
+    return K, R_lidar_to_cam, t_lidar_to_cam
+
+
+def project_lidar_to_image(lidar_points, K, R, t):
+    """Project LiDAR points (in LiDAR frame) to image pixel coordinates.
+
+    Steps:
+      1. LiDAR frame -&gt; Camera frame: X_cam = R @ X_lidar + t
+      2. Camera frame -&gt; Image frame:  x = K @ X_cam (normalized)
+      3. Filter points behind camera (Z_cam &lt;= 0)
+    H&amp;Z (6.8, p.156): x_pixel = K[R|t] X_lidar
+    """
+    # Step 1 &amp; 2 combined
+    lidar_xyz = lidar_points[:, :3].T  # 3xN
+    lidar_homo = np.vstack([lidar_xyz, np.ones(lidar_xyz.shape[1])])  # 4xN
+    Rt = np.column_stack([R, t.flatten()])  # 3x4
+    P = K @ Rt  # 3x4 camera matrix
+    img_homo = P @ lidar_homo  # 3xN
+
+    # Step 3: dehomogenize and filter
+    depth = img_homo[2, :]
+    valid = depth &gt; 0  # keep only points in front of camera
+    u = img_homo[0, valid] / depth[valid]
+    v = img_homo[1, valid] / depth[valid]
+    points_in_front = lidar_points[valid]
+
+    return u, v, points_in_front, depth[valid]
+
+
+# --- Example usage ---
+# Synthetic LiDAR points (in LiDAR frame)
+lidar_pts = np.random.uniform(-10, 10, (1000, 4))
+
+# Load from calibration
+K, R_lc, t_lc = load_calibration("calibration.json")
+
+# Project
+u_vals, v_vals, pts_3d, depths = project_lidar_to_image(
+    lidar_pts, K, R_lc, t_lc
+)
+print(f"Projected {len(u_vals)} / {len(lidar_pts)} LiDAR points onto image")
+print(f"Depth range: [{depths.min():.2f}, {depths.max():.2f}] m")
+</code></pre>
+<p>这段代码是多传感器融合的标准操作——自动驾驶中最常见的场景：把 LiDAR 点投影到相机图像上做“着色“（给点云染上图像 RGB），或做“深度补全“（用 LiDAR 稀疏深度引导稠密深度估计）。</p>
+<hr>
+<h2 id="苏格拉底时刻-4"><a class="header" href="#苏格拉底时刻-4">苏格拉底时刻</a></h2>
+<ol>
+<li><strong>如果你把世界坐标系的原点从房间角落移到相机上，所有的三维坐标都变了。但相机拍到的照片不会变——为什么？这暗示了什么关于“绝对坐标“和“相对坐标“的本质差异？</strong></li>
+</ol>
+<p>（提示：照片记录的是三维场景相对于相机的位置——即相机坐标系的 $X_c, Y_c, Z_c$。世界坐标系的原点位置不影响相机与场景之间的相对关系。改变世界原点只是给所有世界坐标加一个偏移量——这个偏移量在 $X_{\text{cam}} = R(X_w - \tilde{C})$ 中被 $\tilde{C}$ 的变化抵消了。这揭示了多视图几何的一个根本事实：<strong>从图像中我们只能恢复相对几何——相机与场景之间、相机与相机之间的相对位置。绝对的世界坐标是一个人类赋予的标签，不是视觉系统能够感知的东西。</strong> 这也是为什么从 E 矩阵恢复平移时，$t$ 的绝对尺度无法确定——你永远不知道相机移动了 1 米还是 10 米，除非有额外的尺度信息（如已知基线长度的双目相机、或已知大小的标定物）。）</p>
+<ol start="2">
+<li><strong>齐次坐标让透视投影变成了线性运算。但“除以 Z“这个非线性步骤并没有真的消失——它去了哪里？</strong></li>
+</ol>
+<p>（提示：齐次坐标的把戏是把“除以 Z“推迟到最后一步——投影矩阵 $P$ 的输出是齐次坐标 $(u, v, w)^T$，真实的像素坐标需要做去齐次化 $(u/w, v/w)$。这个 $w$ 恰好等于相机坐标系下的 $Z_c$。所以齐次坐标没有“消灭“非线性——它只是把非线性从计算中间移到了计算末尾，从而让中间的矩阵乘法保持线性。这个优雅的 trick 才使得整条变换链能用一次矩阵乘法完成。）</p>
+<hr>
+<h2 id="关键论文与文献清单-1"><a class="header" href="#关键论文与文献清单-1">关键论文与文献清单</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>年份</th><th>文献</th><th>一句话贡献</th></tr>
+</thead>
+<tbody>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry</em>, Ch.6</td><td>$P = K[R</td></tr>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry</em>, Ch.2</td><td>齐次坐标、变换分层——射影/仿射/相似/欧几里得变换群的不变性层级（p.37-44）</td></tr>
+<tr><td>2000</td><td>Z. Zhang, “A Flexible New Technique for Camera Calibration”, <em>IEEE TPAMI</em></td><td>张氏标定法——只用棋盘格平面从多张图像同时恢复 $K$ 和每帧的 $[R</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="实操练习-4"><a class="header" href="#实操练习-4">实操练习</a></h2>
+<ol>
+<li><strong>亲手走一遍变换链</strong>：在房间角落里放一个虚拟相机（$C = (0,0,0)$，看向 Z 轴），在 $(3, 0.5, 5)$ 处放一个点。用手算（或用 Python 逐步骤算）这个点从世界坐标系走到像素坐标系的完整过程。验证最终结果和直接用 $P = K[R|t]$ 一次算出来的结果完全相同。</li>
+<li><strong>坐标约定陷阱实验</strong>：把一个 OpenGL 渲染的立方体的顶点坐标手动转换到 OpenCV 约定（$Y \to -Y$, $Z \to -Z$），然后用 OpenCV 的 <code>projectPoints</code> 投影到图像上。如果不做转换直接投影——立方体出现在图像的什么位置？为什么？</li>
+<li><strong>逆推射线</strong>：已知相机内参 $K$ 和图像上的一个像素 $(u,v)$，计算这条像素对应的三维射线在相机坐标系下的方向向量。在空间中画出这条射线——验证它确实穿过相机中心 $(0,0,0)$ 和成像平面上的 $(u - c_x, v - c_y, f)$。</li>
+</ol>
+<hr>
+<h2 id="延伸阅读-4"><a class="header" href="#延伸阅读-4">延伸阅读</a></h2>
+<ul>
+<li>本书内：[[01 相机模型]] · [[02 投影几何]] · [[04 深度表示]]</li>
+<li>H&amp;Z 原书 Ch.6.1：相机模型完整推导——从针孔投影到 $P = K[R|t]$（p.154-157）</li>
+<li>H&amp;Z 原书 Ch.6.2.4：RQ 分解——从已知 $P$ 矩阵中恢复 $K$ 和 $R$（p.163-165）</li>
+<li>H&amp;Z 原书 Ch.2.4：变换分层——射影/仿射/相似/欧几里得的不变性，理解“绝对坐标“与“相对坐标“的本质（p.37-44）</li>
+<li>OpenCV Camera Calibration Tutorial: https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="06-优化基础从有噪声的数据中得到最好的估计"><a class="header" href="#06-优化基础从有噪声的数据中得到最好的估计">06 优化基础：从有噪声的数据中得到最好的估计</a></h1>
+<blockquote>
+<p>预计阅读时间：40 分钟
+前置知识：基础篇第 01-05 节
+读完本节后，你可以：理解 DLT、几何误差、RANSAC、Bundle Adjustment 的基本原理，知道何时用何种方法，能用 NumPy 实现 DLT 和简单 RANSAC。</p>
+</blockquote>
+<hr>
+<h2 id="第一阶直观理解-5"><a class="header" href="#第一阶直观理解-5">第一阶：直观理解</a></h2>
+<h3 id="一个场景-5"><a class="header" href="#一个场景-5">一个场景</a></h3>
+<p>前面的五节教你了一套完整的“几何语言“——你知道如何用 <code>P = K[R|t]</code> 描述相机，知道两张图之间的对极约束 <code>x'^T F x = 0</code>，知道三角测量可以从两个视角恢复 3D 点。</p>
+<p>但这一切都建立在一个假设上：你测量到的像素坐标是<strong>精确的</strong>。</p>
+<p>现实中不是这样。你手动点选的对应点会有像素偏差，自动特征匹配也有误配，甚至传感器本身也有噪声。如果你把有噪声的测量直接扔进 <code>x'^T F x = 0</code>，方程两边很可能不等于零——它不是 0，而是某个小量。</p>
+<p><strong>问题来了：当数据有噪声时，如何仍然得到最好的估计？</strong></p>
+<p>这就是优化的用武之地。优化不是 3D 视觉的特产，而是贯穿整个领域的“底层工具“——从最简单的直线拟合，到上千张图片的全局 Bundle Adjustment，本质上都是在回答同一个问题：在数据不完美的情况下，怎么找到最接近真相的解。</p>
+<h3 id="核心直觉三种估计范式"><a class="header" href="#核心直觉三种估计范式">核心直觉：三种估计范式</a></h3>
+<p>3D 视觉中的参数估计方法可以按“精度 vs 速度“分成三种范式：</p>
+<ol>
+<li>
+<p><strong>代数方法（Algebraic）</strong>——快，但粗糙。把约束改写成线性方程组 <code>Ah = 0</code>，用 SVD 一步出解。代价函数（代数误差）没有几何意义，但胜在不需要迭代，是绝佳的初始值来源。</p>
+</li>
+<li>
+<p><strong>几何方法（Geometric）</strong>——准，但需要迭代。直接最小化图像上像素距离的平方和（重投影误差），有明确的物理意义。在假设高斯噪声的前提下，这是<strong>最大似然估计</strong>——统计意义上的最优解。</p>
+</li>
+<li>
+<p><strong>鲁棒方法（Robust）</strong>——抗干扰。真实数据里总有一些“错得离谱“的匹配（outlier）。RANSAC 的思路是“少数服从多数“——反复随机采样最小子集算出模型，看哪个模型能得到最多数据的支持。</p>
+</li>
+</ol>
+<p>实践中，这三者通常是串联使用的：<strong>RANSAC 剔除 outlier → DLT 给出初值 → 几何优化精细打磨</strong>。这是 3D 视觉中最常见的估计流水线。</p>
+<h3 id="技术全景-5"><a class="header" href="#技术全景-5">技术全景</a></h3>
+<pre><code class="language-mermaid">mindmap
+  root((Optimization))
+    Algebraic Methods
+      DLT Direct Linear Transformation
+      Ah=0 SVD solution
+      Factorization Tomasi-Kanade
+    Geometric Methods
+      Reprojection error
+      Symmetric transfer error
+      Gold Standard algorithm
+      Bundle Adjustment BA
+    Approximate Methods
+      Sampson error
+      First-order correction
+      Closed form
+    Robust Estimation
+      RANSAC
+      M-estimators
+      MLESAC
+      LMEDS
+    Iterative Solvers
+      Gauss-Newton
+      Levenberg-Marquardt
+      Schur complement
+      Sparse BA
+</code></pre>
+<h3 id="mini-case用最小二乘法拟合一条直线"><a class="header" href="#mini-case用最小二乘法拟合一条直线">Mini Case：用最小二乘法拟合一条直线</a></h3>
+<p>先忘掉 3D 和相机。最简单的问题：平面上有一堆带噪声的点，你想找到穿过它们的“最佳直线“。</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+
+# Generate noisy points along line y = 2x + 1
+np.random.seed(42)
+x = np.linspace(0, 10, 50)
+y_true = 2 * x + 1
+y_obs = y_true + np.random.normal(0, 1.5, size=len(x))  # Add Gaussian noise
+
+# Least squares: minimize ||Ax - b||^2
+# For line y = ax + b, each point gives: x_i * a + 1 * b = y_i
+A = np.column_stack([x, np.ones_like(x)])  # Design matrix
+b = y_obs
+
+# Normal equation: (A^T A) theta = A^T b
+theta = np.linalg.solve(A.T @ A, A.T @ b)
+a_hat, b_hat = theta
+print(f"True:      y = 2.00x + 1.00")
+print(f"Estimated: y = {a_hat:.2f}x + {b_hat:.2f}")
+</code></pre>
+<p>这个简单的直线拟合包含了优化的所有核心要素：</p>
+<ul>
+<li><strong>模型</strong>：直线 <code>y = ax + b</code>（就像 <code>x'^T F x = 0</code>）</li>
+<li><strong>观测量</strong>：50 个带噪声的点（就像 50 对特征匹配点）</li>
+<li><strong>代价函数</strong>：所有点误差的平方和 <code>Σ(y_obs_i - (a·x_i + b))^2</code></li>
+<li><strong>求解</strong>：找到使代价函数最小的参数 a, b</li>
+</ul>
+<p>从直线拟合到 Bundle Adjustment，本质上只是<strong>模型变复杂了、参数变多了、代价函数从直线距离变成了像素距离</strong>罢了。</p>
+<hr>
+<h2 id="第二阶原理解析-5"><a class="header" href="#第二阶原理解析-5">第二阶：原理解析</a></h2>
+<h3 id="第一性原理问题的本质是什么"><a class="header" href="#第一性原理问题的本质是什么">第一性原理：问题的本质是什么？</a></h3>
+<p>3D 视觉中的估计问题，本质上都是<strong>从含噪声的观测量中推断隐藏的几何参数</strong>。观测量是图像坐标（可测量的像素位置），隐藏参数可能是单应矩阵 H、相机位姿 R/t、三维点坐标 X。</p>
+<p>噪声来自哪里？</p>
+<ul>
+<li><strong>特征检测不精确</strong>：SIFT、ORB 等检测到的特征点位置有亚像素级别的误差</li>
+<li><strong>传感器噪声</strong>：CMOS 的暗电流、量化误差</li>
+<li><strong>镜头畸变残差</strong>：即使标定过，畸变校正也不会完美</li>
+</ul>
+<p>在数学上，我们假设观测噪声服从某种概率分布（最常见的是均值为零的高斯分布），然后问：<strong>给定这些有噪声的观测，最可能的“真实参数“是什么？</strong> 这就是参数估计的核心问题。</p>
+<h3 id="长链推演从线性代数到全局优化"><a class="header" href="#长链推演从线性代数到全局优化">长链推演：从线性代数到全局优化</a></h3>
+<h4 id="步骤-1dlt--把非线性约束变成线性方程组"><a class="header" href="#步骤-1dlt--把非线性约束变成线性方程组">步骤 1：DLT —— 把非线性约束变成线性方程组</a></h4>
+<p>以估计单应矩阵 H 为例。已知四组或更多对应点 <code>x_i = (x_i, y_i, 1)^T</code> 和 <code>x'_i = (x'_i, y'_i, 1)^T</code>，满足 <code>x'_i = H x_i</code>。</p>
+<p>这是一个非线性关系（齐次坐标下 H 有 9 个未知数）。DLT（Direct Linear Transformation）的妙处是把约束改写为：</p>
+<p>$$x’_i \times H x_i = 0$$</p>
+<p>展开后，每个点对提供两个独立的线性方程（第三个是前两个的线性组合）。把所有点对的方程堆在一起，得到：</p>
+<p>$$A h = 0$$</p>
+<p>其中 h 是 H 的 9 个元素排成的列向量，A 是 2n x 9 的系数矩阵。（H&amp;Z §4.1, p.88-89）</p>
+<p><strong>求解</strong>：<code>h</code> 是 A 的最小奇异值对应的右奇异向量——也就是对 A 做 SVD，<code>A = U Σ V^T</code>，取 V 的最后一行。（H&amp;Z §4.1, p.90）</p>
+<p>为什么用 SVD？因为 <code>||Ah||</code> 在 <code>||h|| = 1</code> 约束下的极小值就是最小奇异值，对应的 h 就是解。这个解最小化的是<strong>代数误差</strong> <code>||Ah||</code>——它度量的是“方程两边离零有多远“，而不是“投影点离测量点有多少像素“。这就是“代数“二字的含义。</p>
+<h4 id="步骤-2代价函数升级--从代数到几何"><a class="header" href="#步骤-2代价函数升级--从代数到几何">步骤 2：代价函数升级 —— 从代数到几何</a></h4>
+<p><strong>代数误差</strong>（H&amp;Z §4.2, p.91-92）：
+$$\epsilon_{alg} = ||Ah||$$</p>
+<p>优点：有闭合解，计算极快。缺点：没有几何意义——如果把图像坐标放大 10 倍，代数误差也变 10 倍，但几何关系没变。它不代表像素距离。</p>
+<p><strong>几何误差 —— 单边转移误差</strong>（H&amp;Z §4.2.3, p.94-95）：
+$$\epsilon_{geo} = \sum_i d(x’_i, H\bar{x}_i)^2$$</p>
+<p>其中 <code>d(·,·)</code> 是图像平面上的欧几里得距离（像素距离），<code>H\bar{x}_i</code> 是将第一幅图的测量点投影到第二幅图的位置。这有明确的物理意义——“我算出来的投影位置和实际看到的位置差了多少像素”。</p>
+<p><strong>几何误差 —— 对称转移误差</strong>（H&amp;Z §4.2.3, p.95, eq 4.8）：
+$$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
+<p>同时考虑两个方向的重投影误差——不是单向转移，而是找一个完美匹配的对应对 <code>(x̂_i, x̂'_i)</code>，使它们既满足 <code>x̂'_i = H x̂_i</code>，又分别离各自的测量点最近。</p>
+<p><strong>Sampson 误差</strong>（H&amp;Z §4.2.6, p.98-99, eq 4.10）：代数误差和几何误差之间的实用折中。它用一阶导数对代数误差做了几何修正，有闭合形式，不需要迭代：</p>
+<p>$$\epsilon_{Sampson} = \sum_i \frac{(x’^T_i F x_i)^2}{(F x_i)_x^2 + (F x_i)_y^2 + (F^T x’_i)_x^2 + (F^T x’_i)_y^2}$$</p>
+<p>在很多情况下，Sampson 误差的优化结果跟完全几何误差几乎一样好——但不需要迭代。（H&amp;Z §4.2.6, p.99）</p>
+<p><strong>代价函数总结：</strong></p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>代价函数</th><th>类型</th><th>几何意义</th><th>需要迭代</th><th>精度</th><th>用途</th></tr>
+</thead>
+<tbody>
+<tr><td>代数误差</td><td>代数</td><td>无</td><td>否</td><td>低</td><td>初始化</td></tr>
+<tr><td>Sampson 误差</td><td>一阶近似</td><td>近似有</td><td>否</td><td>中</td><td>快速估计</td></tr>
+<tr><td>几何误差</td><td>几何</td><td>有（像素）</td><td>是</td><td>高</td><td>最终优化</td></tr>
+</tbody>
+</table>
+</div>
+<h4 id="步骤-3mle--为什么最小化几何误差是最优的"><a class="header" href="#步骤-3mle--为什么最小化几何误差是最优的">步骤 3：MLE —— 为什么最小化几何误差是“最优“的</a></h4>
+<p>如果测量噪声服从均值为零、方差为 σ^2 的独立高斯分布，那么观测值的<strong>似然函数</strong>是：</p>
+<p>$$p({x_i, x’_i} | H) = \prod_i \frac{1}{2\pi\sigma^2} \exp\left(-\frac{d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2}{2\sigma^2}\right)$$</p>
+<p><strong>最大化这个似然函数，等价于最小化几何误差</strong> <code>Σ d(x_i, x̂_i)^2 + d(x'_i, x̂'_i)^2</code>。（H&amp;Z §4.3, p.102-108）</p>
+<p>这就是为什么几何误差的 Gold Standard 算法（Algorithm 4.3, p.114）被当作基准——在常见噪声假设下，它给出了统计意义上的最优估计。</p>
+<p><strong>这一原理贯穿全书</strong>：Bundle Adjustment 最小化重投影误差，本质上就是在做最大似然估计。这个“底座“让所有优化方法有了统计学的正当性。</p>
+<h4 id="步骤-4ransac--对抗-outlier"><a class="header" href="#步骤-4ransac--对抗-outlier">步骤 4：RANSAC —— 对抗 outlier</a></h4>
+<p>前面的方法都假设噪声是“小且均匀“的（inlier）。但真实数据中总有一些匹配是<strong>完全错误的</strong>（outlier）——比如把左边桌角的 SIFT 特征错配到了右边窗户上。</p>
+<p>RANSAC 的核心思想（H&amp;Z §4.7, p.116-119）：</p>
+<ol>
+<li><strong>随机采样</strong>：随机选取求解模型所需的最少数据点（如算 H 需要 4 对）</li>
+<li><strong>拟合模型</strong>：用这最少数据点计算模型参数</li>
+<li><strong>统计共识</strong>：计算在所有数据点中，有多少点“同意“这个模型（内点数量）</li>
+<li><strong>迭代</strong>：重复 N 次</li>
+<li><strong>输出</strong>：选择共识最大的模型，并对所有内点重新拟合最终模型</li>
+</ol>
+<p><strong>迭代次数公式</strong>（H&amp;Z §4.7, p.119）：</p>
+<p>$$N = \frac{\log(1-p)}{\log(1-(1-\varepsilon)^s)}$$</p>
+<p>其中 <code>p</code> 是期望的成功概率（通常设 0.99），<code>ε</code> 是 outlier 比例（需要估计），<code>s</code> 是采样点数量（算 H 用 4，算 F 用 7 或 8）。</p>
+<p><strong>人话翻译</strong>：假设数据里 30% 是错配，采样 4 个点，要想 99% 把握至少有一次全是好点——需要多少次尝试？公式告诉你答案。</p>
+<p>RANSAC 不是优化的替代品，而是优化<strong>之前</strong>的“清洗步骤“——先用 RANSAC 把 outlier 过滤掉，再用几何优化在干净数据上精细调整。</p>
+<h4 id="步骤-5bundle-adjustment--全局最优的最后一步"><a class="header" href="#步骤-5bundle-adjustment--全局最优的最后一步">步骤 5：Bundle Adjustment —— 全局最优的“最后一步“</a></h4>
+<p>当你有多张图片和很多 3D 点，前面几步给了你初始的相机参数和 3D 点位置，但每个量都不太准。Bundle Adjustment 的做法是：<strong>把所有的相机参数和所有的 3D 点同时优化，使重投影误差的总和最小</strong>。</p>
+<p>（H&amp;Z §18.1, p.434-436）</p>
+<p>$$\min_{P^i, X_j} \sum_{i,j} d(P^i \hat{X}_j, x^i_j)^2$$</p>
+<p>这句话的含义：对于第 <code>i</code> 个相机和第 <code>j</code> 个 3D 点，如果这个 3D 点在第 <code>i</code> 张图中可见（有对应像素 <code>x^i_j</code>），就计算“把 <code>X_j</code> 投影到第 <code>i</code> 张图上得到的像素“与“实际观测到的像素 <code>x^i_j</code>“之间的距离。把所有这样的距离的平方加起来，调整所有的相机矩阵 <code>P^i</code> 和 3D 点 <code>X_j</code>，使这个和最小。</p>
+<p><strong>问题的规模</strong>：m 个相机，n 个 3D 点 → 3n + 11m 个参数（每个 3D 点 3 DOF，每个透视相机 11 DOF）。</p>
+<p><strong>为什么能解</strong>：这时候你可能会问——几千个未知数，怎么优化？答案在于<strong>稀疏性</strong>。每个重投影误差只涉及一个相机和一个 3D 点，与其他的相机和点<strong>无关</strong>。这意味着 Hessian 矩阵（二阶导数矩阵）具有“块对角 + 低秩边缘“的结构。</p>
+<p>利用这个结构，可以用 <strong>Schur 补</strong>（也叫 Marginalization）把 3D 点参数“消去“，先解相机参数（规模小得多），再回代解 3D 点。（H&amp;Z Appendix 6, p.597）</p>
+<p><strong>人话翻译</strong>：几千个未知数的优化问题看起来不可能，但因为相机和点之间的交互是“稀疏的“（不是每对相机-点都相关），可以用线性代数技巧把大问题分解成几个小问题。这就是 BA 在实践中有用的原因。</p>
+<h4 id="步骤-6因子分解法--仿射相机下的优雅解法"><a class="header" href="#步骤-6因子分解法--仿射相机下的优雅解法">步骤 6：因子分解法 —— 仿射相机下的优雅解法</a></h4>
+<p>在仿射相机的假设下，有一个不需要迭代的全局方法——Tomasi-Kanade 因子分解法。</p>
+<p>把所有观测点坐标（减均值后）堆成一个 2m x n 的<strong>测量矩阵 W</strong>。在仿射相机下，W 可以分解为：</p>
+<p>$$W = M X$$</p>
+<p>其中 M（2m x 3）包含所有相机的运动信息，X（3 x n）包含所有 3D 点的结构信息。对 W 做 SVD 取前 3 个奇异值，就同时得到了运动和结构。（H&amp;Z §18.2, p.436-440）</p>
+<p>这是整个 3D 视觉中最优雅的算法之一——不需要迭代，SVD 一步到位；在等方差各向同性高斯噪声假设下，它是最大似然估计。（H&amp;Z §18.2, p.439）可惜它要求仿射相机假设和稠密对应（每个点在每个视图中都被观测到），限制了它的实际应用。</p>
+<h3 id="完整流程从原始匹配到最终解"><a class="header" href="#完整流程从原始匹配到最终解">完整流程：从原始匹配到最终解</a></h3>
+<pre><code class="language-mermaid">flowchart TD
+    A[Raw Feature Matches] --&gt; B{RANSAC}
+    B --&gt;|Reject| C[Outlier Pairs: discard]
+    B --&gt;|Accept| D[Inlier Pairs]
+    D --&gt; E[DLT: Ah=0 SVD]
+    E --&gt; F{Algebraic Solution}
+    F --&gt; G[Nonlinear Optimization LM]
+    G --&gt; H{Converged?}
+    H --&gt;|No| G
+    H --&gt;|Yes| I[Golden Standard MLE]
+    I --&gt; J[Final Estimates: H E P X]
+</code></pre>
+<h3 id="code-lens用-numpy-实现-dlt-和简单-ransac"><a class="header" href="#code-lens用-numpy-实现-dlt-和简单-ransac">Code Lens：用 NumPy 实现 DLT 和简单 RANSAC</a></h3>
+<pre><code class="language-python">import numpy as np
+from numpy.linalg import svd, norm
+
+
+def normalise_2d(pts):
+    """Normalise 2D points for numerical stability (H&amp;Z section 4.4, p.107-109).
+
+    Translate centroid to origin, scale so mean distance = sqrt(2).
+    """
+    pts = np.asarray(pts)
+    centroid = pts.mean(axis=0)
+    shifted = pts - centroid
+    mean_dist = norm(shifted, axis=1).mean()
+    scale = np.sqrt(2) / mean_dist
+    T = np.array([[scale, 0, -scale * centroid[0]],
+                  [0, scale, -scale * centroid[1]],
+                  [0, 0, 1]])
+    normalised = (T @ np.column_stack([pts, np.ones(len(pts))]).T).T
+    return normalised[:, :2], T
+
+
+def dlt_homography(pts1, pts2):
+    """Estimate homography H using DLT (H&amp;Z Algorithm 4.2, p.109).
+
+    Args:
+        pts1, pts2: (N, 2) arrays of corresponding points.
+
+    Returns:
+        H: 3x3 homography matrix.
+    """
+    assert len(pts1) &gt;= 4, "Need at least 4 point pairs"
+
+    # Normalise for numerical stability (H&amp;Z section 4.4.3)
+    n1, T1 = normalise_2d(pts1)
+    n2, T2 = normalise_2d(pts2)
+
+    # Build matrix A from constraints: x' x Hx = 0 (H&amp;Z eq 4.1, p.89)
+    A = []
+    for (x, y), (xp, yp) in zip(n1, n2):
+        A.append([0, 0, 0, -x, -y, -1, yp * x, yp * y, yp])
+        A.append([x, y, 1, 0, 0, 0, -xp * x, -xp * y, -xp])
+    A = np.array(A)
+
+    # Solution is the last column of V (H&amp;Z p.90)
+    _, _, Vt = svd(A)
+    h = Vt[-1]  # nullspace of A
+    H_norm = h.reshape(3, 3)
+
+    # Denormalise (H&amp;Z Algorithm 4.2 step v, p.109)
+    H = np.linalg.inv(T2) @ H_norm @ T1
+    return H / H[2, 2]
+
+
+def ransac_homography(pts1, pts2, n_iters=2000, threshold=3.0):
+    """RANSAC for homography estimation (H&amp;Z section 4.7, Algorithm 4.6, p.121).
+
+    Args:
+        pts1, pts2: (N, 2) arrays.
+        n_iters: max iterations.
+        threshold: inlier distance threshold in pixels.
+
+    Returns:
+        best_H: best homography found.
+        best_inliers: boolean mask of inliers.
+    """
+    N = len(pts1)
+    best_inliers = np.zeros(N, dtype=bool)
+    best_count = 0
+    s = 4  # minimal sample size for H (H&amp;Z p.117)
+
+    for _ in range(n_iters):
+        # 1. Random sample
+        idx = np.random.choice(N, s, replace=False)
+
+        # 2. Fit model on sample
+        try:
+            H = dlt_homography(pts1[idx], pts2[idx])
+        except Exception:
+            continue
+
+        # 3. Compute consensus: symmetric transfer error (H&amp;Z eq 4.8, p.95)
+        pts1_h = np.column_stack([pts1, np.ones(N)])
+        pts2_h = np.column_stack([pts2, np.ones(N)])
+
+        proj_forward = (H @ pts1_h.T).T
+        proj_forward = proj_forward[:, :2] / proj_forward[:, 2:]
+
+        H_inv = np.linalg.inv(H)
+        proj_backward = (H_inv @ pts2_h.T).T
+        proj_backward = proj_backward[:, :2] / proj_backward[:, 2:]
+
+        error = np.sum((pts2 - proj_forward) ** 2, axis=1) + \
+                np.sum((pts1 - proj_backward) ** 2, axis=1)
+
+        inliers = error &lt; threshold ** 2
+        count = inliers.sum()
+
+        # 4. Keep best
+        if count &gt; best_count:
+            best_count = count
+            best_inliers = inliers
+            best_H = H
+
+    # 5. Re-fit on all inliers
+    if best_inliers.sum() &gt;= 4:
+        best_H = dlt_homography(pts1[best_inliers], pts2[best_inliers])
+
+    return best_H, best_inliers
+
+
+# ---- Demo with synthetic data ----
+if __name__ == "__main__":
+    # Generate ground truth homography
+    H_true = np.array([[1.2, -0.3, 25.0],
+                       [0.1, 1.1, -15.0],
+                       [0.0, 0.0, 1.0]])
+
+    # Generate 50 inlier points
+    np.random.seed(0)
+    pts1 = np.random.rand(50, 2) * 200
+    pts1_h = np.column_stack([pts1, np.ones(50)])
+    pts2_true = (H_true @ pts1_h.T).T
+    pts2_true = pts2_true[:, :2] / pts2_true[:, 2:]
+
+    # Add Gaussian noise to inliers
+    pts2 = pts2_true + np.random.normal(0, 1.0, pts2_true.shape)
+
+    # Add 10 outliers
+    pts2[-10:] = np.random.rand(10, 2) * 200
+
+    # Run RANSAC + DLT
+    H_est, inliers = ransac_homography(pts1, pts2, n_iters=500)
+    print(f"Inliers found: {inliers.sum()} / {len(pts1)}")
+    print(f"True H:\n{H_true}")
+    print(f"Estimated H:\n{H_est.round(2)}")
+</code></pre>
+<hr>
+<h2 id="第三阶部署实战-5"><a class="header" href="#第三阶部署实战-5">第三阶：部署实战</a></h2>
+<h3 id="方法选型何时用-dlt何时用几何优化"><a class="header" href="#方法选型何时用-dlt何时用几何优化">方法选型：何时用 DLT，何时用几何优化</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>场景</th><th>推荐方法</th><th>理由</th></tr>
+</thead>
+<tbody>
+<tr><td>快速原型验证</td><td>DLT</td><td>闭合解，无初始化问题</td></tr>
+<tr><td>实时系统（SLAM）</td><td>DLT + 少量迭代</td><td>速度优先，精度够用</td></tr>
+<tr><td>离线 SfM</td><td>DLT → BA</td><td>精度优先，时间充裕</td></tr>
+<tr><td>数据有 outlier</td><td>RANSAC → DLT → 优化</td><td>先清洗再迭代</td></tr>
+<tr><td>仿射相机场景（卫星图）</td><td>因子分解法</td><td>SVD 一步到位</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>速度 vs 精度权衡</strong>：DLT 可以在微秒级完成（SVD 很快），但精度有限；完整的几何优化可能需要秒级甚至分钟级（取决于数据量），但精度最优。实践中绝大多数系统采用“DLT 初始化 + 几步 Levenberg-Marquardt 迭代“的折中方案。</p>
+<h3 id="ransac-参数调优"><a class="header" href="#ransac-参数调优">RANSAC 参数调优</a></h3>
+<p>选择正确的参数是 RANSAC 成败的关键：</p>
+<ul>
+<li><strong>内点距离阈值</strong>（H&amp;Z §4.7.1, p.118）：对图像特征匹配，典型值是 <strong>1-3 像素</strong>。设得太大会把 outlier 也纳入内点，设得太小会把真实内点排除。可根据特征点定位精度（通常 0.5-2 像素级的 SIFT）来设定。</li>
+<li><strong>置信概率 p</strong>：通常设为 <strong>0.99</strong>。这确保有 99% 的概率至少有一次采样全都是真正的 inlier。</li>
+<li><strong>最少采样数 s</strong>：取决于模型——H 需 4 对（H&amp;Z §4.1, p.88），F 需 7 或 8 对（H&amp;Z §9.2, p.245），E 在校准情形下只需 5 对（H&amp;Z §9.6, p.258）。</li>
+<li><strong>最大迭代次数 N</strong>：用公式 <code>N = log(1-p) / log(1-(1-ε)^s)</code> 计算，或设一个保守的上界（如 2000）。在实践中常做一个 <strong>adaptive</strong> 版本：每当发现更好的模型时，根据当前估计的 outlier 比例更新 N，可以提前终止。</li>
+</ul>
+<h3 id="实践中的函数"><a class="header" href="#实践中的函数">实践中的函数</a></h3>
+<p>在 OpenCV 中，许多关键函数内部都使用了 DLT + RANSAC 的组合：</p>
+<pre><code class="language-python">import cv2
+
+# Find fundamental matrix with RANSAC (H&amp;Z section 9.2)
+F, mask = cv2.findFundamentalMat(pts1, pts2,
+                                   method=cv2.FM_RANSAC,
+                                   ransacReprojThreshold=3.0,
+                                   confidence=0.99)
+
+# Find essential matrix with RANSAC (H&amp;Z section 9.6)
+E, mask = cv2.findEssentialMat(pts1, pts2,
+                                 cameraMatrix=K,
+                                 method=cv2.RANSAC,
+                                 prob=0.999,
+                                 threshold=1.0)
+
+# PnP: solve camera pose from 2D-3D correspondences
+ret, rvec, tvec, inliers = cv2.solvePnPRansac(
+    objectPoints, imagePoints, K, distCoeffs=None)
+</code></pre>
+<p>这些函数的底层都遵循“RANSAC 选内点 + DLT 初始化 + 迭代优化“的范式。</p>
+<h3 id="bundle-adjustment-在实践中的工具"><a class="header" href="#bundle-adjustment-在实践中的工具">Bundle Adjustment 在实践中的工具</a></h3>
+<p>大型 BA 问题需要专门的求解器来利用稀疏结构：</p>
+<ul>
+<li><strong>Ceres Solver</strong>（Google）：C++ 库，COLMAP 使用它做 BA。支持自动微分，建模灵活。Google 的街景重建也依赖它。</li>
+<li><strong>g2o</strong>（General Graph Optimization）：C++ 图优化框架，广泛应用于 SLAM（ORB-SLAM 等）。将 BA 问题建模为图（节点是参数，边是约束）。</li>
+<li><strong>COLMAP</strong>：完整的 SfM + MVS 流程，内部使用 Ceres 做 BA。</li>
+<li><strong>SciPy / PyTorch</strong>：对于小规模问题（&lt; 100 个参数），<code>scipy.optimize.least_squares</code> 或 PyTorch 的 autograd 也完全可用。</li>
+</ul>
+<h3 id="常见陷阱"><a class="header" href="#常见陷阱">常见陷阱</a></h3>
+<ol>
+<li>
+<p><strong>局部极小值</strong>：非线性优化（Levenberg-Marquardt）从差初值出发很容易收敛到局部极小而不是全局最优。<strong>解决方案</strong>：永远用 DLT 或类似方法提供好的初值。（H&amp;Z §4.3, p.103-104）</p>
+</li>
+<li>
+<p><strong>退化配置</strong>：所有点共面、相机纯旋转无平移、所有点都在一条线上——这些退化情况导致约束不足，解不唯一。<strong>解决方案</strong>：检查矩阵的条件数，退化时主动切换到更稳定的求解策略。</p>
+</li>
+<li>
+<p><strong>参数化问题</strong>：旋转矩阵 R 有 9 个元素但只有 3 DOF——直接在 9 个数上优化会破坏正交性。<strong>解决方案</strong>：用轴角表示（3 参数）、四元数（4 参数+单位范数约束）或李代数 se(3) 来参数化旋转。</p>
+</li>
+<li>
+<p><strong>尺度漂移</strong>：在未标定的 SfM 中，不同部分的尺度可能不一致（因为 t 只有方向没有大小）。<strong>解决方案</strong>：BA 时可以添加尺度一致性约束，或者在标定相机后用 E 而非 F。</p>
+</li>
+<li>
+<p><strong>缺失数据</strong>：因子分解法要求稠密矩阵（每个点在每个视图都出现），现实中很多特征点只在局部视图中可见。<strong>解决方案</strong>：用增量式 SfM 框架（如 COLMAP），对缺失观测进行局部 BA。</p>
+</li>
+</ol>
+<hr>
+<h2 id="苏格拉底时刻-5"><a class="header" href="#苏格拉底时刻-5">苏格拉底时刻</a></h2>
+<ol>
+<li>
+<p><strong>BA 同时优化相机和三维点——但如果所有的相机位置都错了，三维点也错了，你怎么知道“真值“是什么？优化方法在什么意义上保证收敛到正确解？</strong></p>
+<p>（提示：思考 BA 的代价函数是重投影误差——它只关心“投影回去跟观测是否一致“，而不关心“绝对坐标是否对“。一个整体的射影变换会同时改变所有相机参数和 3D 点，但重投影误差不变。这就是“未标定重建最多到射影等价“的深层原因——你需要额外的约束（已知内参、已知距离等）来固定这个“规范自由度“。）</p>
+</li>
+<li>
+<p><strong>如果把 RANSAC 的内点阈值设得非常大，算法会退化成什么？如果设得非常小呢？</strong></p>
+<p>（提示：阈值无穷大 → 所有点都是内点 → RANSAC 退化为直接在所有数据上用最小二乘，无法排除 outlier。阈值无穷小 → 几乎所有点都是外点 → 几乎没有共识 → 算法找不到模型。RANSAC 的有效性依赖于“大多数内点形成共识“这个假设。）</p>
+</li>
+</ol>
+<hr>
+<h2 id="关键论文清单-3"><a class="header" href="#关键论文清单-3">关键论文清单</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>年份</th><th>论文</th><th>一句话贡献</th></tr>
+</thead>
+<tbody>
+<tr><td>1981</td><td>Fischler &amp; Bolles, “Random Sample Consensus”</td><td>RANSAC 的原始论文，引入鲁棒估计范式</td></tr>
+<tr><td>1992</td><td>Tomasi &amp; Kanade, “Shape and Motion from Image Streams under Orthography”</td><td>因子分解法，SVD 一步到位重建仿射场景</td></tr>
+<tr><td>1999</td><td>Lowe, “Object Recognition from Local Scale-Invariant Features”</td><td>SIFT 特征，为 RANSAC 提供了高质量的输入匹配</td></tr>
+<tr><td>2000</td><td>Triggs et al., “Bundle Adjustment — A Modern Synthesis”</td><td>BA 的全面综述，稀疏求解的完整论述</td></tr>
+<tr><td>2005</td><td>Nister, “An Efficient Solution to the Five-Point Relative Pose Problem”</td><td>5 点法解本质矩阵，RANSAC 的最小配置可降至 5</td></tr>
+<tr><td>2010</td><td>Agarwal et al., “Building Rome in a Day”</td><td>大规模 SfM，将 RANSAC + BA 扩展到城市场景</td></tr>
+<tr><td>2016</td><td>Schonberger &amp; Frahm, “Structure-from-Motion Revisited”</td><td>COLMAP 论文，SfM 实践中 RANSAC + BA 的标准流程</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="实操练习-5"><a class="header" href="#实操练习-5">实操练习</a></h2>
+<ol>
+<li>
+<p><strong>用上面的 Code Lens 代码，生成 20 对对应点（带 0.5 像素高斯噪声），验证 DLT 能恢复 H。再混入 5 个随机 outlier，看纯 DLT（不用 RANSAC）的误差有多大，加上 RANSAC 后能恢复到什么程度。</strong></p>
+</li>
+<li>
+<p><strong>取两张你自己拍的照片（从不同角度拍同一个物体），手动标注 8 对对应点，用 OpenCV 的 <code>findFundamentalMat</code>（FM_8POINT vs FM_RANSAC）对比，观察 RANSAC 版本是否更稳定。</strong></p>
+</li>
+<li>
+<p><strong>思考：如果你只有 4 对对应点（恰好够解 H），RANSAC 还有用吗？为什么？（提示：4 对就是最小配置，无法从内部分出 inlier 和 outlier。）</strong></p>
+</li>
+</ol>
+<hr>
+<h2 id="延伸阅读-5"><a class="header" href="#延伸阅读-5">延伸阅读</a></h2>
+<ul>
+<li>本书内：[[03 多视图几何入门]]（F 矩阵的 8 点法就是 DLT 的具体应用）、[[01 相机模型]]（BA 中优化的相机参数来源）</li>
+<li>H&amp;Z 原书：第 4 章（DLT、代价函数、MLE、RANSAC）、第 18 章（BA 和因子分解法）、附录 6（稀疏 BA 的 Schur 补推导）</li>
+<li>Triggs et al., “Bundle Adjustment — A Modern Synthesis”: BA 的经典综述，涵盖稀疏求解、协方差估计、规范自由度处理</li>
+<li>Ceres Solver 官方教程：http://ceres-solver.org/tutorial.html — 手把手教你建模和求解 BA 问题</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="模块-a单目深度估计"><a class="header" href="#模块-a单目深度估计">模块 A：单目深度估计</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="直观理解"><a class="header" href="#直观理解">直观理解</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="原理解析"><a class="header" href="#原理解析">原理解析</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="部署实战"><a class="header" href="#部署实战">部署实战</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="模块-b双目立体匹配"><a class="header" href="#模块-b双目立体匹配">模块 B：双目立体匹配</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="直观理解-1"><a class="header" href="#直观理解-1">直观理解</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="原理解析-1"><a class="header" href="#原理解析-1">原理解析</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="部署实战-1"><a class="header" href="#部署实战-1">部署实战</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="模块-c3d-gaussian-splatting"><a class="header" href="#模块-c3d-gaussian-splatting">模块 C：3D Gaussian Splatting</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="直观理解-2"><a class="header" href="#直观理解-2">直观理解</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="原理解析-2"><a class="header" href="#原理解析-2">原理解析</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="部署实战-2"><a class="header" href="#部署实战-2">部署实战</a></h1>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr-ef4e11c1.min.js"></script>
+        <script src="mark-09e88c2c.min.js"></script>
+        <script src="searcher-c2a407aa.js"></script>
+
+        <script src="clipboard-1626706a.min.js"></script>
+        <script src="highlight-abc7f01d.js"></script>
+        <script src="book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            MathJax.Hub.Register.StartupHook('End', function() {
+                window.setTimeout(window.print, 100);
+            });
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>
