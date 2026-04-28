@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-6dae151e.js";
+            window.path_to_searchindex_js = "searchindex-6128ff9d.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-d47b7a93.js"></script>
@@ -1018,10 +1018,10 @@ print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
 <tr><th>变换类型</th><th>矩阵形式</th><th>DOF</th><th>保持不变的性质</th><th>丢失的性质</th></tr>
 </thead>
 <tbody>
-<tr><td>射影 Projective</td><td>$\begin{pmatrix} h_{11} &amp; h_{12} &amp; h_{13} \ h_{21} &amp; h_{22} &amp; h_{23} \ h_{31} &amp; h_{32} &amp; h_{33} \end{pmatrix}$</td><td>8</td><td>共线性（collinearity）、交比（cross-ratio）</td><td>平行性、角度、长度</td></tr>
-<tr><td>仿射 Affine</td><td>$\begin{pmatrix} a_{11} &amp; a_{12} &amp; t_x \ a_{21} &amp; a_{22} &amp; t_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$</td><td>6</td><td>平行性、面积比、平行线段长度比</td><td>角度、绝对长度</td></tr>
-<tr><td>相似 Similarity</td><td>$\begin{pmatrix} s r_{11} &amp; s r_{12} &amp; t_x \ s r_{21} &amp; s r_{22} &amp; t_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$</td><td>4</td><td>角度、任意线段长度比</td><td>绝对长度</td></tr>
-<tr><td>欧几里得 Euclidean</td><td>$\begin{pmatrix} r_{11} &amp; r_{12} &amp; t_x \ r_{21} &amp; r_{22} &amp; t_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$</td><td>3</td><td>长度、面积、角度</td><td>—</td></tr>
+<tr><td>射影 Projective</td><td>$$\begin{pmatrix} h_{11} &amp; h_{12} &amp; h_{13} \ h_{21} &amp; h_{22} &amp; h_{23} \ h_{31} &amp; h_{32} &amp; h_{33} \end{pmatrix}$$</td><td>8</td><td>共线性（collinearity）、交比（cross-ratio）</td><td>平行性、角度、长度</td></tr>
+<tr><td>仿射 Affine</td><td>$$\begin{pmatrix} a_{11} &amp; a_{12} &amp; t_x \ a_{21} &amp; a_{22} &amp; t_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$$</td><td>6</td><td>平行性、面积比、平行线段长度比</td><td>角度、绝对长度</td></tr>
+<tr><td>相似 Similarity</td><td>$$\begin{pmatrix} s r_{11} &amp; s r_{12} &amp; t_x \ s r_{21} &amp; s r_{22} &amp; t_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$$</td><td>4</td><td>角度、任意线段长度比</td><td>绝对长度</td></tr>
+<tr><td>欧几里得 Euclidean</td><td>$$\begin{pmatrix} r_{11} &amp; r_{12} &amp; t_x \ r_{21} &amp; r_{22} &amp; t_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$$</td><td>3</td><td>长度、面积、角度</td><td>—</td></tr>
 </tbody>
 </table>
 </div>
