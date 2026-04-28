@@ -11,6 +11,7 @@
 - [深度表示](00_basics/04_depth_repr.md)
 - [坐标系转换](00_basics/05_coordinates.md)
 - [优化基础](00_basics/06_optimization.md)
+- [3D 相机与传感器](00_basics/07_3d_cameras.md)
 
 # 主题模块
 
