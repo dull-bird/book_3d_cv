@@ -29,8 +29,6 @@
 
         <!-- Custom theme stylesheets -->
 
-        <!-- MathJax -->
-        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
         <!-- Provide site root and default themes to javascript -->
         <script>
@@ -209,7 +207,7 @@
 </ol>
 <p>每一步都是一次“翻译“，把同一个物理点的坐标从一种语言翻成另一种语言。整个链条合在一起，就是 $P = K[R|t]$——整本书最重要的公式之一。</p>
 <h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Coordinate Systems))
     World Frame
       Arbitrary origin
@@ -231,7 +229,8 @@
       World -&gt; Camera R t 6 DOF
       Camera -&gt; Image perspective K
       Image -&gt; Pixel affine scaling
-</code></pre>
+</pre>
+
 <h3 id="mini-case跟踪一个点的完整旅程"><a class="header" href="#mini-case跟踪一个点的完整旅程">Mini Case：跟踪一个点的完整旅程</a></h3>
 <pre><code class="language-python">import numpy as np
 
@@ -277,7 +276,7 @@ print(f"One-liner verification: ({x_pixel[0]/x_pixel[2]:.1f}, "
 <hr>
 <h2 id="第二阶原理解析"><a class="header" href="#第二阶原理解析">第二阶：原理解析</a></h2>
 <h3 id="变换链全景"><a class="header" href="#变换链全景">变换链全景</a></h3>
-<pre><code class="language-mermaid">flowchart LR
+<pre class="mermaid">flowchart LR
     subgraph W["World Frame O_w"]
         Xw["X_w = (X, Y, Z, 1)^T"]
     end
@@ -293,7 +292,8 @@ print(f"One-liner verification: ({x_pixel[0]/x_pixel[2]:.1f}, "
     W --&gt;|"R, t&lt;br/&gt;6 DOF"| C
     C --&gt;|"Perspective&lt;br/&gt;Projection&lt;br/&gt;3D -&gt; 2D lossy"| I
     I --&gt;|"K matrix&lt;br/&gt;Scaling + Offset"| Px
-</code></pre>
+</pre>
+
 <p>每一步的矩阵维度和变换性质：</p>
 <div class="table-wrapper">
 <table>
@@ -451,7 +451,7 @@ print(f"Verification (one-shot): u={u_full:.1f}, v={v_full:.1f}")
 </div>
 <p>右手定则：右手大拇指指向 X，食指指向 Y，中指自然指向 Z（前方）。这一定则在 OpenCV 的所有函数中一致——从 <code>solvePnP</code> 到 <code>projectPoints</code> 到 <code>stereoRectify</code>。</p>
 <h3 id="常见坐标系统对比"><a class="header" href="#常见坐标系统对比">常见坐标系统对比</a></h3>
-<pre><code class="language-mermaid">quadrantChart
+<pre class="mermaid">quadrantChart
     title Coordinate System Comparison
     x-axis "X Direction" --&gt; "Right"
     y-axis "Y Direction" --&gt; "Up vs Down"
@@ -459,7 +459,8 @@ print(f"Verification (one-shot): u={u_full:.1f}, v={v_full:.1f}")
     quadrant-2 "OpenGL&lt;br/&gt;X=Right, Y=Up, Z=Backward&lt;br/&gt;Right-Hand"
     quadrant-3 "Unity&lt;br/&gt;X=Right, Y=Up, Z=Forward&lt;br/&gt;Left-Hand"
     quadrant-4 "ROS Robot&lt;br/&gt;X=Forward, Y=Left, Z=Up&lt;br/&gt;Right-Hand"
-</code></pre>
+</pre>
+
 <p><strong>转换速查表</strong>：</p>
 <div class="table-wrapper">
 <table>
@@ -623,6 +624,7 @@ print(f"Depth range: [{depths.min():.2f}, {depths.max():.2f}] m")
         <script src="../book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/js/mathjax-mermaid-a0d07254.js"></script>
 
 
 

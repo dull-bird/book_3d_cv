@@ -29,8 +29,6 @@
 
         <!-- Custom theme stylesheets -->
 
-        <!-- MathJax -->
-        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
         <!-- Provide site root and default themes to javascript -->
         <script>
@@ -203,7 +201,7 @@
 <p>从那个三维点出发的光线，穿过小孔，直直地打在成像平面上。这个点落在成像平面上的位置，就是<strong>投影点</strong>。所有三维点的投影点合在一起，就是你的照片。</p>
 <p>这个模型的妙处在于：它只用<strong>一条直线</strong>（光线）连接了三维世界和二维图像。没有复杂的折射、没有镜头畸变——就是一个简单的几何关系。理解了这个关系，你就能用数学精确描述“拍照片“这件事。</p>
 <h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Camera Model))
     针孔相机 Pinhole
       中心投影 Central Projection
@@ -229,7 +227,8 @@
       Zhang's method
       棋盘格 chessboard
       重投影误差 reprojection error
-</code></pre>
+</pre>
+
 <h3 id="mini-case用-opencv-捕捉一帧并查看像素坐标"><a class="header" href="#mini-case用-opencv-捕捉一帧并查看像素坐标">Mini Case：用 OpenCV 捕捉一帧并查看像素坐标</a></h3>
 <p>打开你的电脑摄像头，捕捉一帧，看看每个像素的坐标是什么样的。</p>
 <pre><code class="language-python">import cv2
@@ -332,7 +331,7 @@ $$(X, Y, Z)^T \rightarrow (fX/Z, fY/Z)^T$$</p>
 <p><code>P = K[R|t]</code> 这个公式是整本书最重要的公式之一。</p>
 </blockquote>
 <h3 id="投影管线全景"><a class="header" href="#投影管线全景">投影管线全景</a></h3>
-<pre><code class="language-mermaid">flowchart TD
+<pre class="mermaid">flowchart TD
     A["3D World Point (X_w, Y_w, Z_w)"] --&gt; B["Apply Extrinsic [R|t]: convert to camera coordinates"]
     B --&gt; C["3D Camera Point (X_c, Y_c, Z_c)"]
     C --&gt; D["Apply Intrinsic K: project to image plane"]
@@ -351,7 +350,8 @@ $$(X, Y, Z)^T \rightarrow (fX/Z, fY/Z)^T$$</p>
     subgraph Result["Image Result"]
         G
     end
-</code></pre>
+</pre>
+
 <h3 id="p-矩阵的几何解读"><a class="header" href="#p-矩阵的几何解读">P 矩阵的几何解读</a></h3>
 <p>相机矩阵 P 不仅是一个计算工具——它的每一行、每一列都有明确的几何意义（H&amp;Z section 6.2, p.158-162）：</p>
 <div class="table-wrapper">
@@ -717,6 +717,7 @@ print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
         <script src="../book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/js/mathjax-mermaid-a0d07254.js"></script>
 
 
 

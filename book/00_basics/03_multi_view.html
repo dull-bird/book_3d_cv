@@ -29,8 +29,6 @@
 
         <!-- Custom theme stylesheets -->
 
-        <!-- MathJax -->
-        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
         <!-- Provide site root and default themes to javascript -->
         <script>
@@ -200,7 +198,7 @@
 <p>两台相机中心的连线与图像平面的交点，叫<strong>对极点（epipole）</strong>。在左图中，e 是右相机中心在左图中的投影（你看右眼时，左眼视野里那个“盲区“就是 e）；在右图中，e’ 是左相机中心在右图中的投影。所有对极线都经过对极点。</p>
 <p>对极几何最深刻的性质是：<strong>它与场景内容无关——只取决于两个相机的内参和相对位姿。</strong> 相机位置摆好，对极几何就固定了，无论你在拍一座山还是一杯咖啡。（H&amp;Z section 9.1, p.239-241）</p>
 <h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Multi-View Geometry))
     Epipolar Geometry
       Epipolar plane
@@ -232,7 +230,8 @@
       Normalized 8-point Hartley 1997
       RANSAC for outliers
       findFundamentalMat OpenCV
-</code></pre>
+</pre>
+
 <h3 id="mini-case用-opencv-在一对立体图像上画对极线"><a class="header" href="#mini-case用-opencv-在一对立体图像上画对极线">Mini Case：用 OpenCV 在一对立体图像上画对极线</a></h3>
 <p>以下代码在一对立体图像中选取关键点，计算基础矩阵，然后画出对应的对极线：</p>
 <pre><code class="language-python">import cv2
@@ -413,7 +412,7 @@ $$x’^T (K’^{-T} E K^{-1}) x = 0$$</p>
 <p>有了相机矩阵 $P$ 和 $P’$，以及对应点 $x \leftrightarrow x’$，如何恢复三维点 $X$？</p>
 <p>从 $x = PX$ 可得 $x \times PX = 0$，每个相机提供两个线性独立方程，两个相机共四个方程，求解三个未知数（$X$ 的齐次坐标，3 DOF）——过约束但可解（H&amp;Z section 10.1, p.262-264）。</p>
 <p>如果对极约束 $x’^T F x = 0$ 严格满足，两条反向投影射线在空间中相交于一点。实际操作中由于噪声，两条射线不严格相交——需要用最小二乘法找最优近似交点。</p>
-<pre><code class="language-mermaid">flowchart TD
+<pre class="mermaid">flowchart TD
     A["Feature Matches&lt;br/&gt;x_i &amp;lt;-&amp;gt; x'_i"] --&gt; B["Compute F&lt;br/&gt;8-point + RANSAC&lt;br/&gt;H&amp;Z section 9.2"]
     B --&gt; C["F: rank-2, 7 DOF&lt;br/&gt;x'^T F x = 0"]
     C --&gt; D{"Calibrated&lt;br/&gt;cameras?"}
@@ -428,7 +427,8 @@ $$x’^T (K’^{-T} E K^{-1}) x = 0$$</p>
     K --&gt; L["3D Point Cloud&lt;br/&gt;X_1, X_2, ..., X_n"]
     L --&gt; M["Bundle Adjustment&lt;br/&gt;jointly optimize all P^i and X_j&lt;br/&gt;H&amp;Z section 18.1, p.434"]
     M --&gt; N["Final Reconstruction"]
-</code></pre>
+</pre>
+
 <h3 id="射影重建定理不需要标定也能重建三维"><a class="header" href="#射影重建定理不需要标定也能重建三维">射影重建定理——不需要标定也能重建三维</a></h3>
 <p>这是未校准多视图几何中最重要的结果（H&amp;Z Theorem 10.1, p.266）：</p>
 <blockquote>
@@ -818,6 +818,7 @@ rectR = cv2.remap(imgR, map2x, map2y, cv2.INTER_LINEAR)
         <script src="../book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/js/mathjax-mermaid-a0d07254.js"></script>
 
 
 

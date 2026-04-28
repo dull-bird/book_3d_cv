@@ -30,8 +30,6 @@
 
         <!-- Custom theme stylesheets -->
 
-        <!-- MathJax -->
-        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
         <!-- Provide site root and default themes to javascript -->
         <script>
@@ -377,7 +375,7 @@ print(f"Pairwise distances (unscaled): {np.sort(distances)[::-1][:5]}")
 <p>从那个三维点出发的光线，穿过小孔，直直地打在成像平面上。这个点落在成像平面上的位置，就是<strong>投影点</strong>。所有三维点的投影点合在一起，就是你的照片。</p>
 <p>这个模型的妙处在于：它只用<strong>一条直线</strong>（光线）连接了三维世界和二维图像。没有复杂的折射、没有镜头畸变——就是一个简单的几何关系。理解了这个关系，你就能用数学精确描述“拍照片“这件事。</p>
 <h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Camera Model))
     针孔相机 Pinhole
       中心投影 Central Projection
@@ -403,7 +401,8 @@ print(f"Pairwise distances (unscaled): {np.sort(distances)[::-1][:5]}")
       Zhang's method
       棋盘格 chessboard
       重投影误差 reprojection error
-</code></pre>
+</pre>
+
 <h3 id="mini-case用-opencv-捕捉一帧并查看像素坐标"><a class="header" href="#mini-case用-opencv-捕捉一帧并查看像素坐标">Mini Case：用 OpenCV 捕捉一帧并查看像素坐标</a></h3>
 <p>打开你的电脑摄像头，捕捉一帧，看看每个像素的坐标是什么样的。</p>
 <pre><code class="language-python">import cv2
@@ -506,7 +505,7 @@ $$(X, Y, Z)^T \rightarrow (fX/Z, fY/Z)^T$$</p>
 <p><code>P = K[R|t]</code> 这个公式是整本书最重要的公式之一。</p>
 </blockquote>
 <h3 id="投影管线全景"><a class="header" href="#投影管线全景">投影管线全景</a></h3>
-<pre><code class="language-mermaid">flowchart TD
+<pre class="mermaid">flowchart TD
     A["3D World Point (X_w, Y_w, Z_w)"] --&gt; B["Apply Extrinsic [R|t]: convert to camera coordinates"]
     B --&gt; C["3D Camera Point (X_c, Y_c, Z_c)"]
     C --&gt; D["Apply Intrinsic K: project to image plane"]
@@ -525,7 +524,8 @@ $$(X, Y, Z)^T \rightarrow (fX/Z, fY/Z)^T$$</p>
     subgraph Result["Image Result"]
         G
     end
-</code></pre>
+</pre>
+
 <h3 id="p-矩阵的几何解读"><a class="header" href="#p-矩阵的几何解读">P 矩阵的几何解读</a></h3>
 <p>相机矩阵 P 不仅是一个计算工具——它的每一行、每一列都有明确的几何意义（H&amp;Z section 6.2, p.158-162）：</p>
 <div class="table-wrapper">
@@ -863,7 +863,7 @@ print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
 <p>这就是齐次坐标的核心动机：它把透视几何从一个“到处是例外“的体系，变成一个统一、简洁的体系。</p>
 <p>齐次坐标还带来了另一个好处：透视投影中那个讨厌的“除以 Z“（$x = fX/Z$, $y = fY/Z$），在齐次坐标下变成了纯粹的线性矩阵乘法——做完矩阵乘法之后，只要把结果的前两个分量除以第三个分量即可。用一个额外的维度，换来了线性的优雅。</p>
 <h3 id="技术全景-1"><a class="header" href="#技术全景-1">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Projective Geometry 2D))
     Homogeneous Coordinates
       Points as 3-vectors
@@ -895,15 +895,17 @@ print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
       Panorama stitching
       Planar metrology
       Augmented reality
-</code></pre>
+</pre>
+
 <h3 id="十年关键突破"><a class="header" href="#十年关键突破">十年关键突破</a></h3>
-<pre><code class="language-mermaid">flowchart LR
+<pre class="mermaid">flowchart LR
     A["~1500&lt;br/&gt;Perspective Art&lt;br/&gt;Brunelleschi, da Vinci"] --&gt; B["1822&lt;br/&gt;Projective Geometry&lt;br/&gt;Poncelet"]
     B --&gt; C["1971&lt;br/&gt;DLT Algorithm&lt;br/&gt;Abdel-Aziz &amp; Karara"]
     C --&gt; D["1981&lt;br/&gt;RANSAC&lt;br/&gt;Fischler &amp; Bolles"]
     D --&gt; E["1998&lt;br/&gt;Plane Rectification&lt;br/&gt;Liebowitz &amp; Zisserman"]
     E --&gt; F["2004&lt;br/&gt;H&amp;Z Book&lt;br/&gt;Unified Framework"]
-</code></pre>
+</pre>
+
 <p>从文艺复兴时期的透视绘画，到 19 世纪的抽象几何体系，再到现代计算机视觉的算法工具箱——射影几何是一根贯穿了 500 年的线。</p>
 <hr>
 <h2 id="第二阶原理解析-1"><a class="header" href="#第二阶原理解析-1">第二阶：原理解析</a></h2>
@@ -962,7 +964,7 @@ print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
 <p>这就是 <strong>DLT（Direct Linear Transformation）算法</strong>——最直接、最常用的 H 求解方法。它的优点是简单到只需要一次 SVD；缺点是它最小化的是代数误差（没有几何意义），通常只用作初值。（H&amp;Z section 4.1, p.88-91）</p>
 <h3 id="变换分层从捏橡皮泥到拼积木"><a class="header" href="#变换分层从捏橡皮泥到拼积木">变换分层：从捏橡皮泥到拼积木</a></h3>
 <p>射影变换是最一般的二维映射——它把正方形变成任意四边形。但在很多实际问题中，我们不需要这么“自由“的变换。根据我们保留了哪些约束，可以定义四个层级（H&amp;Z section 2.4, p.37-44）：</p>
-<pre><code class="language-mermaid">flowchart TD
+<pre class="mermaid">flowchart TD
     P["Projective&lt;br/&gt;8 DOF&lt;br/&gt;h11 to h33 minus scale&lt;br/&gt;Preserves: collinearity, cross-ratio"]
     A["Affine&lt;br/&gt;6 DOF&lt;br/&gt;H_affine: last row = 0 0 1&lt;br/&gt;Preserves: parallelism, area ratio, parallel length ratio"]
     S["Similarity&lt;br/&gt;4 DOF&lt;br/&gt;H_sim = [sR | t]&lt;br/&gt;Preserves: angles, length ratio"]
@@ -971,7 +973,8 @@ print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
     P --&gt;|"Fix l_inf&lt;br/&gt;lose 2 DOF"| A
     A --&gt;|"Fix circular points&lt;br/&gt;lose 2 DOF"| S
     S --&gt;|"Fix scale&lt;br/&gt;lose 1 DOF"| E
-</code></pre>
+</pre>
+
 <p><strong>各层级的形式和约束</strong>（H&amp;Z Table 2.1, p.44）：</p>
 <div class="table-wrapper">
 <table>
@@ -1291,7 +1294,7 @@ for (s, d) in zip(src, dst):
 <p>两台相机中心的连线与图像平面的交点，叫<strong>对极点（epipole）</strong>。在左图中，e 是右相机中心在左图中的投影（你看右眼时，左眼视野里那个“盲区“就是 e）；在右图中，e’ 是左相机中心在右图中的投影。所有对极线都经过对极点。</p>
 <p>对极几何最深刻的性质是：<strong>它与场景内容无关——只取决于两个相机的内参和相对位姿。</strong> 相机位置摆好，对极几何就固定了，无论你在拍一座山还是一杯咖啡。（H&amp;Z section 9.1, p.239-241）</p>
 <h3 id="技术全景-2"><a class="header" href="#技术全景-2">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Multi-View Geometry))
     Epipolar Geometry
       Epipolar plane
@@ -1323,7 +1326,8 @@ for (s, d) in zip(src, dst):
       Normalized 8-point Hartley 1997
       RANSAC for outliers
       findFundamentalMat OpenCV
-</code></pre>
+</pre>
+
 <h3 id="mini-case用-opencv-在一对立体图像上画对极线"><a class="header" href="#mini-case用-opencv-在一对立体图像上画对极线">Mini Case：用 OpenCV 在一对立体图像上画对极线</a></h3>
 <p>以下代码在一对立体图像中选取关键点，计算基础矩阵，然后画出对应的对极线：</p>
 <pre><code class="language-python">import cv2
@@ -1504,7 +1508,7 @@ $$x’^T (K’^{-T} E K^{-1}) x = 0$$</p>
 <p>有了相机矩阵 $P$ 和 $P’$，以及对应点 $x \leftrightarrow x’$，如何恢复三维点 $X$？</p>
 <p>从 $x = PX$ 可得 $x \times PX = 0$，每个相机提供两个线性独立方程，两个相机共四个方程，求解三个未知数（$X$ 的齐次坐标，3 DOF）——过约束但可解（H&amp;Z section 10.1, p.262-264）。</p>
 <p>如果对极约束 $x’^T F x = 0$ 严格满足，两条反向投影射线在空间中相交于一点。实际操作中由于噪声，两条射线不严格相交——需要用最小二乘法找最优近似交点。</p>
-<pre><code class="language-mermaid">flowchart TD
+<pre class="mermaid">flowchart TD
     A["Feature Matches&lt;br/&gt;x_i &amp;lt;-&amp;gt; x'_i"] --&gt; B["Compute F&lt;br/&gt;8-point + RANSAC&lt;br/&gt;H&amp;Z section 9.2"]
     B --&gt; C["F: rank-2, 7 DOF&lt;br/&gt;x'^T F x = 0"]
     C --&gt; D{"Calibrated&lt;br/&gt;cameras?"}
@@ -1519,7 +1523,8 @@ $$x’^T (K’^{-T} E K^{-1}) x = 0$$</p>
     K --&gt; L["3D Point Cloud&lt;br/&gt;X_1, X_2, ..., X_n"]
     L --&gt; M["Bundle Adjustment&lt;br/&gt;jointly optimize all P^i and X_j&lt;br/&gt;H&amp;Z section 18.1, p.434"]
     M --&gt; N["Final Reconstruction"]
-</code></pre>
+</pre>
+
 <h3 id="射影重建定理不需要标定也能重建三维"><a class="header" href="#射影重建定理不需要标定也能重建三维">射影重建定理——不需要标定也能重建三维</a></h3>
 <p>这是未校准多视图几何中最重要的结果（H&amp;Z Theorem 10.1, p.266）：</p>
 <blockquote>
@@ -1879,7 +1884,7 @@ rectR = cv2.remap(imgR, map2x, map2y, cv2.INTER_LINEAR)
 <p>这两种表达之间，靠相机的几何关系来转换——知道焦距和主点位置，就能把深度图的每个像素“反投影“成三维空间的一个点。反之，把点云“投影“回图像平面，就得到深度图。</p>
 <p>它们之间的第三种表示——<strong>视差图</strong>——只在双目/多目系统中有意义。它是左图和右图中对应点之间的像素偏移量。视差越大，物体越近；视差越小，物体越远。</p>
 <h3 id="技术全景-3"><a class="header" href="#技术全景-3">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Depth Representation))
     Disparity Map
       Left-right pixel shifts
@@ -1900,7 +1905,8 @@ rectR = cv2.remap(imgR, map2x, map2y, cv2.INTER_LINEAR)
       Disparity -&gt; Depth: Z = f*b / d
       Depth -&gt; Point Cloud: back-projection
       Point Cloud -&gt; Depth: rasterization
-</code></pre>
+</pre>
+
 <h3 id="三种表示对比"><a class="header" href="#三种表示对比">三种表示对比</a></h3>
 <div class="table-wrapper">
 <table>
@@ -2140,7 +2146,7 @@ def pointcloud_to_depth(points, K, H, W):
 </table>
 </div>
 <h3 id="什么时候用哪种表示"><a class="header" href="#什么时候用哪种表示">什么时候用哪种表示？</a></h3>
-<pre><code class="language-mermaid">flowchart TD
+<pre class="mermaid">flowchart TD
     A["I have 3D data"] --&gt; B{"Dense, regular&lt;br/&gt;grid structure?"}
     B --&gt;|"Yes&lt;br/&gt;Depth camera / stereo output"| C{"Need per-pixel&lt;br/&gt;neighbor ops?"}
     C --&gt;|"Yes&lt;br/&gt;CNN / filtering"| D["Depth Map&lt;br/&gt;.png / .npy"]
@@ -2148,7 +2154,8 @@ def pointcloud_to_depth(points, K, H, W):
     B --&gt;|"No&lt;br/&gt;LiDAR / SfM output"| F["Point Cloud&lt;br/&gt;.ply / .pcd"]
     E --&gt;|"Tight"| D
     E --&gt;|"Relaxed"| F
-</code></pre>
+</pre>
+
 <p><strong>经验法则</strong>：</p>
 <ul>
 <li>输入是深度相机 → 保持深度图，直到需要 3D 变换</li>
@@ -2257,7 +2264,7 @@ o3d.visualization.draw_geometries([pcd_down])
 </ol>
 <p>每一步都是一次“翻译“，把同一个物理点的坐标从一种语言翻成另一种语言。整个链条合在一起，就是 $P = K[R|t]$——整本书最重要的公式之一。</p>
 <h3 id="技术全景-4"><a class="header" href="#技术全景-4">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Coordinate Systems))
     World Frame
       Arbitrary origin
@@ -2279,7 +2286,8 @@ o3d.visualization.draw_geometries([pcd_down])
       World -&gt; Camera R t 6 DOF
       Camera -&gt; Image perspective K
       Image -&gt; Pixel affine scaling
-</code></pre>
+</pre>
+
 <h3 id="mini-case跟踪一个点的完整旅程"><a class="header" href="#mini-case跟踪一个点的完整旅程">Mini Case：跟踪一个点的完整旅程</a></h3>
 <pre><code class="language-python">import numpy as np
 
@@ -2325,7 +2333,7 @@ print(f"One-liner verification: ({x_pixel[0]/x_pixel[2]:.1f}, "
 <hr>
 <h2 id="第二阶原理解析-4"><a class="header" href="#第二阶原理解析-4">第二阶：原理解析</a></h2>
 <h3 id="变换链全景"><a class="header" href="#变换链全景">变换链全景</a></h3>
-<pre><code class="language-mermaid">flowchart LR
+<pre class="mermaid">flowchart LR
     subgraph W["World Frame O_w"]
         Xw["X_w = (X, Y, Z, 1)^T"]
     end
@@ -2341,7 +2349,8 @@ print(f"One-liner verification: ({x_pixel[0]/x_pixel[2]:.1f}, "
     W --&gt;|"R, t&lt;br/&gt;6 DOF"| C
     C --&gt;|"Perspective&lt;br/&gt;Projection&lt;br/&gt;3D -&gt; 2D lossy"| I
     I --&gt;|"K matrix&lt;br/&gt;Scaling + Offset"| Px
-</code></pre>
+</pre>
+
 <p>每一步的矩阵维度和变换性质：</p>
 <div class="table-wrapper">
 <table>
@@ -2499,7 +2508,7 @@ print(f"Verification (one-shot): u={u_full:.1f}, v={v_full:.1f}")
 </div>
 <p>右手定则：右手大拇指指向 X，食指指向 Y，中指自然指向 Z（前方）。这一定则在 OpenCV 的所有函数中一致——从 <code>solvePnP</code> 到 <code>projectPoints</code> 到 <code>stereoRectify</code>。</p>
 <h3 id="常见坐标系统对比"><a class="header" href="#常见坐标系统对比">常见坐标系统对比</a></h3>
-<pre><code class="language-mermaid">quadrantChart
+<pre class="mermaid">quadrantChart
     title Coordinate System Comparison
     x-axis "X Direction" --&gt; "Right"
     y-axis "Y Direction" --&gt; "Up vs Down"
@@ -2507,7 +2516,8 @@ print(f"Verification (one-shot): u={u_full:.1f}, v={v_full:.1f}")
     quadrant-2 "OpenGL&lt;br/&gt;X=Right, Y=Up, Z=Backward&lt;br/&gt;Right-Hand"
     quadrant-3 "Unity&lt;br/&gt;X=Right, Y=Up, Z=Forward&lt;br/&gt;Left-Hand"
     quadrant-4 "ROS Robot&lt;br/&gt;X=Forward, Y=Left, Z=Up&lt;br/&gt;Right-Hand"
-</code></pre>
+</pre>
+
 <p><strong>转换速查表</strong>：</p>
 <div class="table-wrapper">
 <table>
@@ -2649,7 +2659,7 @@ print(f"Depth range: [{depths.min():.2f}, {depths.max():.2f}] m")
 </ol>
 <p>实践中，这三者通常是串联使用的：<strong>RANSAC 剔除 outlier → DLT 给出初值 → 几何优化精细打磨</strong>。这是 3D 视觉中最常见的估计流水线。</p>
 <h3 id="技术全景-5"><a class="header" href="#技术全景-5">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Optimization))
     Algebraic Methods
       DLT Direct Linear Transformation
@@ -2674,7 +2684,8 @@ print(f"Depth range: [{depths.min():.2f}, {depths.max():.2f}] m")
       Levenberg-Marquardt
       Schur complement
       Sparse BA
-</code></pre>
+</pre>
+
 <h3 id="mini-case用最小二乘法拟合一条直线"><a class="header" href="#mini-case用最小二乘法拟合一条直线">Mini Case：用最小二乘法拟合一条直线</a></h3>
 <p>先忘掉 3D 和相机。最简单的问题：平面上有一堆带噪声的点，你想找到穿过它们的“最佳直线“。</p>
 <pre><code class="language-python">import numpy as np
@@ -2789,7 +2800,7 @@ $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
 <p>其中 M（2m x 3）包含所有相机的运动信息，X（3 x n）包含所有 3D 点的结构信息。对 W 做 SVD 取前 3 个奇异值，就同时得到了运动和结构。（H&amp;Z §18.2, p.436-440）</p>
 <p>这是整个 3D 视觉中最优雅的算法之一——不需要迭代，SVD 一步到位；在等方差各向同性高斯噪声假设下，它是最大似然估计。（H&amp;Z §18.2, p.439）可惜它要求仿射相机假设和稠密对应（每个点在每个视图中都被观测到），限制了它的实际应用。</p>
 <h3 id="完整流程从原始匹配到最终解"><a class="header" href="#完整流程从原始匹配到最终解">完整流程：从原始匹配到最终解</a></h3>
-<pre><code class="language-mermaid">flowchart TD
+<pre class="mermaid">flowchart TD
     A[Raw Feature Matches] --&gt; B{RANSAC}
     B --&gt;|Reject| C[Outlier Pairs: discard]
     B --&gt;|Accept| D[Inlier Pairs]
@@ -2800,7 +2811,8 @@ $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
     H --&gt;|No| G
     H --&gt;|Yes| I[Golden Standard MLE]
     I --&gt; J[Final Estimates: H E P X]
-</code></pre>
+</pre>
+
 <h3 id="code-lens用-numpy-实现-dlt-和简单-ransac"><a class="header" href="#code-lens用-numpy-实现-dlt-和简单-ransac">Code Lens：用 NumPy 实现 DLT 和简单 RANSAC</a></h3>
 <pre><code class="language-python">import numpy as np
 from numpy.linalg import svd, norm
@@ -3127,12 +3139,11 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
         <script src="book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="theme/js/mathjax-mermaid-a0d07254.js"></script>
 
         <script>
         window.addEventListener('load', function() {
-            MathJax.Hub.Register.StartupHook('End', function() {
-                window.setTimeout(window.print, 100);
-            });
+            window.setTimeout(window.print, 100);
         });
         </script>
 

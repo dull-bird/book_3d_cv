@@ -5,10 +5,13 @@ language = "zh"
 src = "src"
 
 [output.html]
-mathjax-support = true
 git-repository-url = "https://github.com/dull-bird/book_3d_cv"
 edit-url-template = "https://github.com/dull-bird/book_3d_cv/edit/main/{path}"
 site-url = "/book_3d_cv/"
+additional-js = ["theme/js/mathjax-mermaid.js"]
 
 [output.html.search]
 enable = true
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"

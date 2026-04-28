@@ -29,8 +29,6 @@
 
         <!-- Custom theme stylesheets -->
 
-        <!-- MathJax -->
-        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
         <!-- Provide site root and default themes to javascript -->
         <script>
@@ -205,7 +203,7 @@
 <p>这就是齐次坐标的核心动机：它把透视几何从一个“到处是例外“的体系，变成一个统一、简洁的体系。</p>
 <p>齐次坐标还带来了另一个好处：透视投影中那个讨厌的“除以 Z“（$x = fX/Z$, $y = fY/Z$），在齐次坐标下变成了纯粹的线性矩阵乘法——做完矩阵乘法之后，只要把结果的前两个分量除以第三个分量即可。用一个额外的维度，换来了线性的优雅。</p>
 <h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Projective Geometry 2D))
     Homogeneous Coordinates
       Points as 3-vectors
@@ -237,15 +235,17 @@
       Panorama stitching
       Planar metrology
       Augmented reality
-</code></pre>
+</pre>
+
 <h3 id="十年关键突破"><a class="header" href="#十年关键突破">十年关键突破</a></h3>
-<pre><code class="language-mermaid">flowchart LR
+<pre class="mermaid">flowchart LR
     A["~1500&lt;br/&gt;Perspective Art&lt;br/&gt;Brunelleschi, da Vinci"] --&gt; B["1822&lt;br/&gt;Projective Geometry&lt;br/&gt;Poncelet"]
     B --&gt; C["1971&lt;br/&gt;DLT Algorithm&lt;br/&gt;Abdel-Aziz &amp; Karara"]
     C --&gt; D["1981&lt;br/&gt;RANSAC&lt;br/&gt;Fischler &amp; Bolles"]
     D --&gt; E["1998&lt;br/&gt;Plane Rectification&lt;br/&gt;Liebowitz &amp; Zisserman"]
     E --&gt; F["2004&lt;br/&gt;H&amp;Z Book&lt;br/&gt;Unified Framework"]
-</code></pre>
+</pre>
+
 <p>从文艺复兴时期的透视绘画，到 19 世纪的抽象几何体系，再到现代计算机视觉的算法工具箱——射影几何是一根贯穿了 500 年的线。</p>
 <hr>
 <h2 id="第二阶原理解析"><a class="header" href="#第二阶原理解析">第二阶：原理解析</a></h2>
@@ -304,7 +304,7 @@
 <p>这就是 <strong>DLT（Direct Linear Transformation）算法</strong>——最直接、最常用的 H 求解方法。它的优点是简单到只需要一次 SVD；缺点是它最小化的是代数误差（没有几何意义），通常只用作初值。（H&amp;Z section 4.1, p.88-91）</p>
 <h3 id="变换分层从捏橡皮泥到拼积木"><a class="header" href="#变换分层从捏橡皮泥到拼积木">变换分层：从捏橡皮泥到拼积木</a></h3>
 <p>射影变换是最一般的二维映射——它把正方形变成任意四边形。但在很多实际问题中，我们不需要这么“自由“的变换。根据我们保留了哪些约束，可以定义四个层级（H&amp;Z section 2.4, p.37-44）：</p>
-<pre><code class="language-mermaid">flowchart TD
+<pre class="mermaid">flowchart TD
     P["Projective&lt;br/&gt;8 DOF&lt;br/&gt;h11 to h33 minus scale&lt;br/&gt;Preserves: collinearity, cross-ratio"]
     A["Affine&lt;br/&gt;6 DOF&lt;br/&gt;H_affine: last row = 0 0 1&lt;br/&gt;Preserves: parallelism, area ratio, parallel length ratio"]
     S["Similarity&lt;br/&gt;4 DOF&lt;br/&gt;H_sim = [sR | t]&lt;br/&gt;Preserves: angles, length ratio"]
@@ -313,7 +313,8 @@
     P --&gt;|"Fix l_inf&lt;br/&gt;lose 2 DOF"| A
     A --&gt;|"Fix circular points&lt;br/&gt;lose 2 DOF"| S
     S --&gt;|"Fix scale&lt;br/&gt;lose 1 DOF"| E
-</code></pre>
+</pre>
+
 <p><strong>各层级的形式和约束</strong>（H&amp;Z Table 2.1, p.44）：</p>
 <div class="table-wrapper">
 <table>
@@ -666,6 +667,7 @@ for (s, d) in zip(src, dst):
         <script src="../book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/js/mathjax-mermaid-a0d07254.js"></script>
 
 
 

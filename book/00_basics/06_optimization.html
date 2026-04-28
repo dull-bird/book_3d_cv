@@ -29,8 +29,6 @@
 
         <!-- Custom theme stylesheets -->
 
-        <!-- MathJax -->
-        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
         <!-- Provide site root and default themes to javascript -->
         <script>
@@ -211,7 +209,7 @@
 </ol>
 <p>实践中，这三者通常是串联使用的：<strong>RANSAC 剔除 outlier → DLT 给出初值 → 几何优化精细打磨</strong>。这是 3D 视觉中最常见的估计流水线。</p>
 <h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
-<pre><code class="language-mermaid">mindmap
+<pre class="mermaid">mindmap
   root((Optimization))
     Algebraic Methods
       DLT Direct Linear Transformation
@@ -236,7 +234,8 @@
       Levenberg-Marquardt
       Schur complement
       Sparse BA
-</code></pre>
+</pre>
+
 <h3 id="mini-case用最小二乘法拟合一条直线"><a class="header" href="#mini-case用最小二乘法拟合一条直线">Mini Case：用最小二乘法拟合一条直线</a></h3>
 <p>先忘掉 3D 和相机。最简单的问题：平面上有一堆带噪声的点，你想找到穿过它们的“最佳直线“。</p>
 <pre><code class="language-python">import numpy as np
@@ -351,7 +350,7 @@ $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
 <p>其中 M（2m x 3）包含所有相机的运动信息，X（3 x n）包含所有 3D 点的结构信息。对 W 做 SVD 取前 3 个奇异值，就同时得到了运动和结构。（H&amp;Z §18.2, p.436-440）</p>
 <p>这是整个 3D 视觉中最优雅的算法之一——不需要迭代，SVD 一步到位；在等方差各向同性高斯噪声假设下，它是最大似然估计。（H&amp;Z §18.2, p.439）可惜它要求仿射相机假设和稠密对应（每个点在每个视图中都被观测到），限制了它的实际应用。</p>
 <h3 id="完整流程从原始匹配到最终解"><a class="header" href="#完整流程从原始匹配到最终解">完整流程：从原始匹配到最终解</a></h3>
-<pre><code class="language-mermaid">flowchart TD
+<pre class="mermaid">flowchart TD
     A[Raw Feature Matches] --&gt; B{RANSAC}
     B --&gt;|Reject| C[Outlier Pairs: discard]
     B --&gt;|Accept| D[Inlier Pairs]
@@ -362,7 +361,8 @@ $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
     H --&gt;|No| G
     H --&gt;|Yes| I[Golden Standard MLE]
     I --&gt; J[Final Estimates: H E P X]
-</code></pre>
+</pre>
+
 <h3 id="code-lens用-numpy-实现-dlt-和简单-ransac"><a class="header" href="#code-lens用-numpy-实现-dlt-和简单-ransac">Code Lens：用 NumPy 实现 DLT 和简单 RANSAC</a></h3>
 <pre><code class="language-python">import numpy as np
 from numpy.linalg import svd, norm
@@ -677,6 +677,7 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
         <script src="../book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/js/mathjax-mermaid-a0d07254.js"></script>
 
 
 
