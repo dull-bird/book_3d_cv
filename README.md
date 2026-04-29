@@ -4,13 +4,13 @@
 
 ## 阅读
 
-在线版：https://[your-username].github.io/3d-vision-book
+在线版：<https://dull-bird.github.io/book_3d_cv>
 
 ## 进度
 
 | 模块 | 状态 |
 |------|------|
-| 基础篇：3D 视觉的脚手架 | 🔴 待开始 |
+| 基础篇：3D 视觉的脚手架 | ✅ 已完成 |
 | 模块A：单目深度估计 | 🔴 待开始 |
 | 模块B：双目立体匹配 | 🔴 待开始 |
 | 模块C：3D Gaussian Splatting | 🔴 待开始 |
