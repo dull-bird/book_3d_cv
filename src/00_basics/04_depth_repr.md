@@ -381,7 +381,7 @@ o3d.visualization.draw_geometries([pcd_down])
 | 年份 | 文献 | 一句话贡献 |
 |------|------|-----------|
 | 2004 | Hartley & Zisserman, *Multiple View Geometry*, Ch.10 | 三角测量原理、射影重建定理、分层重建策略——从两视图恢复到三维点的理论框架（p.262-273） |
-| 2004 | Hartley & Zisserman, *Multiple View Geometry*, Ch.6 | 深度公式 $\text{depth}(X; P)$（6.15, p.162），相机内参矩阵 K 的定义与参数化（p.155-157） |
+| 2004 | Hartley & Zisserman, *Multiple View Geometry*, Ch.6 | 深度公式 $\text{depth}(X; P)$（6.15, p.162），相机内参矩阵 $K$ 的定义与参数化（p.155-157） |
 | 2012 | D. Scharstein & R. Szeliski, "A Taxonomy and Evaluation of Dense Two-Frame Stereo Correspondence Algorithms", *IJCV* | Middlebury 立体评估基准——定义了视差图/深度图的标准化评测方法，建立了从视差到深度的转换管道 |
 
 ---
