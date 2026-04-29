@@ -15,3 +15,5 @@ enable = true
 
 [preprocessor.mermaid]
 command = "mdbook-mermaid"
+
+[preprocessor.alerts]
