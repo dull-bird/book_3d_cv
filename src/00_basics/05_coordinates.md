@@ -36,27 +36,27 @@
 
 ```mermaid
 mindmap
-  root((Coordinate Systems))
-    World Frame
-      Arbitrary origin
-      3 DOF translation
-      Z-up or Y-up convention
-    Camera Frame
-      Origin at camera center C
-      Z = optical axis forward
-      X right Y down (OpenCV)
-    Image Frame
-      2D continuous coordinates
-      Origin at principal point
-      Unit: mm or normalized
-    Pixel Frame
-      2D discrete coordinates
-      Origin at top-left (0,0)
-      Unit: pixel integer
-    Transforms
-      World -> Camera R t 6 DOF
-      Camera -> Image perspective K
-      Image -> Pixel affine scaling
+  root((坐标系))
+    世界坐标系
+      原点任意选定
+      3 DOF 平移
+      Z轴向上或Y轴向上
+    相机坐标系
+      原点在相机中心 C
+      Z轴为光轴方向
+      X右 Y下 (OpenCV)
+    图像坐标系
+      二维连续坐标
+      原点在主点
+      单位: 毫米或归一化
+    像素坐标系
+      二维离散坐标
+      原点在左上角 (0,0)
+      单位: 整数像素
+    变换关系
+      世界到相机: R t 6 DOF
+      相机到图像: 透视投影 K
+      图像到像素: 仿射缩放
 ```
 
 ### 5.1.4 Mini Case：跟踪一个点的完整旅程
@@ -122,22 +122,22 @@ One-liner verification: (-2305.0, -3260.0)
 ### 5.2.1 变换链全景
 
 ```mermaid
-flowchart LR
-    subgraph W["World Frame O_w"]
+flowchart TD
+    subgraph W["世界坐标系 O_w"]
         Xw["X_w = (X, Y, Z, 1)^T"]
     end
-    subgraph C["Camera Frame O_c"]
-        Xc["X_c = R(X_w - C_tilde)"]
+    subgraph Cam["相机坐标系 O_c"]
+        Xc["X_c = R(X_w - C̃)"]
     end
-    subgraph I["Image Frame"]
-        x["x = (fX_c/Z_c, fY_c/Z_c)^T"]
+    subgraph I["图像坐标系"]
+        xi["x = (fX_c/Z_c, fY_c/Z_c)^T"]
     end
-    subgraph Px["Pixel Frame"]
-        uv["(u, v) = (alpha_x*x/Z + x0, alpha_y*y/Z + y0)"]
+    subgraph Px["像素坐标系"]
+        uv["(u, v) = (alpha_x x + x0, alpha_y y + y0)"]
     end
-    W -->|"R, t<br/>6 DOF"| C
-    C -->|"Perspective<br/>Projection<br/>3D -> 2D lossy"| I
-    I -->|"K matrix<br/>Scaling + Offset"| Px
+    W -->|"R, t 刚体变换<br/>6 DOF, 可逆"| Cam
+    Cam -->|"透视投影<br/>3D→2D, 丢失深度"| I
+    I -->|"K 矩阵<br/>缩放 + 偏移"| Px
 ```
 
 每一步的矩阵维度和变换性质：

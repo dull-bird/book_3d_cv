@@ -36,48 +36,48 @@
 
 ```mermaid
 mindmap
-  root((Projective Geometry 2D))
-    Homogeneous Coordinates
-      Points as 3-vectors
-      Scale equivalence
-      Ideal points w=0
-      Line at infinity l_inf
-    Lines and Conics
-      Line representation l
-      Point-line incidence
-      Intersection via cross product
-      Conic C 5 DOF
-    Projective Transformation H
-      3x3 matrix 8 DOF
-      Point mapping x to Hx
-      Line mapping by H inverse T
-      Homography estimation DLT
-    Transformation Hierarchy
-      Projective 8 DOF
-      Affine 6 DOF
-      Similarity 4 DOF
-      Euclidean 3 DOF
-    Metric Recovery
-      Circular points I J
-      Absolute conic dual C*_inf
-      Affine rectification
-      Metric rectification
-    Applications
-      Image rectification
-      Panorama stitching
-      Planar metrology
-      Augmented reality
+  root((射影几何 2D))
+    齐次坐标
+      点即三维向量
+      尺度等价性
+      理想点 w=0
+      无穷远线
+    直线与圆锥曲线
+      直线的三维向量表示
+      点线共轭关系
+      交点叉积运算
+      圆锥曲线 5 DOF
+    射影变换 H
+      3x3 矩阵 8 DOF
+      点的映射
+      线的逆转置映射
+      单应估计 DLT
+    变换层级
+      射影 8 DOF
+      仿射 6 DOF
+      相似 4 DOF
+      欧几里得 3 DOF
+    度量恢复
+      圆环点
+      绝对二次曲线对偶
+      仿射校正
+      度量校正
+    应用
+      图像校正
+      全景拼接
+      平面测量
+      增强现实
 ```
 
 ### 2.1.4 十年关键突破
 
 ```mermaid
-flowchart LR
-    A["~1500<br/>Perspective Art<br/>Brunelleschi, da Vinci"] --> B["1822<br/>Projective Geometry<br/>Poncelet"]
-    B --> C["1971<br/>DLT Algorithm<br/>Abdel-Aziz & Karara"]
-    C --> D["1981<br/>RANSAC<br/>Fischler & Bolles"]
-    D --> E["1998<br/>Plane Rectification<br/>Liebowitz & Zisserman"]
-    E --> F["2004<br/>H&Z Book<br/>Unified Framework"]
+flowchart TD
+    A["约1500年<br/>透视绘画<br/>布鲁内莱斯基 / 达芬奇"] --> B["1822年<br/>射影几何诞生<br/>庞斯莱 Poncelet"]
+    B --> C["1971年<br/>DLT 算法<br/>Abdel-Aziz & Karara"]
+    C --> D["1981年<br/>RANSAC<br/>Fischler & Bolles"]
+    D --> E["1998年<br/>平面校正<br/>Liebowitz & Zisserman"]
+    E --> F["2004年<br/>H&Z 多视图几何<br/>统一框架"]
 ```
 
 从文艺复兴时期的透视绘画，到 19 世纪的抽象几何体系，再到现代计算机视觉的算法工具箱——射影几何是一根贯穿了 500 年的线。
@@ -166,14 +166,14 @@ $$x' = Hx$$
 
 ```mermaid
 flowchart TD
-    P["Projective<br/>8 DOF<br/>h11 to h33 minus scale<br/>Preserves: collinearity, cross-ratio"]
-    A["Affine<br/>6 DOF<br/>H_affine: last row = 0 0 1<br/>Preserves: parallelism, area ratio, parallel length ratio"]
-    S["Similarity<br/>4 DOF<br/>H_sim = [sR | t]<br/>Preserves: angles, length ratio"]
-    E["Euclidean<br/>3 DOF<br/>H_euc = [R | t]<br/>Preserves: length, area"]
+    P["射影变换 Projective<br/>8 DOF<br/>保持: 共线性、交比"]
+    A["仿射变换 Affine<br/>6 DOF<br/>保持: 平行性、面积比、平行线段长度比"]
+    S["相似变换 Similarity<br/>4 DOF<br/>保持: 角度、线段长度比"]
+    E["欧几里得变换 Euclidean<br/>3 DOF<br/>保持: 长度、面积"]
     
-    P -->|"Fix l_inf<br/>lose 2 DOF"| A
-    A -->|"Fix circular points<br/>lose 2 DOF"| S
-    S -->|"Fix scale<br/>lose 1 DOF"| E
+    P -->|"固定无穷远线<br/>减少2 DOF"| A
+    A -->|"固定圆环点<br/>减少2 DOF"| S
+    S -->|"固定尺度<br/>减少1 DOF"| E
 ```
 
 **各层级的形式和约束**（H&Z Table 2.1, p.44）：

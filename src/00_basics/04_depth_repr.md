@@ -31,26 +31,26 @@
 
 ```mermaid
 mindmap
-  root((Depth Representation))
-    Disparity Map
-      Left-right pixel shifts
-      Inverse proportion to depth
-      Unit: pixels
-      Stereo matching output
-    Depth Map
-      2D image of distances
-      Each pixel = Z value
-      Unit: meters or millimeters
-      .png .exr .npy formats
-    Point Cloud
-      Unordered set of (X,Y,Z)
-      Optionally colored RGB
-      .ply .pcd .las formats
-      Open3D / PCL libraries
-    Conversion Pipeline
-      Disparity -> Depth: Z = f*b / d
-      Depth -> Point Cloud: back-projection
-      Point Cloud -> Depth: rasterization
+  root((深度表示))
+    视差图
+      左右像素列差
+      与深度成反比
+      单位: 像素
+      双目匹配的直接输出
+    深度图
+      距离的二维图像
+      每个像素存 Z 值
+      单位: 米或毫米
+      格式: .png .exr .npy
+    点云
+      无序 (X,Y,Z) 集合
+      可选带颜色 RGB
+      格式: .ply .pcd .las
+      库: Open3D / PCL
+    转换管线
+      视差到深度: Z = fb/d
+      深度到点云: 反投影
+      点云到深度: 光栅化
 ```
 
 ### 4.1.4 三种表示对比
@@ -317,13 +317,13 @@ def pointcloud_to_depth(points, K, H, W):
 
 ```mermaid
 flowchart TD
-    A["I have 3D data"] --> B{"Dense, regular<br/>grid structure?"}
-    B -->|"Yes<br/>Depth camera / stereo output"| C{"Need per-pixel<br/>neighbor ops?"}
-    C -->|"Yes<br/>CNN / filtering"| D["Depth Map<br/>.png / .npy"]
-    C -->|"No<br/>3D geometry ops"| E{"RAM / speed<br/>constraints?"}
-    B -->|"No<br/>LiDAR / SfM output"| F["Point Cloud<br/>.ply / .pcd"]
-    E -->|"Tight"| D
-    E -->|"Relaxed"| F
+    A["我有三维数据"] --> B{"是稠密规则的<br/>网格结构?"}
+    B -->|"是: 深度相机/双目输出"| C{"需要逐像素<br/>邻域操作?"}
+    C -->|"是: CNN / 滤波"| D["深度图<br/>.png / .npy"]
+    C -->|"否: 三维几何操作"| E{"内存/速度<br/>有约束?"}
+    B -->|"否: LiDAR / SfM 输出"| F["点云<br/>.ply / .pcd"]
+    E -->|"紧张"| D
+    E -->|"宽松"| F
 ```
 
 **经验法则**：

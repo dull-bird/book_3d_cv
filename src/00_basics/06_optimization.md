@@ -36,30 +36,30 @@
 
 ```mermaid
 mindmap
-  root((Optimization))
-    Algebraic Methods
-      DLT Direct Linear Transformation
-      Ah=0 SVD solution
-      Factorization Tomasi-Kanade
-    Geometric Methods
-      Reprojection error
-      Symmetric transfer error
-      Gold Standard algorithm
-      Bundle Adjustment BA
-    Approximate Methods
-      Sampson error
-      First-order correction
-      Closed form
-    Robust Estimation
+  root((优化方法))
+    代数方法
+      DLT 直接线性变换
+      Ah=0 SVD求解
+      因子分解法 Tomasi-Kanade
+    几何方法
+      重投影误差
+      对称转移误差
+      Gold Standard 算法
+      集束调整 BA
+    近似方法
+      Sampson 误差
+      一阶校正
+      闭式解
+    鲁棒估计
       RANSAC
-      M-estimators
+      M-估计器
       MLESAC
       LMEDS
-    Iterative Solvers
-      Gauss-Newton
+    迭代求解器
+      高斯-牛顿法
       Levenberg-Marquardt
-      Schur complement
-      Sparse BA
+      Schur 补
+      稀疏 BA
 ```
 
 ### 6.1.4 Mini Case：用最小二乘法拟合一条直线
@@ -238,16 +238,16 @@ $$W = M X$$
 
 ```mermaid
 flowchart TD
-    A[Raw Feature Matches] --> B{RANSAC}
-    B -->|Reject| C[Outlier Pairs: discard]
-    B -->|Accept| D[Inlier Pairs]
-    D --> E[DLT: Ah=0 SVD]
-    E --> F{Algebraic Solution}
-    F --> G[Nonlinear Optimization LM]
-    G --> H{Converged?}
-    H -->|No| G
-    H -->|Yes| I[Golden Standard MLE]
-    I --> J[Final Estimates: H E P X]
+    A["原始特征匹配"] --> B{"RANSAC<br/>鲁棒筛选"}
+    B -->|"剔除"| C["野点对: 丢弃"]
+    B -->|"保留"| D["内点对集合"]
+    D --> E["DLT: Ah=0 SVD 求解"]
+    E --> F{"代数解<br/>作为初值"}
+    F --> G["非线性优化 LM"]
+    G --> H{"已收敛?"}
+    H -->|"否"| G
+    H -->|"是"| I["Gold Standard MLE<br/>统计最优解"]
+    I --> J["最终估计: H E P X"]
 ```
 
 ### 6.2.4 Code Lens：用 NumPy 实现 DLT 和简单 RANSAC

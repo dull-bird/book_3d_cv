@@ -30,37 +30,37 @@
 
 ```mermaid
 mindmap
-  root((Multi-View Geometry))
-    Epipolar Geometry
-      Epipolar plane
-      Epipolar lines
-      Epipoles
-      Baseline
-    Fundamental Matrix F
-      3x3 rank-2 matrix
+  root((多视图几何))
+    对极几何
+      对极平面
+      对极线
+      对极点
+      基线
+    基础矩阵 F
+      3x3 秩为2的矩阵
       7 DOF
-      x'T F x equals 0
-      Point-to-line mapping
-      Null spaces
-    Essential Matrix E
-      5 DOF calibrated case
-      E from t cross R
-      F from K E K inverse
-      SVD decomposition
-    Two-View Reconstruction
-      Matches to F
-      F to E if K known
-      E to R and t 4 solutions
-      Triangulation to 3D
-    Degenerate Cases
-      Pure rotation no 3D
-      Planar scene ambiguous
-      Pure translation
-    Estimation Methods
-      8-point algorithm
-      Normalized 8-point
-      RANSAC for outliers
-      OpenCV findFundamentalMat
+      对极约束方程
+      点到线的映射
+      零空间
+    本质矩阵 E
+      5 DOF 已标定
+      E 由 t叉乘R 得
+      F 由 K E K逆 得
+      SVD 分解
+    双视图重建
+      匹配点对求F
+      已知K求E
+      E 得 R t 四组解
+      三角测量求3D
+    退化情况
+      纯旋转无3D信息
+      平面场景歧义
+      纯平移退化
+    估计方法
+      8点算法
+      归一化8点法
+      RANSAC 剔除野点
+      OpenCV 函数
 ```
 
 ### 3.1.4 Mini Case：用 OpenCV 在一对立体图像上画对极线
@@ -351,20 +351,20 @@ $$\begin{bmatrix} u p_{3} - p_{1} \\ v p_{3} - p_{2} \\ u' p'_{3} - p'_{1} \\ v'
 
 ```mermaid
 flowchart TD
-    A["Feature Matches: x_i to x'_i"] --> B["Compute F: 8-point + RANSAC<br/>H and Z section 9.2"]
-    B --> C["F: rank-2, 7 DOF<br/>x'^T F x = 0"]
-    C --> D{"Calibrated<br/>cameras?"}
-    D -->|"Yes: K, K' known"| E["E = K'^T F K<br/>H&Z section 9.6, p.257"]
-    D -->|"No"| F["Canonical cameras<br/>P=[I|0], P'=[[e']_x F | e']<br/>H&Z Result 9.14, p.255"]
-    E --> G["SVD of E<br/>E = U diag(1,1,0) V^T<br/>H&Z p.258"]
-    G --> H["4 (R,t) solutions<br/>select by positive depth<br/>H&Z p.258-259"]
-    H --> I["Metric cameras<br/>P=K[I|0], P'=K'[R|t]"]
-    F --> J["Projective reconstruction<br/>up to 3D homography"]
-    I --> K["Triangulation<br/>back-project rays, solve for X<br/>H&Z section 10.1, p.262"]
+    A["特征匹配: 点对 x_i 到 x'_i"] --> B["计算 F: 8点法 + RANSAC"]
+    B --> C["F: 秩2矩阵, 7 DOF"]
+    C --> D{"相机已标定?"}
+    D -->|"是: K, K' 已知"| E["E = K'^T F K"]
+    D -->|"否"| F["规范相机<br/>P=[I|0], P'=[[e']_x F | e']"]
+    E --> G["SVD 分解 E<br/>E = U diag(1,1,0) V^T"]
+    G --> H["4组 R t 解<br/>根据正深度筛选"]
+    H --> I["度量相机<br/>P=K[I|0], P'=K'[R|t]"]
+    F --> J["射影重建<br/>差一个三维射影变换"]
+    I --> K["三角测量<br/>反向投影射线 求解X"]
     J --> K
-    K --> L["3D Point Cloud<br/>X_1, X_2, ..., X_n"]
-    L --> M["Bundle Adjustment<br/>jointly optimize all P^i and X_j<br/>H&Z section 18.1, p.434"]
-    M --> N["Final Reconstruction"]
+    K --> L["三维点云<br/>X1, X2, ..., Xn"]
+    L --> M["集束调整 BA<br/>联合优化所有 P 和 X"]
+    M --> N["最终重建结果"]
 ```
 
 ### 3.2.7 射影重建定理——不需要标定也能重建三维
