@@ -44,13 +44,13 @@ mindmap
       Line at infinity l_inf
     Lines and Conics
       Line representation l
-      Point-line incidence x^T l = 0
+      Point-line incidence
       Intersection via cross product
       Conic C 5 DOF
     Projective Transformation H
       3x3 matrix 8 DOF
-      Point mapping x' = Hx
-      Line mapping l' = H^{-T}l
+      Point mapping x to Hx
+      Line mapping by H inverse T
       Homography estimation DLT
     Transformation Hierarchy
       Projective 8 DOF
