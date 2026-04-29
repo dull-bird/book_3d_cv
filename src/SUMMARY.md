@@ -27,3 +27,7 @@
   - [直观理解](03_3dgs/01_intuition.md)
   - [原理解析](03_3dgs/02_principles.md)
   - [部署实战](03_3dgs/03_deployment.md)
+
+# 附录
+
+- [计算机视觉的"苦涩教训"](appendix/bitter_lesson.md)
