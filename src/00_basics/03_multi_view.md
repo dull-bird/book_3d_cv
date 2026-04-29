@@ -305,7 +305,7 @@ $$P = K[I \mid 0], \quad P' = K'[R \mid t]$$
 
 ```mermaid
 flowchart TD
-    A["Feature Matches<br/>x_i &lt;-&gt; x'_i"] --> B["Compute F<br/>8-point + RANSAC<br/>H&Z section 9.2"]
+    A["Feature Matches: x_i to x'_i"] --> B["Compute F: 8-point + RANSAC<br/>H and Z section 9.2"]
     B --> C["F: rank-2, 7 DOF<br/>x'^T F x = 0"]
     C --> D{"Calibrated<br/>cameras?"}
     D -->|"Yes: K, K' known"| E["E = K'^T F K<br/>H&Z section 9.6, p.257"]

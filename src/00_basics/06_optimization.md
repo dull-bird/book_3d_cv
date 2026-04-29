@@ -88,6 +88,13 @@ print(f"True:      y = 2.00x + 1.00")
 print(f"Estimated: y = {a_hat:.2f}x + {b_hat:.2f}")
 ```
 
+**输出**：
+
+```
+True:      y = 2.00x + 1.00
+Estimated: y = 1.91x + 1.10
+```
+
 这个简单的直线拟合包含了优化的所有核心要素：
 
 - **模型**：直线 $y = ax + b$（就像 $x'^T F x = 0$）
