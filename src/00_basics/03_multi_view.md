@@ -33,34 +33,34 @@ mindmap
   root((Multi-View Geometry))
     Epipolar Geometry
       Epipolar plane
-      Epipolar lines l l'
-      Epipoles e e'
-      Baseline b
+      Epipolar lines
+      Epipoles
+      Baseline
     Fundamental Matrix F
       3x3 rank-2 matrix
       7 DOF
-      Correspondence condition x'^T F x = 0
-      Point-to-line mapping l' = Fx
-      Null spaces Fe = 0 F^T e' = 0
+      x'T F x equals 0
+      Point-to-line mapping
+      Null spaces
     Essential Matrix E
       5 DOF calibrated case
-      E = [t]_x R
-      F = K'^{-T} E K^{-1}
-      SVD U diag(1,1,0) V^T
+      E from t cross R
+      F from K E K inverse
+      SVD decomposition
     Two-View Reconstruction
-      Correspondences -> F
-      F -> E (if K known)
-      E -> [R|t] (4 solutions)
-      Triangulation -> 3D points
+      Matches to F
+      F to E if K known
+      E to R and t 4 solutions
+      Triangulation to 3D
     Degenerate Cases
-      Pure rotation no 3D info
-      Planar scene F ambiguous
-      Pure translation F = [e]_x
+      Pure rotation no 3D
+      Planar scene ambiguous
+      Pure translation
     Estimation Methods
       8-point algorithm
-      Normalized 8-point Hartley 1997
+      Normalized 8-point
       RANSAC for outliers
-      findFundamentalMat OpenCV
+      OpenCV findFundamentalMat
 ```
 
 ### Mini Case：用 OpenCV 在一对立体图像上画对极线
