@@ -8,7 +8,8 @@ src = "src"
 git-repository-url = "https://github.com/dull-bird/book_3d_cv"
 edit-url-template = "https://github.com/dull-bird/book_3d_cv/edit/main/{path}"
 site-url = "/book_3d_cv/"
-additional-js = ["theme/js/mathjax-mermaid.js"]
+additional-js = ["theme/js/mathjax-mermaid.js", "theme/js/custom.js"]
+additional-css = ["theme/css/custom.css"]
 
 [output.html.search]
 enable = true
@@ -16,4 +17,6 @@ enable = true
 [preprocessor.mermaid]
 command = "mdbook-mermaid"
 
-[preprocessor.alerts]
+# mdbook 0.5.2 原生支持 GitHub-style alerts，无需外部 preprocessor
+# [preprocessor.alerts]
+# command = "mdbook-alerts"

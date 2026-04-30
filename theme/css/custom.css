@@ -1,0 +1,79 @@
+/* 图片默认居中 */
+.markdown-section img {
+    display: block;
+    margin: 1.5em auto;
+    max-width: 100%;
+}
+
+/* 普通引用块统一样式 */
+.markdown-section blockquote {
+    border-left: 4px solid #adb5bd;
+    background: #f8f9fa;
+    padding: 0.5em 1em;
+    margin: 1em 0;
+}
+
+.markdown-section blockquote p {
+    margin: 0.3em 0;
+}
+
+/* ============================================
+   Callout 样式覆盖：给原生 alert 加上背景色块
+   ============================================ */
+
+/* TIP —— 紫色背景（人话翻译） */
+.blockquote-tag-tip {
+    background-color: #f5f3ff !important;
+    border-inline-start-color: #8b5cf6 !important;
+    border-inline-start-width: 4px !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    margin: 1em 0 !important;
+}
+
+.blockquote-tag-tip .blockquote-tag-title {
+    color: #7c3aed !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5em !important;
+}
+
+/* NOTE —— 淡蓝背景 */
+.blockquote-tag-note {
+    background-color: #f0f7ff !important;
+    border-inline-start-color: #3b82f6 !important;
+    border-inline-start-width: 4px !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    margin: 1em 0 !important;
+}
+
+.blockquote-tag-note .blockquote-tag-title {
+    color: #2563eb !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5em !important;
+}
+
+/* CAUTION —— 淡红背景 */
+.blockquote-tag-caution {
+    background-color: #fef2f2 !important;
+    border-inline-start-color: #ef4444 !important;
+    border-inline-start-width: 4px !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    margin: 1em 0 !important;
+}
+
+.blockquote-tag-caution .blockquote-tag-title {
+    color: #dc2626 !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5em !important;
+}
+
+/* 通用：callout 内部段间距 */
+.blockquote-tag p {
+    margin: 0.3em 0 !important;
+}
+
+.blockquote-tag p:last-child {
+    margin-bottom: 0 !important;
+}

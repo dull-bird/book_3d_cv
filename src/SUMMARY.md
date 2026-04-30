@@ -1,15 +1,15 @@
 # 目录
 
 [前言](README.md)
+  - [导读](00_basics/00_index.md)
 
 # 基础篇：3D 视觉的脚手架
 
-- [导读](00_basics/00_index.md)
 - [相机模型](00_basics/01_camera_model.md)
-- [投影几何](00_basics/02_projection.md)
-- [多视图几何入门](00_basics/03_multi_view.md)
-- [深度表示](00_basics/04_depth_repr.md)
-- [坐标系转换](00_basics/05_coordinates.md)
+- [坐标系转换](00_basics/02_coordinates.md)
+- [投影几何](00_basics/03_projection.md)
+- [多视图几何入门](00_basics/04_multi_view.md)
+- [深度表示](00_basics/05_depth_repr.md)
 - [优化基础](00_basics/06_optimization.md)
 - [3D 相机与传感器](00_basics/07_3d_cameras.md)
 

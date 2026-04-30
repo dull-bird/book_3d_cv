@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/css/custom-6d107f3d.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-6128ff9d.js";
+            window.path_to_searchindex_js = "../searchindex-c0428002.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-d47b7a93.js"></script>
+        <script src="../toc-4983ef3f.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -181,96 +182,223 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="01-相机模型三维世界如何变成二维图像"><a class="header" href="#01-相机模型三维世界如何变成二维图像">01 相机模型：三维世界如何变成二维图像</a></h1>
-<blockquote>
-<p>预计阅读时间：40 分钟
-前置知识：无（本篇第 01 节）
-读完本节后，你可以：写出完整的投影公式 $P = K[R|t]$，理解内参和外参的区别，用 OpenCV 标定自己的手机相机。</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p><strong>预计阅读时间</strong>：40 分钟 · <strong>前置知识</strong>：无（本篇第 01 节）</p>
+<p><strong>读完本节后，你可以</strong>：理解光圈、焦距、视场角、景深等光学概念，知道为什么真实相机可以简化为针孔模型，写出相机坐标系下的投影公式 $x_{pixel} = K X_{cam}$，理解内参矩阵 $K$ 的每个元素的物理意义，理解镜头畸变（径向和切向）的产生原因和矫正方法，知道透视/仿射/移轴相机的区别和适用场景。</p>
 </blockquote>
 <hr>
-<h2 id="第一阶直观理解"><a class="header" href="#第一阶直观理解">第一阶：直观理解</a></h2>
-<h3 id="一个场景"><a class="header" href="#一个场景">一个场景</a></h3>
+<h2 id="11-你真的了解你手里的相机吗"><a class="header" href="#11-你真的了解你手里的相机吗">1.1 你真的了解你手里的相机吗？</a></h2>
+<p>在进入针孔模型之前，我们先花十分钟回答一个更根本的问题：<strong>真实相机是怎么成像的？为什么我们可以用一个针孔来近似它？</strong></p>
+<h3 id="111-真实相机的结构"><a class="header" href="#111-真实相机的结构">1.1.1 真实相机的结构</a></h3>
+<p>一台真实相机由四个核心部件串成一条“光路“：</p>
+<ul>
+<li>
+<p><strong>镜头（Lens）</strong>：一组精密研磨的玻璃或塑料镜片，负责将入射光汇聚到传感器上。通常有 5–15 片镜片，每一片都经过镀膜以减少反射和色差。</p>
+<p><img src="../assets/figures/01_camera_model/camera-lens-anatomy.jpg" alt="镜头剖面示意图：展示了前镜组、镜片组、光圈和后镜组的内部结构"></p>
+<p><em>镜头剖面示意图。展示了前镜组（Front Element）、镜片组（Lens Group）、光圈（Aperture）和后镜组（Rear Element）的内部结构。</em></p>
+<p>镜头外壳上通常有两个环（变焦镜头）：<strong>变焦环</strong>（Zoom Ring）改变焦距（视角宽窄），<strong>对焦环</strong>（Focus Ring）改变对焦距离（哪个位置的物体清晰）。<strong>定焦镜头没有变焦环，但一定有对焦环</strong>——否则它只能清晰拍摄某一个固定距离的物体，稍微远一点或近一点都会模糊，根本无法正常使用。</p>
+<p>拧对焦环时，镜头内部<strong>某些镜片组</strong>（通常是后组或中间组，不是全部镜片，更不是整个镜头）会沿光轴前后移动，改变的是<strong>像距</strong> $v$（投影中心到传感器的距离），从而改变清晰成像的物距。<strong>光学焦距</strong> $f_{opt}$（由镜片曲率和折射率决定）并不会变——定焦镜头的“定“就是这个意思。但像距 $v$ 的变化会悄悄改变后面标定出来的像素焦距，这是 3D 视觉中一个非常隐蔽的误差源，后面 1.3.2 节会详细展开。</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>工业相机常用的定焦镜头（如 C-mount/CS-mount）通常<strong>没有对焦环</strong>——它们在出厂前就针对特定工作距离调好对焦并锁死，使用时不再调整。这与手机/单反上的定焦头不同。</p>
+<p>自动对焦（AF）的本质和拧对焦环完全一样：用马达驱动镜片组前后移动来寻找最佳对焦位置。区别在于驱动力从“手指“变成了“马达“，对焦距离的判定从“人眼观察“变成了“相位检测/对比度检测算法“。</p>
+</blockquote>
+</li>
+<li>
+<p><strong>光圈（Aperture）</strong>：镜头中间一个<strong>可调节孔径</strong>，控制有多少光能通过。用 <strong>f 值</strong>（f-stop）表示，比如 f/1.4、f/2.8、f/16。f 值越小 → 孔径越大 → 进光越多。</p>
+<p><img src="../assets/figures/01_camera_model/camera-lens-Aperture-Scale.png" alt="光圈刻度示意图：f 值越小，光圈孔径越大，进光量越多，景深越浅"></p>
+<p><em>光圈刻度示意图。f 值越小，光圈孔径越大，进光量越多，景深越浅。</em></p>
+</li>
+<li>
+<p><strong>快门（Shutter）</strong>：控制传感器接收光的时间长度。机械快门是一道物理帘幕，电子快门则是直接控制传感器的通电时间。</p>
+</li>
+<li>
+<p><strong>传感器（Sensor）</strong>：将光信号转换为电信号的芯片，由数百万个感光单元（像素）排列成矩形阵列。</p>
+</li>
+</ul>
+<h3 id="112-曝光三角光圈快门iso"><a class="header" href="#112-曝光三角光圈快门iso">1.1.2 曝光三角：光圈、快门、ISO</a></h3>
+<p>一张照片的亮度由三个参数的平衡决定——摄影师叫它“曝光三角“（Exposure Triangle）：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>参数</th><th>作用</th><th>效果</th><th>单位</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>光圈（Aperture）</strong></td><td>控制进光孔径</td><td>大光圈(f/1.4) → 亮、浅景深；小光圈(f/16) → 暗、深景深</td><td>f 值</td></tr>
+<tr><td><strong>快门速度（Shutter Speed）</strong></td><td>控制曝光时长</td><td>慢快门(1/30s) → 亮、可能模糊；快快门(1/4000s) → 暗、冻结运动</td><td>秒或分数秒</td></tr>
+<tr><td><strong>ISO（感光度）</strong></td><td>控制传感器信号增益</td><td>低 ISO(100) → 干净、需要多光；高 ISO(6400) → 亮但有噪点</td><td>100–102400+</td></tr>
+</tbody>
+</table>
+</div>
+<p>这三个参数互相牵制：在同样的环境光下，加大一档光圈 → 你可以用更快的快门或更低的 ISO → 分别影响景深和噪点。摄影就是在三者之间做取舍。</p>
+<h3 id="113-视场角fov与焦距"><a class="header" href="#113-视场角fov与焦距">1.1.3 视场角（FOV）与焦距</a></h3>
+<p><strong>焦距（Focal Length）<strong>是镜头的光学中心到传感器的距离。它和传感器尺寸一起决定了</strong>视场角（Field of View, FOV）</strong>——也就是相机能“看见“的角度范围：</p>
+<p>$$FOV = 2 \cdot \arctan\left(\frac{d}{2f}\right)$$</p>
+<p>其中 $d$ 是传感器在某一方向上的长度（水平宽度、垂直高度或对角线），$f$ 是焦距。$d$ 对应哪个方向，算出的就是哪个方向的 FOV。定性来说：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>焦距</th><th>视场角</th><th>俗称</th><th>典型用途</th></tr>
+</thead>
+<tbody>
+<tr><td>8–24 mm</td><td>&gt; 90°</td><td>超广角 / 鱼眼</td><td>全景、AR/VR、机器人导航</td></tr>
+<tr><td>24–35 mm</td><td>~60–75°</td><td>广角</td><td>街拍、手机主摄、安防监控</td></tr>
+<tr><td>35–70 mm</td><td>~30–55°</td><td>标准</td><td>人像、日常记录</td></tr>
+<tr><td>70–200 mm</td><td>~10–30°</td><td>长焦</td><td>远距拍摄、野生动物</td></tr>
+<tr><td>&gt; 200 mm</td><td>&lt; 10°</td><td>超长焦</td><td>天文、体育、远距监控</td></tr>
+</tbody>
+</table>
+</div>
+<p>在 3D 视觉中，FOV 决定了你能“看到“多大范围的三维信息。FOV 越大 → 单帧覆盖越多场景 → 但单位角度的像素越少 → 远处物体的细节越少。</p>
+<blockquote class="blockquote-tag blockquote-tag-caution">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Caution</p>
+<p><strong>物理焦距 vs 像素焦距——这是初学者最常踩的坑。</strong>
+上面公式里的 $f$ 是<strong>光学焦距</strong>（单位 mm），它写在镜头筒上（如“f=28 mm“），由镜片曲率和折射率决定，是透镜的固有属性。</p>
+<p>但在 1.3 节的投影公式中，你会遇到另一个“焦距“——$\alpha_x = f \cdot m_x$，单位是<strong>像素</strong>。它本质上是<strong>像距</strong>（投影中心到成像平面的距离）乘上“每毫米多少像素“得到的。只有当对焦在无穷远时，像距才恰好等于光学焦距；近处对焦时，像距会变大——这意味着标定出来的“焦距“也会随之变大，FOV 会变窄。这就是影视工业中常说的<strong>镜头呼吸效应（Focus Breathing）</strong>。</p>
+<p>为什么要搞两个焦距？因为光学焦距本身<strong>不能决定视场角</strong>——你还得知道传感器有多大、对焦在哪个位置。但像素焦距可以直接算 FOV：$FOV = 2 \arctan(W / 2\alpha_x)$，其中 $W$ 就是图像宽度（像素）。这就是为什么在计算机视觉中，我们几乎总是用<strong>像素焦距</strong>——它和图像坐标系天然对齐，不需要知道传感器的物理尺寸。更深层的原因见 1.3.2 Step 4 的详细推导。</p>
+</blockquote>
+<h3 id="114-景深为什么近处清晰远处模糊"><a class="header" href="#114-景深为什么近处清晰远处模糊">1.1.4 景深：为什么近处清晰、远处模糊？</a></h3>
+<p>用大光圈拍一朵花，花很清晰，但背景是虚的。你看到的“虚“就是**景深（Depth of Field, DoF）**有限的表现。</p>
+<p>景深是指：<strong>在传感器前方，物体可以移动多远而依然看起来“清晰“</strong>。它不是突然清晰→突然模糊，而是逐渐过渡的——模糊的程度用**弥散圆（Circle of Confusion, CoC）**来衡量。</p>
+<blockquote>
+<p><strong>[TODO: 图] 景深与弥散圆示意图</strong>——左图：物体在焦平面上，像点清晰；右图：物体不在焦平面上，像点扩散为弥散圆。需要从摄影光学教材截取。</p>
+</blockquote>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>弥散圆的直觉：一个点光源恰好落在焦平面上，传感器上得到一个锐利的点；离焦平面上有一定距离，就得到一个模糊的光斑——这个光斑的直径就是弥散圆。当弥散圆小到人眼分辨不出时，我们就说它是“清晰的“。</p>
+</blockquote>
+<p>景深的计算公式（简化版）：</p>
+<p>$$DoF \approx \frac{2 N c (u - f) f}{f^2 - N^2 c^2}$$</p>
+<p>其中 $N$ 是 f 值（光圈），$c$ 是弥散圆直径，$u$ 是物距，$f$ 是焦距。</p>
+<p>公式不需要记，但结论要记住：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>如何增大景深（让更多东西清晰）</th><th>物理原因</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>缩小光圈</strong>（增大 f 值）</td><td>光线只能从更窄的范围穿过 → 更接近“一根光线“的理想情况</td></tr>
+<tr><td>缩短焦距（用广角镜头）</td><td>同样的物距下，广角的光线汇聚角度更小</td></tr>
+<tr><td>远离被摄物体</td><td>物距增大 → 像距变化的比例减小</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p><strong>“远离被摄物体“是什么意思？</strong></p>
+<p>这里的“远离“指的是<strong>对焦位置本身在远处</strong>，而不是“相机后退但保持原来的对焦位置“。</p>
+<p>对焦的本质是移动镜片组改变像距 $v$，使特定距离的物体清晰成像。同一支 50 mm 镜头，你可以对焦在 1 m 处拍人像，也可以对焦在 10 m 处拍风景——对焦位置由你选择，不是镜头的固定属性。</p>
+<p>景深的绝对宽度随物距增大而增大（近似与 $u^2$ 成正比）。例如 50 mm、f/2.8：</p>
+<ul>
+<li>对焦在 1 m：景深约 3 cm</li>
+<li>对焦在 10 m：景深约 3.5 m</li>
+</ul>
+<p>所以风景摄影常用小光圈+远距离对焦来获得“全景深“。但如果你把相机从 1 m 退到 10 m 却<strong>保持对焦在 1 m</strong>，原来的被摄物体反而会模糊——景深的增大是对焦位置变远带来的，不是单纯后退。</p>
+</blockquote>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p><strong>焦距 ≠ 对焦距离。</strong> “50 mm” 是<strong>焦距</strong>（决定视角宽窄，定焦镜头不能变），“1 m” 是<strong>对焦距离</strong>（决定哪个位置清晰，拧对焦环就能变）。变焦镜头改变焦距（如 24–70 mm），对焦环改变对焦距离——两者完全独立。</p>
+</blockquote>
+<h3 id="115-关键桥梁针孔模型是一个几何抽象"><a class="header" href="#115-关键桥梁针孔模型是一个几何抽象">1.1.5 关键桥梁：针孔模型是一个几何抽象</a></h3>
+<p>上面讲了这么多光学概念——光圈、景深、弥散圆——目的是让你理解真实相机的物理行为。但计算机视觉里的针孔模型不是对这些细节的完整描述，它抓住了一个更根本的东西：几何投影关系。</p>
+<p>要回答的问题是：<strong>一台真实相机（f/1.4 大光圈、全开拍摄），为什么能用针孔模型来建模？</strong></p>
+<h4 id="针孔模型的本质中心投影"><a class="header" href="#针孔模型的本质中心投影">针孔模型的本质：中心投影</a></h4>
+<p>针孔模型的核心假设只有一个：</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>针孔模型的核心假设：场景中每个三维点在传感器上对应<strong>唯一一个</strong>像点，这个像点由<strong>穿过某一固定点（光学中心）的直线</strong>决定。</p>
+</blockquote>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>中心投影的本质：三维点 P、光学中心 C、像点 p 三点共线。这个几何关系与光线实际走了什么路径无关——只与“在哪里成像“有关。详见后文 H&amp;Z Fig 6.1 的完整几何图示。</p>
+</blockquote>
+<p>这个“光学中心 → 直线 → 像点“的映射，就是<strong>中心投影</strong>（Central Projection）。它不是物理实体的描述（有没有真的针孔），而是一个<strong>几何模型</strong>：不管光线在真实镜头里走了多复杂的路径，最终在传感器上形成的像点，等效于从光学中心连过去的一条直线。</p>
+<h4 id="真实镜头怎么实现这个几何抽象"><a class="header" href="#真实镜头怎么实现这个几何抽象">真实镜头怎么“实现“这个几何抽象？</a></h4>
+<p>真实镜头不是靠缩小光圈来实现中心投影的——它是靠<strong>设计</strong>。</p>
+<p>一组精密研磨的镜片被排列成这样的光学系统：从场景中一个点出发、进入镜头的所有光线，经过折射之后，<strong>重新汇聚到传感器上的同一个点</strong>——条件是物体在焦平面上。</p>
+<p>真实镜头用多片镜片把从物点出发、从镜头各位置进入的光线<strong>弯曲后重新汇聚到同一点</strong>。这就是镜头的本职工作——它对每个物距做“光线整理“。</p>
+<p>针孔模型完全不管“光线如何被整理“——它直接假设所有成像光线都过同一个光学中心。这个光学中心在真实镜头中有个名字：<strong>入瞳</strong>（Entrance Pupil）——从场景侧看进去，光圈在镜片折射后形成的虚像。入瞳就是从场景出发的所有光线的“表观出发点“。</p>
+<p><strong>关键结论</strong>：真实镜头不是靠缩小光圈来“变成“针孔——它从设计之初就是为了模拟中心投影。光圈大小控制的是“偏离焦平面多远会开始模糊“（即景深），不是“是否服从中心投影“。f/1.4 和 f/16 都服从中心投影——差异仅在景深。</p>
+<h4 id="针孔模型描述了哪些没描述哪些"><a class="header" href="#针孔模型描述了哪些没描述哪些">针孔模型描述了哪些，没描述哪些</a></h4>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>描述了什么</th><th>没描述什么</th></tr>
+</thead>
+<tbody>
+<tr><td>✅ 相机坐标系 → 像素的几何映射（$x_{pixel} = K , X_{cam}$）</td><td>❌ 景深 / 离焦模糊（弥散圆）</td></tr>
+<tr><td>✅ 像素坐标与三维方向的对应关系</td><td>❌ 进光量与曝光控制</td></tr>
+<tr><td>✅ 多视图之间的对极几何约束</td><td>❌ 镜头畸变（后续标定修复）</td></tr>
+<tr><td>✅ 三角测量的数学基础</td><td>❌ 衍射、色差、眩光</td></tr>
+<tr><td>✅ 焦距和视场角的关系</td><td>❌ 暗角（Vignetting）</td></tr>
+</tbody>
+</table>
+</div>
+<p>这个表的潜台词是：<strong>针孔模型描述的是“哪个三维点落到哪个像素“，而不是“这个像素有多亮、多锐“。</strong> 而计算机视觉的几乎所有几何算法——三角测量、对极匹配、SfM、SLAM——需要的恰好只是“哪个点对应哪个像素“。</p>
+<h4 id="景深在针孔模型中怎么理解"><a class="header" href="#景深在针孔模型中怎么理解">景深在针孔模型中怎么理解？</a></h4>
+<p>在针孔模型中，景深这个概念<strong>不存在</strong>，或者说景深是<strong>无穷大</strong>。</p>
+<p>这不是因为“光圈太小“，而是因为针孔模型<strong>压根就不描述离焦现象</strong>。弥散圆、景深这些概念存在于真实镜头的物理行为中——大光圈时非焦平面上的点会散开成圆斑。针孔模型只说“物体的像落在传感器上的哪个位置“，不回答“它会不会模糊“。</p>
+<p>这两个问题是正交的：</p>
+<ul>
+<li>针孔模型回答：<strong>在哪里成像</strong>（where）——几何问题</li>
+<li>景深回答：<strong>成像锐不锐</strong>（how sharp）——光度学问题</li>
+</ul>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>针孔模型是一个<strong>几何抽象</strong>，不是“小光圈“的同义词。它假设所有成像光线经过同一个光学中心，而这个抽象在真实镜头中通过镜片组的光学设计来实现——不管光圈开到多大。计算机视觉只需要“在哪里成像“的答案，所以针孔模型的几何精度就足够了。至于真实镜头偏离这个模型的畸变，后面标定会修。</p>
+</blockquote>
+<hr>
+<h2 id="12-直观理解"><a class="header" href="#12-直观理解">1.2 直观理解</a></h2>
+<h3 id="121-一个场景"><a class="header" href="#121-一个场景">1.2.1 一个场景</a></h3>
 <p>你拿起手机拍了张照片。真实世界是三维的——有远近、有高低、有前后。照片是二维的——只有宽和高。三维怎么变成二维的？这个“压扁“的过程就是<strong>投影</strong>。相机就是用来做这件事的，而理解相机如何做投影，是理解一切 3D 视觉算法的起点。</p>
-<h3 id="核心直觉小孔成像"><a class="header" href="#核心直觉小孔成像">核心直觉：小孔成像</a></h3>
+<h3 id="122-核心直觉小孔成像"><a class="header" href="#122-核心直觉小孔成像">1.2.2 核心直觉：小孔成像</a></h3>
 <p>想象一个完全不透光的盒子，只在正面扎一个针尖大的孔。盒子背面贴一张感光胶片。外面有一棵树，阳光照在树上，反射的光线穿过小孔，在胶片上留下倒立的树影。</p>
 <p>这就是<strong>针孔相机模型</strong>。它只有三个要素：</p>
+<p><img src="../assets/figures/hz_hires/fig6_1_pinhole.png" alt="针孔相机几何：世界坐标系中的点X经相机中心C投影到图像平面x。相机坐标系以C为原点，Z轴沿主轴方向。(H&amp;Z Figure 6.1)"></p>
+<p><em>针孔相机几何示意图。世界坐标系中的点 $X$ 经相机中心 $C$ 投影到图像平面 $x$。相机坐标系以 $C$ 为原点，$Z$ 轴沿主轴方向。（H&amp;Z Figure 6.1）</em></p>
 <ol>
 <li><strong>三维世界中的一个点</strong>（比如树顶的某片叶子）</li>
 <li><strong>一个小孔</strong>（光线只能从这里穿过）</li>
 <li><strong>一个成像平面</strong>（胶片、CMOS 传感器）</li>
 </ol>
 <p>从那个三维点出发的光线，穿过小孔，直直地打在成像平面上。这个点落在成像平面上的位置，就是<strong>投影点</strong>。所有三维点的投影点合在一起，就是你的照片。</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>真实的小孔成像是<strong>倒像</strong>——树顶的光线穿过小孔后打到胶片下方，树根的光线打到上方，照片上下左右都是颠倒的。但 H&amp;Z Figure 6.1 中的 image plane 在相机中心<strong>前方</strong>，这不是物理真实位置，而是一个<strong>虚拟成像平面</strong>：我们把真实成像平面关于相机中心做对称，“搬“到镜头前方。这样树顶还是在上、树根还是在下，和真实世界同向，投影公式可以直接写成 $x = fX/Z$ 而不带负号。计算机视觉里的所有推导都基于这个虚拟平面——它让数学更简洁，而几何关系（哪个三维点对应哪个像素）完全等价。</p>
+</blockquote>
 <p>这个模型的妙处在于：它只用<strong>一条直线</strong>（光线）连接了三维世界和二维图像。没有复杂的折射、没有镜头畸变——就是一个简单的几何关系。理解了这个关系，你就能用数学精确描述“拍照片“这件事。</p>
-<h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
+<h3 id="123-技术全景"><a class="header" href="#123-技术全景">1.2.3 技术全景</a></h3>
 <pre class="mermaid">mindmap
   root((Camera Model))
     针孔相机 Pinhole
       中心投影 Central Projection
       齐次坐标 Homogeneous Coordinates
-      投影矩阵 P 3x4 matrix
     内参 Intrinsic K
       焦距 focal length fx fy
       主点 principal point cx cy
       像素纵横比 aspect ratio
       偏斜 skew s
-    外参 Extrinsic R t
-      旋转矩阵 rotation 3x3
-      平移向量 translation 3x1
-      相机中心 camera center C
-    分解 Decomposition
-      RQ decomposition
-      从 P 恢复 K R t
     相机类型
       透视相机 perspective
       仿射相机 affine
       移轴相机 tilt shift
       正射投影 orthographic
-    标定 Calibration
-      Zhang's method
-      棋盘格 chessboard
-      重投影误差 reprojection error
+    畸变 Distortion
+      径向畸变 radial k1 k2 k3
+      切向畸变 tangential p1 p2
+      去畸变 undistort
 </pre>
 
-<h3 id="mini-case用-opencv-捕捉一帧并查看像素坐标"><a class="header" href="#mini-case用-opencv-捕捉一帧并查看像素坐标">Mini Case：用 OpenCV 捕捉一帧并查看像素坐标</a></h3>
-<p>打开你的电脑摄像头，捕捉一帧，看看每个像素的坐标是什么样的。</p>
-<pre><code class="language-python">import cv2
-import numpy as np
-
-# Open the default camera
-cap = cv2.VideoCapture(0)
-if not cap.isOpened():
-    raise RuntimeError("Cannot open camera")
-
-ret, frame = cap.read()
-cap.release()
-
-if not ret:
-    raise RuntimeError("Cannot read frame")
-
-h, w = frame.shape[:2]
-print(f"Image size: {w} x {h}")
-print(f"Top-left pixel coordinate:    (0, 0)")
-print(f"Top-right pixel coordinate:   ({w-1}, 0)")
-print(f"Bottom-left pixel coordinate: (0, {h-1})")
-print(f"Center pixel coordinate:      ({w//2}, {h//2})")
-print(f"Bottom-right pixel coordinate: ({w-1}, {h-1})")
-
-# Save and display
-cv2.imwrite("/tmp/capture_test.jpg", frame)
-print("\nFrame saved to /tmp/capture_test.jpg")
-print("Now imagine: each of these pixels corresponds to a 3D point")
-print("in the real world. The camera model tells you exactly which one.")
-</code></pre>
-<p>这段代码没有做任何视觉处理。它只是告诉你：你看到的每一帧图像，本质上就是一个二维数组——每个位置 <code>(u, v)</code> 记录了一个颜色值。相机模型的全部工作，就是告诉你：<strong>三维世界中的点 <code>(X, Y, Z)</code> 会落在图像上的哪个位置 <code>(u, v)</code></strong>。</p>
 <hr>
-<h2 id="第二阶原理解析"><a class="header" href="#第二阶原理解析">第二阶：原理解析</a></h2>
-<h3 id="第一性原理中心投影"><a class="header" href="#第一性原理中心投影">第一性原理：中心投影</a></h3>
+<h2 id="13-原理解析"><a class="header" href="#13-原理解析">1.3 原理解析</a></h2>
+<h3 id="131-第一性原理中心投影"><a class="header" href="#131-第一性原理中心投影">1.3.1 第一性原理：中心投影</a></h3>
 <p>针孔相机做的事情，用一句话说：<strong>将三维空间中的点，沿着穿过一个固定点（相机中心）的直线，映射到一个平面上</strong>。这在几何上称为<strong>中心投影（central projection）</strong>，是从三维射影空间 $IP^3$ 到二维射影平面 $IP^2$ 的映射。（H&amp;Z section 6.1, p.154）</p>
-<h3 id="从三维点到像素坐标完整推导"><a class="header" href="#从三维点到像素坐标完整推导">从三维点到像素坐标——完整推导</a></h3>
+<h3 id="132-从三维点到像素坐标完整推导"><a class="header" href="#132-从三维点到像素坐标完整推导">1.3.2 从三维点到像素坐标——完整推导</a></h3>
 <h4 id="step-1最简单的针孔没有主点偏移"><a class="header" href="#step-1最简单的针孔没有主点偏移">Step 1：最简单的针孔——没有主点偏移</a></h4>
 <p>假设小孔（相机中心）位于原点，相机朝向 Z 轴正方向，成像平面在距离 f 处（f 是焦距）。根据相似三角形：</p>
-<pre><code>X/Z = x/f   →   x = fX / Z
-Y/Z = y/f   →   y = fY / Z
-</code></pre>
+<p>$$\frac{X}{Z} = \frac{x}{f} \quad \Rightarrow \quad x = \frac{fX}{Z}$$</p>
+<p>$$\frac{Y}{Z} = \frac{y}{f} \quad \Rightarrow \quad y = \frac{fY}{Z}$$</p>
 <p>中心投影公式（H&amp;Z 6.1, p.154）：
 $$(X, Y, Z)^T \rightarrow (fX/Z, fY/Z)^T$$</p>
 <p>这个映射是<strong>非线性的</strong>——除以 Z 使得远处的物体看起来更小（近大远小）。</p>
@@ -278,180 +406,345 @@ $$(X, Y, Z)^T \rightarrow (fX/Z, fY/Z)^T$$</p>
 <p>引入齐次坐标后，这个非线性映射变成了线性矩阵乘法（H&amp;Z 6.2, p.154）：</p>
 <p>$$x = P X$$</p>
 <p>其中 $P = \text{diag}(f, f, 1)[I;|;0]$，展开为：</p>
-<p>$$\begin{pmatrix} u \ v \ w \end{pmatrix} =
-\begin{pmatrix} f &amp; 0 &amp; 0 &amp; 0 \ 0 &amp; f &amp; 0 &amp; 0 \ 0 &amp; 0 &amp; 1 &amp; 0 \end{pmatrix}
-\begin{pmatrix} X \ Y \ Z \ 1 \end{pmatrix}$$</p>
+<p>$$\begin{pmatrix} u \cr v \cr w \end{pmatrix} =
+\begin{pmatrix} f &amp; 0 &amp; 0 &amp; 0 \cr 0 &amp; f &amp; 0 &amp; 0 \cr 0 &amp; 0 &amp; 1 &amp; 0 \end{pmatrix}
+\begin{pmatrix} X \cr Y \cr Z \cr 1 \end{pmatrix}$$</p>
 <p>从齐次坐标回到像素坐标只需除以第三分量：$(u/w, v/w)$。这就是齐次坐标的核心魅力——用多一维的代价换来线性的简洁。</p>
 <h4 id="step-3加入主点偏移"><a class="header" href="#step-3加入主点偏移">Step 3：加入主点偏移</a></h4>
 <p>真实的相机传感器未必以光轴为中心。设主点（principal point）为 $(p_x, p_y)$——即光轴打在传感器上的位置（H&amp;Z 6.3, p.155）：</p>
+<p><img src="../assets/figures/hz_hires/fig6_2_coords.png" alt="H&amp;Z Fig 6.2: 相机坐标系 $(x_{cam}, y_{cam})$ 与图像坐标系的关系。主点 $&#92;mathbf{p}$ 是光轴在成像平面上的交点，像素坐标 $(x, y)$ 以图像左上角为原点（H&amp;Z p.155）"></p>
+<p><em>相机坐标系 $(x_{cam}, y_{cam})$ 与图像坐标系的关系。主点 $\mathbf{p}$ 是光轴在成像平面上的交点，像素坐标 $(x, y)$ 以图像左上角为原点。（H&amp;Z Figure 6.2, p.155）</em></p>
 <p>$$(X, Y, Z)^T \rightarrow (fX/Z + p_x, fY/Z + p_y)^T$$</p>
-<p>在齐次形式下，这等价于在投影矩阵中嵌入标定矩阵 K（H&amp;Z 6.4, p.155）：</p>
-<p>$$K = \begin{pmatrix} f &amp; 0 &amp; p_x \ 0 &amp; f &amp; p_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$$</p>
+<p>在齐次形式下，这等价于在投影矩阵中嵌入标定矩阵 $K$（H&amp;Z 6.4, p.155）：</p>
+<p>$$K = \begin{pmatrix} f &amp; 0 &amp; p_x \cr 0 &amp; f &amp; p_y \cr 0 &amp; 0 &amp; 1 \end{pmatrix}$$</p>
 <p>此时投影变为 $x = K[I;|;0]X_{cam}$。</p>
 <h4 id="step-4ccd-像素从毫米到像素"><a class="header" href="#step-4ccd-像素从毫米到像素">Step 4：CCD 像素——从毫米到像素</a></h4>
 <p>真正的数码相机使用 CCD/CMOS 传感器，像素可能不是正方形，且 x 和 y 方向的像素密度可能不同。因此需要将焦距从毫米转换为像素单位（H&amp;Z 6.9, p.157）：</p>
 <p>$$\alpha_x = f \cdot m_x, \quad \alpha_y = f \cdot m_y$$</p>
-<p>其中 $m_x, m_y$ 是单位距离内的像素数。最通用的 K 矩阵还包含一个偏斜参数 $s$，表示像素的歪斜程度（H&amp;Z 6.10, p.157）：</p>
-<p>$$K = \begin{pmatrix} \alpha_x &amp; s &amp; x_0 \ 0 &amp; \alpha_y &amp; y_0 \ 0 &amp; 0 &amp; 1 \end{pmatrix}$$</p>
+<p>其中：</p>
+<ul>
+<li>$f$ 是<strong>几何等效焦距</strong>（mm），即针孔模型中投影中心到成像平面的距离</li>
+<li>$m_x, m_y$ 是<strong>像素密度</strong>（像素/mm），由传感器尺寸和分辨率决定</li>
+<li>$\alpha_x, \alpha_y$ 是<strong>像素焦距</strong>（pixel），这是 K 矩阵里实际存放的数字</li>
+</ul>
+<blockquote class="blockquote-tag blockquote-tag-caution">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Caution</p>
+<p><strong>这里藏着一个隐蔽的近似——而这个近似在特定场景下会失效。</strong></p>
+<p>针孔模型里的 $f$ 本质上是<strong>像距</strong>（Image Distance），记作 $v$。在真实相机中，为了成像清晰，传感器必须放在透镜的成像面上，所以 $f \equiv v$。但 $v$ 不是固定的——它由对焦位置决定：
+$$\frac{1}{u} + \frac{1}{v} = \frac{1}{f_{opt}} \quad \Rightarrow \quad v = \frac{u \cdot f_{opt}}{u - f_{opt}}$$
+其中 $u$ 是物距，$f_{opt}$ 是镜头的<strong>光学焦距</strong>（写在镜头筒上的那个数字，如“28 mm“）。</p>
+<ul>
+<li><strong>对焦在无穷远</strong>（$u \to \infty$）：$v \to f_{opt}$。此时像距恰好等于光学焦距，所以用 $f_{opt}$ 代替 $v$ 是精确的。</li>
+<li><strong>对焦在近处</strong>：$v &gt; f_{opt}$。如果你仍然把镜头筒上的 $f_{opt}$ 当作公式里的 $f$ 代入，就会系统性低估像素焦距。一个 50 mm 镜头对焦在 1 米处时，实际像距约为 52.6 mm，误差超过 5%。</li>
+</ul>
+<p><strong>这对 3D 视觉意味着什么？</strong> 标定出来的 $K$ 矩阵里的“焦距“，实际上是<strong>当前对焦位置下的像距 $v$ 换算成的像素单位</strong>。如果你标定后改变了对焦位置（如打开了自动对焦、从拍远景切换到拍近景），$v$ 变了，标定的内参就失效了。这就是为什么工业 3D 视觉系统<strong>必须固定对焦、关闭自动对焦</strong>。</p>
+</blockquote>
+<p>把上面的概念落到数字上：一部手机的光学焦距 $f_{opt} = 4.2$ mm，传感器横向宽度 $6.4$ mm，分辨率 $640$ 像素。假设对焦在无穷远（$v \approx f_{opt}$），则像素密度 $m_x = 640 / 6.4 = 100$ 像素/mm，像素焦距 $\alpha_x = 4.2 \times 100 = 420$ 像素。OpenCV 标定后，你会在 K 矩阵中看到 $K[0,0] \approx 420$——<strong>不是 4.2</strong>。</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p><strong>为什么 K 矩阵里的“焦距“单位是像素？</strong>
+因为投影公式 $(X, Y, Z) \to (fX/Z, fY/Z)$ 算出来的是<strong>图像平面上的位置</strong>。如果我们用物理焦距（mm），结果也是 mm；但图像坐标系是以像素为单位的。所以必须乘上像素密度，把 mm “翻译“成像素。</p>
+<p>这个“翻译“带来的好处是：<strong>像素焦距可以直接计算视场角</strong>，不需要知道传感器物理尺寸：
+$$FOV_x = 2 \arctan\left(\frac{W}{2\alpha_x}\right)$$
+其中 $W$ 就是图像宽度（像素）——你在代码里直接能拿到。如果用光学焦距 $f_{opt}$，你还得查传感器的宽度和分辨率，还要确认对焦位置是否在无穷远。</p>
+</blockquote>
+<p>最通用的 K 矩阵还包含一个偏斜参数 $s$，表示像素的歪斜程度（H&amp;Z 6.10, p.157）：</p>
+<p>$$K = \begin{pmatrix} \alpha_x &amp; s &amp; x_0 \cr 0 &amp; \alpha_y &amp; y_0 \cr 0 &amp; 0 &amp; 1 \end{pmatrix}$$</p>
 <div class="table-wrapper">
 <table>
 <thead>
 <tr><th>参数</th><th>含义</th><th>物理意义</th></tr>
 </thead>
 <tbody>
-<tr><td>$\alpha_x, \alpha_y$</td><td>横向/纵向焦距（像素单位）</td><td>决定了视场角的大小</td></tr>
-<tr><td>$x_0, y_0$</td><td>主点坐标</td><td>光轴打在 sensor 的位置，通常在图像中心附近</td></tr>
-<tr><td>$s$</td><td>偏斜参数</td><td>像素是否“歪“了——现代相机基本为 0</td></tr>
+<tr><td>$\alpha_x, \alpha_y$</td><td>横向/纵向<strong>像素焦距</strong>（pixel）</td><td>直接决定视场角；和物理焦距的关系是 $\alpha = f \cdot m$</td></tr>
+<tr><td>$x_0, y_0$</td><td>主点坐标（pixel）</td><td>光轴打在 sensor 的位置，通常在图像中心附近</td></tr>
+<tr><td>$s$</td><td>偏斜参数（pixel）</td><td>像素是否“歪“了——现代相机基本为 0</td></tr>
 </tbody>
 </table>
 </div>
 <p>内参 K 从 3 DOF（$f, p_x, p_y$）到 5 DOF（$\alpha_x, \alpha_y, s, x_0, y_0$），每增加一个参数就多描述一种物理上的不完美。</p>
-<h4 id="step-5世界坐标系到相机坐标系外参-r-t"><a class="header" href="#step-5世界坐标系到相机坐标系外参-r-t">Step 5：世界坐标系到相机坐标系——外参 R, t</a></h4>
-<p>前面的推导假设三维点已经在相机坐标系下。但现实中，物体在世界坐标系中，相机可以摆在任意位置。需要先做一次三维刚体变换（H&amp;Z 6.6, p.156）：</p>
-<p>$$X_{cam} = R(X - \tilde{C})$$</p>
-<p>其中 $R$ 是 3x3 旋转矩阵（旋转由谁承担什么坐标系的意义），$\tilde{C}$ 是相机中心在世界坐标系中的坐标。</p>
-<p>在齐次坐标下，这写成（H&amp;Z 6.8, p.156）：</p>
-<p>$$X_{cam} = \begin{pmatrix} R &amp; -R\tilde{C} \ 0 &amp; 1 \end{pmatrix} X_{world}$$</p>
-<p>定义 $t = -R\tilde{C}$，于是：</p>
-<p>$$X_{cam} = [R;|;t];X_{world}$$</p>
-<h4 id="核心公式p--krt"><a class="header" href="#核心公式p--krt">核心公式：P = K[R|t]</a></h4>
-<p>将内参和外参合并，得到完整的相机投影矩阵（H&amp;Z 6.8, p.156）：</p>
-<p>$$P = K[R;|;t]$$</p>
-<p>其中 $t = -R\tilde{C}$。</p>
-<p>展开：</p>
-<p>$$\underbrace{\begin{pmatrix} \alpha_x &amp; s &amp; x_0 \ 0 &amp; \alpha_y &amp; y_0 \ 0 &amp; 0 &amp; 1 \end{pmatrix}}<em>{K}
-\underbrace{\begin{pmatrix} r</em>{11} &amp; r_{12} &amp; r_{13} &amp; t_1 \ r_{21} &amp; r_{22} &amp; r_{23} &amp; t_2 \ r_{31} &amp; r_{32} &amp; r_{33} &amp; t_3 \end{pmatrix}}_{[R|t]}$$</p>
-<p><strong>P 是一个 3x4 矩阵，秩为 3，有 11 个自由度</strong>（5 个内参 + 3 个旋转 + 3 个平移）。</p>
+<h4 id="核心公式相机坐标系下的投影"><a class="header" href="#核心公式相机坐标系下的投影">核心公式：相机坐标系下的投影</a></h4>
+<p>到这一步为止，我们只讨论了<strong>相机坐标系</strong>下的投影——即三维点已经以相机中心为原点、光轴为 Z 轴表示。核心公式是：</p>
+<p>$$x_{pixel} = K , X_{cam}$$</p>
+<p>其中 $X_{cam} = (X, Y, Z)^T$ 是相机坐标系下的三维点，$K$ 是 $3 \times 3$ 内参矩阵，$x_{pixel}$ 是齐次像素坐标（需除以第三分量得到实际像素位置）。</p>
 <p>用人话总结：</p>
-<blockquote>
-<p>一个三维世界点要变成像素坐标，经历两步：</p>
-<ol>
-<li><strong>外参变换</strong>：把世界坐标系下的点转到相机坐标系下——$[R|t]$ 告诉你相机“在哪“和“朝哪看“。</li>
-<li><strong>内参投影</strong>：把相机坐标系下的点投影到像素平面上——K 告诉你相机的“个性“（焦距多长、主点在哪）。</li>
-</ol>
-<p>$P = K[R|t]$ 这个公式是整本书最重要的公式之一。</p>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>在相机坐标系中，一个三维点变成像素坐标只需要<strong>一步</strong>：把相机坐标系下的点投影到像素平面上——K 告诉你相机的“个性“（焦距多长、主点在哪）。至于世界坐标系和相机坐标系之间的变换（相机“在哪“、“朝哪看”），那是下一节的内容。</p>
 </blockquote>
-<h3 id="投影管线全景"><a class="header" href="#投影管线全景">投影管线全景</a></h3>
+<h4 id="真实镜头会弯畸变模型"><a class="header" href="#真实镜头会弯畸变模型">真实镜头会“弯“：畸变模型</a></h4>
+<p>针孔模型是一个美丽的几何抽象，但真实镜头不是完美的针孔。它是一组精密研磨的曲面玻璃，光线在穿过这些曲面时会发生偏折——尤其是<strong>远离光轴的光线</strong>。</p>
+<p><strong>直觉：为什么照片边缘的直线会弯曲？</strong></p>
+<p>想象你把一张棋盘格纸贴在墙上，用广角镜头拍摄。如果你仔细看照片的四个角落，原本笔直的棋盘格线会向内或向外弯曲。这不是你的错觉，而是<strong>镜头畸变</strong>。</p>
+<p><img src="../assets/figures/hz_hires/fig7_4a_short_focal.png" alt="短焦距（广角）镜头拍摄的室内场景，注意边缘书架的明显弯曲——这是径向畸变的典型表现（H&amp;Z Fig 7.4a）"></p>
+<p><em>短焦距（广角）镜头拍摄的室内场景。注意边缘书架的明显弯曲——这是径向畸变的典型表现。（H&amp;Z Figure 7.4a）</em></p>
+<p><img src="../assets/figures/hz_hires/fig7_4b_long_focal.png" alt="同一位置用长焦距镜头拍摄，边缘直线保持笔直（H&amp;Z Fig 7.4b）"></p>
+<p><em>同一位置用长焦距镜头拍摄，边缘直线保持笔直。（H&amp;Z Figure 7.4b）</em></p>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>广角镜头（短焦距）的镜片曲率大，边缘光线偏折剧烈 → 畸变明显。长焦镜头更接近“理想针孔“ → 畸变小。这就是为什么手机超广角拍合影时，站在边缘的人脸会被拉得变形。</p>
+</blockquote>
+<hr>
+<p><strong>径向畸变（Radial Distortion）</strong></p>
+<p>径向畸变是最主要的畸变类型，名字已经说明了它的来源：只和像素到图像中心的<strong>径向距离</strong>有关，与方向无关。</p>
+<p>它的物理原因是镜头的<strong>曲面形状</strong>。镜头中心附近近似平面（光线近乎垂直入射），但越往边缘，曲率越明显（光线斜着穿过玻璃，折射更强）。就像透过一个球形鱼缸看外面的直线——直线会弯。</p>
+<p>数学上，OpenCV 采用多项式模型来描述这种径向拉伸/压缩（H&amp;Z §7.4, p.189；OpenCV 文档 <code>calib3d</code>）：</p>
+<p>$$
+\begin{bmatrix} x_d \ y_d \end{bmatrix} = \underbrace{(1 + k_1 r^2 + k_2 r^4 + k_3 r^6)}_{\text{畸变因子}} \begin{bmatrix} x’ \ y’ \end{bmatrix}
+$$</p>
+<p>其中 $(x’, y’)$ 是理想针孔投影后的归一化坐标，$r^2 = x’^2 + y’^2$ 是到中心的距离，$(x_d, y_d)$ 是畸变后的实际坐标。$k_1$、$k_2$、$k_3$ 是<strong>径向畸变系数</strong>。</p>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>这个公式在做一个非常简单的操作——根据像素离中心有多远，按比例“拉伸“或“压缩“它。$r^2$ 和 $r^4$ 只是让拉伸量随距离“加速增长“（就像重力随高度变化不是线性的）。</p>
+</blockquote>
+<p>两种典型的径向畸变：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>类型</th><th>$k_1$ 符号</th><th>视觉效果</th><th>常见于</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>桶形畸变</strong>（Barrel）</td><td>$k_1 &lt; 0$</td><td>边缘向外鼓，像桶壁</td><td>广角镜头、手机、安防相机</td></tr>
+<tr><td><strong>枕形畸变</strong>（Pincushion）</td><td>$k_1 &gt; 0$</td><td>边缘向内凹，像枕头</td><td>长焦镜头、老胶片相机</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>一个简单的记忆法：桶形畸变让直线向外“鼓“成桶状——你想把东西装进桶里，桶壁是向外凸的。枕形畸变像有人捏住了枕头的四个角往中间挤，边缘向内凹。</p>
+</blockquote>
+<p>OpenCV 文档还提供了更精细的<strong>有理模型</strong>（Rational Model），用 $k_4, k_5, k_6$ 作为分母多项式：</p>
+<p>$$
+\text{因子} = \frac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6}
+$$</p>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>什么时候需要用到 $k_4$-$k_6$？只有当你使用非常廉价的广角镜头（畸变极强）或者鱼眼镜头时。大多数场景下，$k_1$ 和 $k_2$（最多加个 $k_3$）已经足够了。</p>
+</blockquote>
+<hr>
+<p><strong>切向畸变（Tangential Distortion）</strong></p>
+<p>切向畸变来自一个更平凡的源头：<strong>镜头和传感器没有完美平行</strong>。装配时如果有微小的倾斜，图像就会在某个方向上被“拉扯“。想象一下：你把一本书正对桌面放，书上的字是正的；如果把书稍微倾斜一个角度，字就会在某个方向上被拉长——切向畸变就是这个效果。</p>
+<p>$$
+\begin{aligned}
+x_d &amp;= x’ + 2p_1 x’ y’ + p_2(r^2 + 2x’^2) \
+y_d &amp;= y’ + p_1(r^2 + 2y’^2) + 2p_2 x’ y’
+\end{aligned}
+$$</p>
+<p>$p_1$ 和 $p_2$ 是切向畸变系数。对于工业定焦镜头，切向畸变通常很小（因为装配精度高）。但对于消费级相机和车载模组，不可忽视。</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>切向畸变和径向畸变是<strong>叠加</strong>的——真实图像先经过径向拉伸/压缩，再被切向“拉扯“。OpenCV 的标定函数同时估计这两组参数。</p>
+</blockquote>
+<hr>
+<p><strong>OpenCV 的畸变系数向量</strong></p>
+<p>在 <code>cv2.calibrateCamera</code> 中，所有畸变参数被打包进一个向量 <code>distCoeffs</code>：</p>
+<pre><code>(k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6[, s_1, s_2, s_3, s_4[, tau_x, tau_y]]]])
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>参数个数</th><th>包含内容</th><th>适用场景</th></tr>
+</thead>
+<tbody>
+<tr><td>4</td><td>$k_1, k_2, p_1, p_2$</td><td>大多数情况——手机、单反、工业相机</td></tr>
+<tr><td>5</td><td>+ $k_3$</td><td>广角镜头、畸变较明显的模组</td></tr>
+<tr><td>8</td><td>+ $k_4, k_5, k_6$</td><td>强畸变广角/鱼眼、廉价镜头</td></tr>
+<tr><td>12</td><td>+ $s_1$-$s_4$</td><td>薄棱镜畸变（极少需要）</td></tr>
+<tr><td>14</td><td>+ $\tau_x, \tau_y$</td><td>移轴镜头（见下一节）</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p><strong>参数不要贪多。</strong> 14 个参数虽然能拟合更复杂的畸变，但标定越容易不稳定、越容易过拟合。OpenCV 官方推荐：先用 4 个参数（<code>k1</code>、<code>k2</code>、<code>p1</code>、<code>p2</code>）标定，如果重投影误差在图像边缘仍然偏大，再逐步增加 $k_3$ 和 $k_4$-$k_6$。</p>
+</blockquote>
+<hr>
+<p><strong>什么时候可以忽略畸变？</strong></p>
+<p>不是所有场景都需要考虑畸变。判断标准：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>场景</th><th>畸变影响</th><th>建议</th></tr>
+</thead>
+<tbody>
+<tr><td>工业定焦镜头，FOV &lt; 60°</td><td>&lt; 0.5 像素</td><td>可忽略</td></tr>
+<tr><td>手机主摄，只用中心 70% 区域</td><td>&lt; 1 像素</td><td>可忽略（边缘裁剪后）</td></tr>
+<tr><td>手机超广角，全画面使用</td><td>3-10 像素</td><td><strong>必须矫正</strong></td></tr>
+<tr><td>AR/VR，虚实叠加</td><td>任何偏移都可见</td><td><strong>必须精确矫正</strong></td></tr>
+<tr><td>立体匹配，未矫正图像</td><td>破坏对极约束</td><td><strong>必须矫正</strong></td></tr>
+<tr><td>变焦镜头（如监控球机）</td><td>随焦距变化</td><td>每个焦距单独标定</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>一个快速判断方法：在图像中找一条你知道是直线的边缘（比如建筑墙角、门框）。如果这条线在照片边缘明显弯曲，畸变就不可忽视。</p>
+</blockquote>
+<hr>
+<p><strong>Code Lens：去畸变</strong></p>
+<p>标定后得到的 <code>distCoeffs</code> 可以反过来“拉直“图像：</p>
+<pre><code class="language-python">import cv2
+
+# K: 相机内参矩阵 (3x3)
+# dist: 畸变系数 (k1, k2, p1, p2, k3)
+# img: 原始畸变图像
+
+# 方法 1：一步去畸变（适合单张图）
+undistorted = cv2.undistort(img, K, dist)
+
+# 方法 2：预计算映射（适合视频流/多张图——只算一次映射，后续复用）
+map1, map2 = cv2.initUndistortRectifyMap(
+    K, dist, None, K, (width, height), cv2.CV_16SC2
+)
+undistorted = cv2.remap(img, map1, map2, cv2.INTER_LINEAR)
+</code></pre>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>为什么方法 2 更好？<code>initUndistortRectifyMap</code> 只计算一次“每个像素应该去哪里“的查找表。视频流的每一帧只需要做一次 <code>remap</code>（查表+插值），比重复计算 <code>undistort</code> 快得多。</p>
+</blockquote>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>去畸变内部实现。畸变模型是“正向“的：给定理想点 $(x, y)$，你能直接算出畸变后的位置 $(x_d, y_d)$。但去畸变要做的是<strong>反问题</strong>——已知畸变后的像素，求理想位置。这个反问题<strong>没有解析解</strong>。OpenCV 内部用的是<strong>不动点迭代</strong>（Fixed-Point Iteration），默认迭代 5 次。核心思路：把畸变后的坐标作为初始猜测，每次用当前猜测计算正向畸变，比较误差，修正猜测，直到收敛。</p>
+</blockquote>
+<p><img src="../assets/figures/hz_hires/fig7_6a_distorted.png" alt="原始畸变图像：注意右侧书架和天花板的明显弯曲（H&amp;Z Fig 7.6a）"></p>
+<p><em>原始畸变图像。注意右侧书架和天花板的明显弯曲。（H&amp;Z Figure 7.6a）</em></p>
+<p><img src="../assets/figures/hz_hires/fig7_6b_corrected.png" alt="去畸变后：书架和天花板恢复笔直，但图像边界呈弧形（H&amp;Z Fig 7.6b）"></p>
+<p><em>去畸变后的图像。书架和天花板恢复笔直，但图像边界呈弧形。（H&amp;Z Figure 7.6b）</em></p>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>去畸变的副作用——矫正后的图像边界会变成弧形（因为边缘的像素被“拉直“了，原始矩形的角点不再存在）。实际应用中通常需要裁剪掉边缘的黑色区域。</p>
+</blockquote>
+<p><img src="../assets/figures/hz_hires/fig7_5_distortion_correction_diagram.png" alt="畸变校正的几何示意图：左侧为畸变的“圆角矩形“（桶形畸变），右侧为校正后的正常矩形（H&amp;Z Fig 7.5）"></p>
+<p><em>畸变校正的几何示意图。左侧为畸变的“圆角矩形“（桶形畸变），右侧为校正后的正常矩形。（H&amp;Z Figure 7.5）</em></p>
+<hr>
+<p><strong>畸变模型的局限</strong></p>
+<p>针孔+多项式畸变模型虽然覆盖了大量场景，但它不是万能的：</p>
+<ol>
+<li><strong>超广角和鱼眼镜头</strong>（FOV &gt; 120°）：多项式模型会失效——边缘的畸变太强，高阶多项式反而引入震荡。OpenCV 提供了专门的 <code>fisheye</code> 模型（等距投影）。</li>
+<li><strong>变焦镜头</strong>：畸变参数随焦距变化。标定一次只对一个焦距有效。如果需要全焦距范围使用，必须对每个焦距单独标定，或者建立“焦距-畸变“的查表/插值模型。</li>
+<li><strong>温度影响</strong>：镜头玻璃的热胀冷缩会轻微改变畸变。高精度工业应用中，标定需要在实际工作温度下进行。</li>
+</ol>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>H&amp;Z 中的优雅方法——除了用标定板估计畸变，H&amp;Z 还提到了一种不需要标定物的方法：利用场景中的直线。如果场景中有足够多的直线（比如建筑、室内），可以通过最小化“直线弯曲程度“来直接估计畸变参数（H&amp;Z §7.4, p.190）。这在摄影测量和无人机航拍中非常实用。</p>
+</blockquote>
+<h3 id="133-投影全流程相机坐标系视角"><a class="header" href="#133-投影全流程相机坐标系视角">1.3.3 投影全流程（相机坐标系视角）</a></h3>
 <pre class="mermaid">flowchart TD
-    A["3D World Point (X_w, Y_w, Z_w)"] --&gt; B["Apply Extrinsic [R|t]: convert to camera coordinates"]
-    B --&gt; C["3D Camera Point (X_c, Y_c, Z_c)"]
-    C --&gt; D["Apply Intrinsic K: project to image plane"]
-    D --&gt; E["Homogeneous Image Point (u, v, w)"]
-    E --&gt; F["Dehomogenize: divide by w"]
-    F --&gt; G["Pixel Coordinate (u/w, v/w)"]
+    A["三维相机坐标点 (X_c, Y_c, Z_c)"] --&gt; B["归一化投影: x = X/Z, y = Y/Z"]
+    B --&gt; C["应用畸变模型: k1-k6, p1-p2"]
+    C --&gt; D["应用内参 K: 焦距+主点"]
+    D --&gt; E["齐次像素坐标 (u, v, w)"]
+    E --&gt; F["反齐次化: 除以 w"]
+    F --&gt; G["最终像素坐标 (u/w, v/w)"]
     
-    subgraph Extrinsic_Params["Extrinsic Parameters: 6 DOF"]
+    subgraph Projection["透视投影"]
         B
     end
     
-    subgraph Intrinsic_Params["Intrinsic Parameters: 5 DOF"]
+    subgraph Distortion["应用畸变模型"]
+        C
+    end
+    
+    subgraph Intrinsic_Params["内参: 5 自由度"]
         D
     end
     
-    subgraph Result["Image Result"]
+    subgraph Result["图像结果"]
         G
     end
 </pre>
 
-<h3 id="p-矩阵的几何解读"><a class="header" href="#p-矩阵的几何解读">P 矩阵的几何解读</a></h3>
-<p>相机矩阵 P 不仅是一个计算工具——它的每一行、每一列都有明确的几何意义（H&amp;Z section 6.2, p.158-162）：</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>本节固定相机坐标系，只关注“相机坐标系下的三维点如何变成像素“。世界坐标系 → 相机坐标系的变换（外参 $[R|t]$）将在下一节「坐标系转换」中详细讲解。</p>
+</blockquote>
+<h3 id="134-从-k-矩阵读出相机的个性"><a class="header" href="#134-从-k-矩阵读出相机的个性">1.3.4 从 K 矩阵读出相机的“个性“</a></h3>
+<p>内参矩阵 $K$ 不仅是一个计算工具——它的每个元素都直接对应相机的物理属性：</p>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>P 的组成部分</th><th>几何意义</th></tr>
+<tr><th>K 的元素</th><th>物理意义</th></tr>
 </thead>
 <tbody>
-<tr><td>左边 3x3 块 M</td><td>$M = KR$，包含了 K 和 R 的信息</td></tr>
-<tr><td>第四列 $p_4$</td><td>与相机中心相关</td></tr>
-<tr><td>P 的行向量</td><td>世界空间中的平面（主平面、X/Y 轴平面）</td></tr>
-<tr><td>P 的列向量</td><td>图像点——前三个列是消失点（vanishing points）</td></tr>
+<tr><td>$K[0,0] = \alpha_x$</td><td>横向焦距（像素单位），决定水平视场角</td></tr>
+<tr><td>$K[1,1] = \alpha_y$</td><td>纵向焦距（像素单位），决定垂直视场角</td></tr>
+<tr><td>$K[0,1] = s$</td><td>偏斜参数，现代相机基本为 0</td></tr>
+<tr><td>$K[0,2] = x_0$</td><td>主点横坐标，光轴打在 sensor 的 x 位置</td></tr>
+<tr><td>$K[1,2] = y_0$</td><td>主点纵坐标，光轴打在 sensor 的 y 位置</td></tr>
 </tbody>
 </table>
 </div>
 <p>关键性质：</p>
 <ul>
-<li><strong>相机中心 C</strong>：P 的一维右零空间，即 $P C = 0$——这是一个纯代数定义的几何量，极其优雅（H&amp;Z p.158）。</li>
-<li><strong>主平面</strong>：P 的最后一行所定义的世界平面，这个平面上的所有点被投影到无穷远（H&amp;Z p.160）。</li>
-<li><strong>主点</strong>：$x_0 = M m^3$，其中 $m^3$ 是 M 的第三行（H&amp;Z p.160-161）。</li>
-<li><strong>深度</strong>（H&amp;Z 6.15, p.162）：
-$$\text{depth}(X; P) = \text{sign}(\det M) \cdot \frac{w}{T \cdot |m^3|}$$
-可以判断一个三维点在相机前面还是后面。</li>
+<li><strong>焦距与视场角</strong>：给定图像宽度 $W$，水平视场角 $FOV_x = 2 \arctan(W / 2\alpha_x)$。焦距越长，视场角越小。</li>
+<li><strong>主点</strong>：$(x_0, y_0)$ 是光轴与成像平面的交点。理想情况下在图像正中心，但由于装配误差可能偏移几个像素。</li>
+<li><strong>像素纵横比</strong>：$\alpha_x / \alpha_y$ 反映像素是否为正方形。现代传感器这个比值通常非常接近 1.0。</li>
 </ul>
-<blockquote>
-<p>一个 3x4 的相机矩阵 P 本身就是一个宝藏——你能从中直接读出相机中心在哪（$PC=0$）、主光轴方向（$m^3$）、主点位置（$Mm^3$）。所有的几何信息都“编码“在这个 12 个数字的矩阵里。</p>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>一个 $3 \times 3$ 的标定矩阵 $K$ 就是相机的“个性签名“——你能从中直接读出<strong>像素焦距</strong>是多少、主点在哪、像素是不是正方形。所有的内参信息都“编码“在这 9 个数字的矩阵里。</p>
 </blockquote>
-<h3 id="从-p-中拆解-k-和-rrq-分解"><a class="header" href="#从-p-中拆解-k-和-rrq-分解">从 P 中拆解 K 和 R——RQ 分解</a></h3>
-<p>如果你有一个相机矩阵 P，但不知道它的内参和外参，如何把它们拆出来？</p>
-<p>记 M 为 P 的左 3x3 块。由 $M = KR$，其中 K 是上三角矩阵，R 是正交矩阵（H&amp;Z section 6.2.4, p.163）。这就是经典的 <strong>RQ 分解</strong>——将矩阵分解为一个上三角矩阵（R 在 QR 分解中，但这里是 RQ，上三角在左）和一个正交矩阵的乘积。</p>
-<p>数值实现：对 M 的行向量（从下往上）做 Gram-Schmidt 正交化（H&amp;Z A4.1.1, p.579）：</p>
-<ol>
-<li>$r_3 = M_{2} / |M_{2}|$ → 得到 $K[2,2]$</li>
-<li>$r_2 = (M_{1} - K[1,2] \cdot r_3) / |\ldots|$ → 得到 $K[1,1], K[1,2]$</li>
-<li>$r_1 = (M_{0} - K[0,1] \cdot r_2 - K[0,2] \cdot r_3) / |\ldots|$ → 得到 $K[0,0], K[0,1], K[0,2]$</li>
-</ol>
-<p>RQ 分解后，K 需要归一化使得 $K[2,2] = 1$ 来消除尺度歧义。相机中心 C 则通过 SVD 求 P 的零空间得到，然后 $t = -R C$（H&amp;Z p.163-165）。</p>
-<h3 id="code-lens用-numpy-实现投影"><a class="header" href="#code-lens用-numpy-实现投影">Code Lens：用 NumPy 实现投影</a></h3>
-<p>以下代码直接验证 $P = K[R|t]$ 的投影过程，基于 $code_verify.py$ 的核心逻辑。</p>
+<h3 id="135-code-lens用-numpy-实现相机坐标系投影"><a class="header" href="#135-code-lens用-numpy-实现相机坐标系投影">1.3.5 Code Lens：用 NumPy 实现相机坐标系投影</a></h3>
+<p>以下代码直接在<strong>相机坐标系</strong>下验证投影过程：给定相机坐标系中的三维点 $X_{cam} = (X, Y, Z)$，用 $K$ 矩阵投影到像素平面。</p>
 <pre><code class="language-python">import numpy as np
 
 
-def build_camera_matrix(fx, fy, cx, cy, R, t):
+def project_camera_to_pixel(K, X_cam):
     """
-    Build finite projective camera matrix P = K [R | t].
-    Reference: H&amp;Z (6.8, p.156), K matrix: H&amp;Z (6.10, p.157).
-
+    Project 3D points in CAMERA coordinates to 2D pixel coordinates.
+    H&amp;Z (6.1, p.154): (X,Y,Z)^T -&gt; (fX/Z + cx, fY/Z + cy)^T
+    
     Parameters
     ----------
-    fx, fy : float
-        Focal lengths in pixels (alpha_x, alpha_y in H&amp;Z notation).
-    cx, cy : float
-        Principal point coordinates in pixels.
-    R : np.ndarray, shape (3, 3)
-        Rotation matrix (orthogonal, det=1).
-    t : np.ndarray, shape (3,)
-        Translation vector.
-
+    K : np.ndarray, shape (3, 3)
+        Intrinsic calibration matrix.
+    X_cam : np.ndarray, shape (N, 3) or (3,)
+        3D points in CAMERA coordinates (not world coordinates).
+        
     Returns
     -------
-    P : np.ndarray, shape (3, 4)
-        Camera projection matrix.
+    pixels : np.ndarray, shape (N, 2)
+        2D pixel coordinates (u, v).
     """
-    # H&amp;Z (6.10, p.157): K matrix (assume zero skew)
-    K = np.array([
-        [fx, 0, cx],
-        [0, fy, cy],
-        [0,  0,  1]
-    ], dtype=np.float64)
+    if X_cam.ndim == 1:
+        X_cam = X_cam.reshape(1, -1)
+    
+    X, Y, Z = X_cam[:, 0], X_cam[:, 1], X_cam[:, 2]
+    
+    # Direct perspective projection (H&amp;Z 6.1, p.154)
+    x = X / Z  # normalized image coordinates
+    y = Y / Z
+    
+    # Apply K matrix: [u, v, 1]^T = K @ [x, y, 1]^T
+    # This is equivalent to: u = fx*x + cx, v = fy*y + cy (when skew=0)
+    fx, fy = K[0, 0], K[1, 1]
+    cx, cy = K[0, 2], K[1, 2]
+    
+    u = fx * x + cx
+    v = fy * y + cy
+    
+    return np.column_stack([u, v])
 
-    # H&amp;Z (6.8, p.156): P = K [R | t]
-    Rt = np.hstack([R, t.reshape(3, 1)])
-    P = K @ Rt
-    return P
 
-
-def project(P, X_world):
+def project_camera_to_pixel_homogeneous(K, X_cam):
     """
-    Project 3D world points to 2D pixel coordinates.
-    H&amp;Z (6.1, p.154): (X,Y,Z)^T -&gt; (fX/Z, fY/Z)^T
-    H&amp;Z (6.2, p.154): x = P X in homogeneous coordinates.
+    Same projection using homogeneous coordinates and matrix multiplication.
+    Shows the 'elegance' of homogeneous coordinates: linear-ish until the last step.
     """
-    if X_world.ndim == 1:
-        X_world = X_world.reshape(1, -1)
-
-    if X_world.shape[1] == 3:
-        ones = np.ones((X_world.shape[0], 1))
-        X_homo = np.hstack([X_world, ones])
-    else:
-        X_homo = X_world
-
-    # H&amp;Z (6.2, p.154): x = P X
-    x_homo = P @ X_homo.T  # shape (3, N)
-
-    # Dehomogenize (H&amp;Z p.154)
-    w = x_homo[2, :]
-    u = x_homo[0, :] / w
-    v = x_homo[1, :] / w
-
+    if X_cam.ndim == 1:
+        X_cam = X_cam.reshape(1, -1)
+    
+    # Convert to homogeneous: [X, Y, Z] -&gt; [X, Y, Z, 1]... wait, no.
+    # In camera coordinates, we don't need the 4th dimension because there's
+    # no extrinsic transform. We directly project: x_homo = K @ [X/Z, Y/Z, 1]
+    # But cleaner: x_homo = K @ X_cam.T, then divide by Z (the 3rd component)
+    
+    x_homo = (K @ X_cam.T).T  # shape (N, 3)
+    w = x_homo[:, 2]  # This is just Z (since K[2,:] = [0,0,1])
+    
+    u = x_homo[:, 0] / w
+    v = x_homo[:, 1] / w
+    
     return np.column_stack([u, v])
 
 
@@ -459,45 +752,105 @@ def project(P, X_world):
 fx, fy = 800.0, 800.0   # focal length in pixels
 cx, cy = 320.0, 240.0   # principal point (640x480 image center)
 
-# Camera at world origin, looking along +Z
-R = np.eye(3)
-t = np.array([0.0, 0.0, 0.0])
+K = np.array([
+    [fx,  0, cx],
+    [ 0, fy, cy],
+    [ 0,  0,  1]
+], dtype=np.float64)
 
-P = build_camera_matrix(fx, fy, cx, cy, R, t)
-
-# 3D points at varying depths
-points_3d = np.array([
+# 3D points in CAMERA coordinates (NOT world coordinates!)
+points_cam = np.array([
     [0.0,  0.0,  5.0],   # on optical axis, 5m away
     [1.0,  1.0,  5.0],   # off-axis, 5m away
     [2.0, -1.0, 10.0],   # off-axis, 10m away
 ])
 
-pixels = project(P, points_3d)
-print("3D point -&gt; 2D pixel")
-for i, (pt, (u, v)) in enumerate(zip(points_3d, pixels)):
+pixels = project_camera_to_pixel(K, points_cam)
+pixels_homo = project_camera_to_pixel_homogeneous(K, points_cam)
+
+print("Camera coord -&gt; 2D pixel")
+for i, (pt, (u, v)) in enumerate(zip(points_cam, pixels)):
     print(f"  ({pt[0]:.1f}, {pt[1]:.1f}, {pt[2]:.1f}) -&gt; ({u:.1f}, {v:.1f})")
 
+# Verify both methods agree
+assert np.allclose(pixels, pixels_homo, atol=1e-9)
+print("\nBoth methods agree!")
+
 # Manual verification: H&amp;Z (6.1, p.154)
-# (X,Y,Z) -&gt; (f*X/Z + cx, f*Y/Z + cy)
-for pt in points_3d:
+for pt in points_cam:
     X, Y, Z = pt
     u_man = fx * X / Z + cx
     v_man = fy * Y / Z + cy
     assert np.allclose([u_man, v_man],
-                       project(P, pt)[0], atol=1e-6)
+                       project_camera_to_pixel(K, pt)[0], atol=1e-9)
 print("Manual formula check passed.")
 </code></pre>
 <p><strong>代码解读</strong>：</p>
 <ol>
-<li><code>build_camera_matrix</code> 构建 $P = K[R|t]$：先用 <code>np.hstack</code> 将 R 和 t 拼成 3x4 的 $[R|t]$ 块，再左乘 K（H&amp;Z 6.8, p.156）。</li>
-<li><code>project</code> 完成 $x = PX$ 的矩阵乘法后，除以第三分量 w 做去齐次化——这正是 $X/Z, Y/Z$ 的非线性来源（H&amp;Z 6.1, p.154）。</li>
-<li>手动验证直接使用公式 $(fX/Z + cx, fY/Z + cy)$ 计算，与矩阵形式等价。齐次坐标的妙处就是把非线性除法“隐藏“在矩阵乘法的第三步中。</li>
+<li><code>project_camera_to_pixel</code> 直接实现公式 $(f_x X/Z + c_x, f_y Y/Z + c_y)$——这是针孔投影最直观的形式（H&amp;Z 6.1, p.154）。</li>
+<li><code>project_camera_to_pixel_homogeneous</code> 用矩阵乘法 $x_{homo} = K X_{cam}$ 然后除以第三分量。注意这里 $X_{cam}$ 是三维的（不是齐次四维），因为<strong>没有外参变换</strong>——我们固定在相机坐标系下。</li>
+<li>两种方法结果完全一致，验证了我们的推导。如果你把这两个函数的结果和下一节的 <code>full_projection</code> 对比（设 $R=I, t=0$），也会完全一致。</li>
+<li><strong>关键区别</strong>：本节所有输入点都是 <code>points_cam</code>（相机坐标系）。在下一节「坐标系转换」中，我们会加入从世界坐标系到相机坐标系的刚体变换 $X_{cam} = R(X_{world} - C)$，从而得到完整的 $P = K[R|t]$ 投影链。</li>
 </ol>
 <hr>
-<h2 id="第三阶部署实战"><a class="header" href="#第三阶部署实战">第三阶：部署实战</a></h2>
-<h3 id="透视相机-vs-仿射相机"><a class="header" href="#透视相机-vs-仿射相机">透视相机 vs 仿射相机</a></h3>
+<p><strong>可视化验证</strong></p>
+<p>下图展示了同样的三个三维点（左：相机坐标系中的位置）经 $K$ 矩阵投影后在像素平面上的位置（右）。注意 $P_1$ 位于光轴上，所以投影点恰好落在主点 $(320, 240)$；$P_3$ 的 $X=2$ 比 $P_2$ 大一倍，但因为 $Z=10$ 也最远，$X/Z=0.2$ 与 $P_2$ 相同、$|Y/Z|=0.1$ 只有 $P_2$ 的一半，投影反而更靠近主点——这正是透视投影“远处景物被压缩“的几何效果。</p>
+<p><img src="../assets/figures/01_camera_model/projection_visualization.png" alt="相机坐标系下的透视投影可视化：左侧为三维相机空间，右侧为对应的二维像素平面投影结果"></p>
+<p><em>相机坐标系下的透视投影可视化。左侧为三维相机空间中的点和投影射线，右侧为对应的二维像素平面投影结果。</em></p>
+<hr>
+<p><strong>OpenCV 接口：<code>cv2.projectPoints</code></strong></p>
+<p>上面的代码是为了帮你理解投影的数学本质。但在实际工程中，你几乎不会手写投影公式——OpenCV 已经封装好了：</p>
+<pre><code class="language-python">import cv2
+import numpy as np
+
+# K matrix (3x3)
+K = np.array([[800, 0, 320],
+              [0, 800, 240],
+              [0,   0,   1]], dtype=np.float64)
+
+# 3D points in CAMERA coordinates (N, 3)
+points_cam = np.array([
+    [0.0,  0.0,  5.0],
+    [1.0,  1.0,  5.0],
+    [2.0, -1.0, 10.0],
+], dtype=np.float64)
+
+# No extrinsic transform: R=I, t=0
+rvec = np.zeros(3)  # Rodrigues vector for identity rotation
+tvec = np.zeros(3)  # zero translation
+
+# project!
+pixels, _ = cv2.projectPoints(points_cam, rvec, tvec, K, None)
+pixels = pixels.reshape(-1, 2)
+
+for pt, (u, v) in zip(points_cam, pixels):
+    print(f"({pt[0]:.1f}, {pt[1]:.1f}, {pt[2]:.1f}) -&gt; ({u:.1f}, {v:.1f})")
+</code></pre>
+<p><code>cv2.projectPoints</code> 的参数说明：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>参数</th><th>含义</th></tr>
+</thead>
+<tbody>
+<tr><td><code>objectPoints</code></td><td>三维点，形状 <code>(N, 3)</code></td></tr>
+<tr><td><code>rvec</code></td><td>旋转向量（Rodrigues），<code>(3,)</code> —— 相机坐标系下填 <code>np.zeros(3)</code></td></tr>
+<tr><td><code>tvec</code></td><td>平移向量，<code>(3,)</code> —— 相机坐标系下填 <code>np.zeros(3)</code></td></tr>
+<tr><td><code>cameraMatrix</code></td><td>内参矩阵 $K$</td></tr>
+<tr><td><code>distCoeffs</code></td><td>畸变系数（本节不涉及畸变，填 <code>None</code>）</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>为什么用 Rodrigues 向量而不是旋转矩阵？旋转矩阵 $R$ 有 9 个数但只有 3 个自由度，直接用矩阵做优化会有约束问题。Rodrigues 向量用 3 个数无约束地表示任意旋转，是标定和姿态估计中的标准做法。下一节「坐标系转换」会详细讲解。</p>
+</blockquote>
+<p>返回值 <code>pixels</code> 的形状是 <code>(N, 1, 2)</code>，所以通常需要 <code>.reshape(-1, 2)</code> 才能得到 <code>(N, 2)</code> 的数组。下一节加入外参后，你只需要把 <code>rvec</code> 和 <code>tvec</code> 换成真实的旋转和平移，同一行代码就能完成“世界坐标系 → 像素坐标“的完整投影链。</p>
+<hr>
+<h2 id="14-部署实战"><a class="header" href="#14-部署实战">1.4 部署实战</a></h2>
+<h3 id="141-透视相机-vs-仿射相机"><a class="header" href="#141-透视相机-vs-仿射相机">1.4.1 透视相机 vs 仿射相机</a></h3>
 <p>真实相机是透视的——远处的物体看起来更小，平行线在远处交汇。但有时候，这个“近大远小“的效果可以忽略。</p>
-<p><strong>仿射相机</strong>是透视相机在极端条件下的近似：当焦距 $f \rightarrow \infty$ 且物体到相机的距离也 $\rightarrow \infty$ 时，透视效应消失。在数学上，仿射相机矩阵的最后一行是 $(0, 0, 0, 1)$（H&amp;Z section 6.3, p.166-173）。</p>
+<p><strong>仿射相机</strong>是透视相机在极端条件下的近似：当焦距 $f \rightarrow \infty$ 且物体到相机的距离也 $\rightarrow \infty$ 时，透视效应消失。此时 $Z$ 的变化对投影结果的影响可以忽略，投影公式退化为<strong>线性映射</strong>：$x = M_{2\times3} X + t$（H&amp;Z section 6.3, p.166-173）。</p>
 <p>对比：</p>
 <div class="table-wrapper">
 <table>
@@ -505,10 +858,10 @@ print("Manual formula check passed.")
 <tr><th>特性</th><th>透视相机 (Finite)</th><th>仿射相机 (Affine)</th></tr>
 </thead>
 <tbody>
-<tr><td>最后一行</td><td>$(r_{31}, r_{32}, r_{33}, t_3)$</td><td>$(0, 0, 0, 1)$</td></tr>
+<tr><td>投影公式</td><td>$x = K X_{cam} / Z$（非线性，除以深度）</td><td>$x = M X + t$（线性，无除法）</td></tr>
 <tr><td>平行线</td><td>交汇于消失点</td><td>始终保持平行</td></tr>
-<tr><td>DOF</td><td>11</td><td>8</td></tr>
-<tr><td>相机中心</td><td>有限远处</td><td>无穷远处</td></tr>
+<tr><td>深度信息</td><td>必须知道 $Z$ 才能投影</td><td>$Z$ 不影响投影结果</td></tr>
+<tr><td>相机中心</td><td>有限远处</td><td>无穷远处（沿光轴“无限远“）</td></tr>
 <tr><td>主点</td><td>有定义</td><td><strong>无定义</strong></td></tr>
 </tbody>
 </table>
@@ -527,20 +880,25 @@ print("Manual formula check passed.")
 </tbody>
 </table>
 </div>
-<h3 id="什么时候用仿射相机"><a class="header" href="#什么时候用仿射相机">什么时候用仿射相机？</a></h3>
+<h3 id="142-什么时候用仿射相机"><a class="header" href="#142-什么时候用仿射相机">1.4.2 什么时候用仿射相机？</a></h3>
 <ul>
 <li><strong>远距离长焦摄影</strong>：你站在远处用长焦拍建筑，建筑上各点到相机的距离差异远小于到相机的平均距离——透视效应几乎消失。</li>
 <li><strong>卫星/航拍图像</strong>：卫星离地面几百公里，地面高度变化几十米，深度变化相对极小。</li>
 <li><strong>显微镜成像</strong>：被观测物体非常小，景深变化可忽略。</li>
 </ul>
 <p>一个实用的判断标准：如果场景中所有点到相机的距离变化 $\Delta Z$ 远小于平均距离 $\bar{Z}$（即 $\Delta Z / \bar{Z} \ll 1$），仿射近似就成立。此时使用仿射相机可以显著减少待估计的参数数量（8 vs 11），简化重建算法（比如用因子分解法——后面章节会讲）。</p>
-<h3 id="移轴相机透视之外的控制"><a class="header" href="#移轴相机透视之外的控制">移轴相机：透视之外的控制</a></h3>
+<h3 id="143-移轴相机透视之外的控制"><a class="header" href="#143-移轴相机透视之外的控制">1.4.3 移轴相机：透视之外的控制</a></h3>
 <p>在透视相机模型中，图像平面垂直于光轴——这意味着所有平行线都会汇聚到一个消失点。但在一些应用中，我们<strong>不想要这种汇聚</strong>。比如拍建筑时，如果相机朝上拍，楼会看起来向后倒；拍产品时需要精确控制景深以保证整体清晰。</p>
 <p>**移轴相机（Tilt-Shift Camera）<strong>通过让镜头相对传感器</strong>偏移（Shift）<strong>和</strong>倾斜（Tilt）**来解决这些问题。</p>
+<p><img src="../assets/figures/tilt-shift-camera.png" alt="移轴相机镜头结构，可见镜头相对传感器偏移和倾斜的机械结构"></p>
+<p><em>移轴相机镜头结构。可见镜头相对传感器偏移和倾斜的机械结构。</em></p>
+<blockquote>
+<p>对移轴镜头的光学原理和实际操作有直观演示，可以参考 YouTube 上的 <a href="https://www.youtube.com/watch?v=gvV5sINKnT8">Tilt-Shift Lens: Explained</a>。</p>
+</blockquote>
 <h4 id="shift改变成像区域而不改变透视"><a class="header" href="#shift改变成像区域而不改变透视">Shift：改变成像区域而不改变透视</a></h4>
 <p>Shift 是将镜头平行于传感器移动。因为透视由相机中心的位置决定，而 shift 只移动了镜头（传感器相对移动），<strong>相机中心没有变</strong>，所以透视关系保持不变。</p>
 <p>在数学上，shift 修改的是 $K$ 矩阵中的主点位置：
-$$K_{shift} = \begin{pmatrix} \alpha_x &amp; s &amp; x_0 + s_x \ 0 &amp; \alpha_y &amp; y_0 + s_y \ 0 &amp; 0 &amp; 1 \end{pmatrix}$$</p>
+$$K_{shift} = \begin{pmatrix} \alpha_x &amp; s &amp; x_0 + s_x \cr 0 &amp; \alpha_y &amp; y_0 + s_y \cr 0 &amp; 0 &amp; 1 \end{pmatrix}$$</p>
 <p>其中 $(s_x, s_y)$ 是 shift 量（单位：像素）。</p>
 <p><strong>实际用途</strong>：</p>
 <ul>
@@ -557,8 +915,58 @@ $$K_{tilt} = K \cdot R_{tilt}$$</p>
 <ul>
 <li>产品摄影：让一个长物体的整个表面都清晰（焦平面沿物体表面延伸）</li>
 <li>微缩模型效果（Miniature Faking）：这是很多人认识的“移轴效果“——反向用 tilt 让焦平面非常窄，真实场景看起来像微缩模型</li>
+</ul>
+<p><img src="../assets/figures/1280px-Tilt-lens_photo_of_model_train.jpg" alt="移轴镜头拍摄的微缩模型效果：真实火车场景因极窄焦平面而看起来像玩具模型"></p>
+<p><em>移轴镜头拍摄的微缩模型效果。真实火车场景因极窄焦平面而看起来像玩具模型。</em></p>
+<ul>
 <li>结构光三维扫描：控制投影平面的聚焦范围</li>
 </ul>
+<h4 id="tilt-的数学模型opencv-视角"><a class="header" href="#tilt-的数学模型opencv-视角">Tilt 的数学模型（OpenCV 视角）</a></h4>
+<p>在 OpenCV 的标定框架中，tilt 被建模为对<strong>归一化图像坐标</strong>的额外透视变换（OpenCV 文档 <code>calib3d</code>，<code>CALIB_TILTED_MODEL</code>）。如果你启用了这个模型，标定函数会额外估计两个参数 $\tau_x$ 和 $\tau_y$——它们描述镜头平面相对传感器绕 X 轴和 Y 轴的旋转角度。</p>
+<p>数学上，tilt 的效果可以写成：</p>
+<p>$$
+s \begin{bmatrix} x’‘’ \ y’‘’ \ 1 \end{bmatrix} = \begin{bmatrix} R_{33} &amp; 0 &amp; -R_{13} \ 0 &amp; R_{33} &amp; -R_{23} \ 0 &amp; 0 &amp; 1 \end{bmatrix} \cdot R(\tau_x, \tau_y) \begin{bmatrix} x’’ \ y’’ \ 1 \end{bmatrix}
+$$</p>
+<p>其中 $R(\tau_x, \tau_y)$ 是两个基本旋转矩阵的乘积——先绕 X 轴转 $\tau_x$，再绕 Y 轴转 $\tau_y$：</p>
+<p>$$
+R(\tau_x, \tau_y) = \begin{bmatrix} \cos\tau_y &amp; \sin\tau_y\sin\tau_x &amp; -\sin\tau_y\cos\tau_x \ 0 &amp; \cos\tau_x &amp; \sin\tau_x \ \sin\tau_y &amp; -\cos\tau_y\sin\tau_x &amp; \cos\tau_y\cos\tau_x \end{bmatrix}
+$$</p>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>这个公式看起来吓人，但本质上只做了一件事——把“理想成像平面“倾斜了一下。$\tau_x$ 和 $\tau_y$ 就是倾斜的角度（通常在 $0.5°$ 到 $5°$ 之间）。倾斜后，原本在传感器上均匀分布的像素，在三维空间中的对应方向不再是均匀的了——这就是 Scheimpflug 原理的数学表达。</p>
+</blockquote>
+<p><strong>什么时候需要在标定中启用 <code>CALIB_TILTED_MODEL</code>？</strong></p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>场景</th><th>是否需要 tilted model</th><th>原因</th></tr>
+</thead>
+<tbody>
+<tr><td>普通手机/单反/工业相机</td><td>❌ 不需要</td><td>传感器和镜头几乎平行，$\tau_x, \tau_y \approx 0$</td></tr>
+<tr><td>移轴镜头（建筑摄影、产品摄影）</td><td>✅ 需要</td><td>故意倾斜镜头以控制焦平面</td></tr>
+<tr><td>粒子图像测速（PIV）</td><td>✅ 需要</td><td>相机倾斜以聚焦流场中的斜平面</td></tr>
+<tr><td>激光三角测量</td><td>✅ 需要</td><td>传感器倾斜以匹配激光扇面的最佳聚焦面</td></tr>
+<tr><td>航拍倾斜摄影</td><td>⚠️ 有时需要</td><td>大角度俯拍时，如果镜头有轻微倾斜</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote class="blockquote-tag blockquote-tag-caution">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Caution</p>
+<p><strong>不要为普通相机启用 <code>CALIB_TILTED_MODEL</code>。</strong> OpenCV 的标定优化器不会自动判断“是否需要 tilt“——如果你给普通相机启用这个标志，优化器可能会为了拟合噪声而硬凑出非零的 $\tau_x, \tau_y$，导致内参估计出现系统性偏差。只有当物理上确实存在传感器倾斜时（移轴镜头、PIV  setups、激光三角测量），才启用这个模型。</p>
+</blockquote>
+<p>在 OpenCV 中启用 tilted model 的方法：</p>
+<pre><code class="language-python"># 启用 tilted model 标定
+distCoeffs = np.zeros(14)  # k1, k2, p1, p2, k3, k4, k5, k6, s1, s2, s3, s4, tau_x, tau_y
+ret, K, dist, rvecs, tvecs = cv2.calibrateCamera(
+    obj_points, img_points, image_size, None, None,
+    flags=cv2.CALIB_TILTED_MODEL
+)
+print(f"Tilt angles: tau_x={dist[12]:.4f}, tau_y={dist[13]:.4f} (radians)")
+</code></pre>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>如果你不确定是否需要 tilted model，可以做<strong>两次标定</strong>：第一次不用（4-5 个畸变参数），第二次启用（14 个参数）。比较两次的重投影误差。如果第二次的误差显著降低（&gt;20%），且 tau_x/tau_y 显著非零（&gt;0.01 rad），说明 tilt 确实存在。</p>
+</blockquote>
 <h4 id="在计算机视觉中的意义"><a class="header" href="#在计算机视觉中的意义">在计算机视觉中的意义</a></h4>
 <p>移轴相机在传统 CV（尤其是摄影测量和工业检测）中有重要应用：</p>
 <ul>
@@ -566,126 +974,133 @@ $$K_{tilt} = K \cdot R_{tilt}$$</p>
 <li>在立体视觉中，使用 tilt 可以扩展景深范围，减少因离焦带来的匹配失败</li>
 <li>在 SfM（Structure from Motion）中，如果输入图像来自移轴镜头，标准的针孔相机模型会失效——必须修改投影模型，否则重建会扭曲</li>
 </ul>
-<blockquote>
-<p><strong>一句话</strong>：普通相机服从 $P = K[R|t]$，移轴相机是 $P = K_{tilt,shift}[R|t]$——多出来的自由度给了你对成像平面和焦平面的精确控制。</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>普通相机的投影是“先外参变换到相机坐标系，再内参投影到像素“，移轴相机则是“先外参变换，再对成像平面做倾斜/平移，最后内参投影“——多出来的自由度给了你对成像平面和焦平面的精确控制。</p>
 </blockquote>
-<h3 id="实战用-opencv-标定你的相机"><a class="header" href="#实战用-opencv-标定你的相机">实战：用 OpenCV 标定你的相机</a></h3>
-<p>相机标定是要解决的问题是：给定一个相机，如何找出它的 $K$ 矩阵和畸变参数？</p>
-<p><strong>标定原理</strong>（Zhang’s method）：拍摄多张不同角度的棋盘格照片。棋盘格上每个角点的三维坐标已知（因为棋盘格是平面的，Z=0），在图像中检测角点得到二维坐标。对于每张图像，棋盘格平面和图像平面之间存在一个单应矩阵 H。利用 H 和旋转矩阵的正交性约束（$r_1 \cdot r_2 = 0$, $|r_1| = |r_2| = 1$），每张图像提供两个关于 K 的约束方程。K 有 5 个自由度（不统计畸变），所以至少需要 3 张图像。</p>
-<pre><code class="language-python">import cv2
-import numpy as np
-import glob
-
-# Chessboard dimensions (inner corners)
-pattern_size = (9, 6)  # 9x6 inner corners
-square_size = 25.0     # square size in mm
-
-# Prepare object points (Z=0 since chessboard is planar)
-objp = np.zeros((pattern_size[0] * pattern_size[1], 3), np.float32)
-objp[:, :2] = np.mgrid[0:pattern_size[0],
-                        0:pattern_size[1]].T.reshape(-1, 2)
-objp *= square_size
-
-obj_points = []   # 3D points in world coordinates
-img_points = []   # 2D points in image coordinates
-
-images = sorted(glob.glob("calibration_images/*.jpg"))
-if not images:
-    raise RuntimeError(
-        "No calibration images found. Please capture 10-20 images "
-        "of a chessboard from different angles."
-    )
-
-grabbed_shape = None
-for fname in images:
-    img = cv2.imread(fname)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    grabbed_shape = gray.shape[::-1]
-
-    # Find chessboard corners
-    ret, corners = cv2.findChessboardCorners(
-        gray, pattern_size,
-        cv2.CALIB_CB_ADAPTIVE_THRESH +
-        cv2.CALIB_CB_FAST_CHECK +
-        cv2.CALIB_CB_NORMALIZE_IMAGE
-    )
-
-    if ret:
-        # Refine corner positions to sub-pixel accuracy
-        corners_sub = cv2.cornerSubPix(
-            gray, corners, (11, 11), (-1, -1),
-            (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-        )
-        obj_points.append(objp)
-        img_points.append(corners_sub)
-
-print(f"Used {len(obj_points)} / {len(images)} images for calibration")
-
-# Calibrate
-ret, K, dist, rvecs, tvecs = cv2.calibrateCamera(
-    obj_points, img_points, grabbed_shape, None, None
-)
-
-print(f"\nReprojection error (RMSE): {ret:.4f} px")
-print(f"\nIntrinsic matrix K:\n{K}")
-print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
-</code></pre>
-<p><strong>输出解读</strong>：</p>
-<ul>
-<li><code>K</code> 矩阵的 $K[0,0]$ 和 $K[1,1]$ 是 $\alpha_x, \alpha_y$（像素单位的焦距）。如果它们是 800，在 640x480 图像上意味着视场角约为 $2 * arctan(240/800) ≈ 33.4°$（垂直）。</li>
-<li>主点 $K[0,2], K[1,2]$ 应该在图像中心附近（如 320, 240），如果偏离太远可能说明 sensor 装配有问题。</li>
-<li><code>dist</code> 是镜头畸变系数，包含径向畸变 $(k_1, k_2, k_3)$ 和切向畸变 $(p_1, p_2)$。</li>
-</ul>
-<h3 id="标定中的常见问题"><a class="header" href="#标定中的常见问题">标定中的常见问题</a></h3>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p><strong>本节为什么不讲标定？</strong> 标定的本质是：已知世界坐标系中的三维点（棋盘格角点），求相机的内参 $K$ 和畸变参数。这要求你已经理解“世界坐标系 → 相机坐标系“的变换——而这正是下一节「坐标系转换」的内容。标定将在该节的部署实战中详细讲解。</p>
+</blockquote>
+<hr>
+<h2 id="15-本章符号速查表"><a class="header" href="#15-本章符号速查表">1.5 本章符号速查表</a></h2>
+<p>下面汇总本章出现的所有核心符号，方便你快速查阅定义、维度、单位和用途。</p>
+<h3 id="光学与物理参数"><a class="header" href="#光学与物理参数">光学与物理参数</a></h3>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>问题</th><th>原因</th><th>解决方案</th></tr>
+<tr><th>符号</th><th>定义</th><th>维度</th><th>单位</th><th>本章主要用途</th></tr>
 </thead>
 <tbody>
-<tr><td>重投影误差居高不下（&gt;1 px）</td><td>棋盘格角点检测不准或图像模糊</td><td>确保光照均匀、对焦清晰、棋盘格平整</td></tr>
-<tr><td>标定结果每次跑都不同</td><td>图像数量太少，姿态覆盖不足</td><td>至少 10-15 张图，覆盖图像四角和不同倾斜角度</td></tr>
-<tr><td>K 矩阵主点偏到天边</td><td>棋盘格始终在图像同一区域，外参退化</td><td>棋盘格需要覆盖图像各个区域</td></tr>
-<tr><td>畸变系数符号奇怪</td><td>部分图像角点检测有系统偏差</td><td>用 <code>cv2.drawChessboardCorners</code> 可视化检查每张图的角点是否正确</td></tr>
-<tr><td>仅返回很少几张有效图</td><td>棋盘格有反光、局部过曝</td><td>用哑光棋盘格，避免强光直射</td></tr>
+<tr><td>$f_{opt}$</td><td><strong>光学焦距</strong>：镜头光学中心到成像面的标称距离，由镜片曲率决定</td><td>标量</td><td>mm</td><td>写在镜头筒上的数字（如“50 mm“），决定理论视场角</td></tr>
+<tr><td>$v$</td><td><strong>像距</strong>：投影中心（入瞳）到传感器的实际距离</td><td>标量</td><td>mm</td><td>随对焦位置变化；$v \approx f_{opt}$（无穷远），$v &gt; f_{opt}$（近处）</td></tr>
+<tr><td>$u$</td><td><strong>物距</strong>：被摄物体到镜头的距离</td><td>标量</td><td>mm / m</td><td>对焦位置；决定景深大小和像距 $v$（高斯公式）</td></tr>
+<tr><td>$N$</td><td><strong>f 值</strong>：光圈孔径的相对大小，$N = f_{opt}/D$</td><td>标量</td><td>无量纲</td><td>控制进光量和景深；$N$ 越大 → 孔径越小 → 景深越大</td></tr>
+<tr><td>$c$</td><td><strong>弥散圆直径</strong>：离焦物点在传感器上的模糊光斑直径</td><td>标量</td><td>mm / pixel</td><td>衡量“清晰“的阈值；$c$ 越小 → 景深越浅</td></tr>
+<tr><td>$FOV$</td><td><strong>视场角</strong>：相机能覆盖的角度范围</td><td>标量</td><td>度 (°)</td><td>$FOV = 2\arctan(d/2f)$；由焦距和传感器尺寸决定</td></tr>
+<tr><td>$d$</td><td>传感器在某一方向（宽/高/对角线）的物理长度</td><td>标量</td><td>mm</td><td>与 $f_{opt}$ 一起决定 FOV</td></tr>
 </tbody>
 </table>
 </div>
+<h3 id="坐标系与投影"><a class="header" href="#坐标系与投影">坐标系与投影</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>符号</th><th>定义</th><th>维度</th><th>单位</th><th>本章主要用途</th></tr>
+</thead>
+<tbody>
+<tr><td>$X_{cam}$</td><td><strong>相机坐标系</strong>下的三维点，$(X, Y, Z)^T$</td><td>$(3,)$ 或 $(N, 3)$</td><td>m / mm</td><td>本节固定相机坐标系，投影公式 $x_{pixel} = K X_{cam}$ 的输入</td></tr>
+<tr><td>$(x, y)$</td><td><strong>归一化图像坐标</strong>：$(X/Z, Y/Z)$</td><td>$(2,)$</td><td>无量纲</td><td>中间步骤；去除了深度 $Z$ 和单位的影响</td></tr>
+<tr><td>$x_{pixel}$</td><td><strong>像素坐标</strong>：$(u, v)$ 或齐次形式 $(u, v, w)$</td><td>$(2,)$ 或 $(3,)$</td><td>pixel</td><td>最终输出；照片里每个像素的位置</td></tr>
+<tr><td>$P$</td><td><strong>投影矩阵</strong>：$P = K[R \mid t]$（$3 \times 4$）</td><td>$(3, 4)$</td><td>混合</td><td>完整投影链；本节只涉及 $P = K[I \mid 0]$（无外参）</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="内参矩阵-k-的元素"><a class="header" href="#内参矩阵-k-的元素">内参矩阵 $K$ 的元素</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>符号</th><th>定义</th><th>维度</th><th>单位</th><th>本章主要用途</th></tr>
+</thead>
+<tbody>
+<tr><td>$K$</td><td><strong>内参矩阵</strong>（标定矩阵）</td><td>$(3, 3)$</td><td>混合</td><td>编码相机的“个性“：焦距、主点、偏斜</td></tr>
+<tr><td>$\alpha_x, \alpha_y$</td><td><strong>像素焦距</strong>：$v \cdot m_x$, $v \cdot m_y$</td><td>标量</td><td>pixel</td><td>$K[0,0], K[1,1]$；直接决定视场角和投影缩放</td></tr>
+<tr><td>$x_0, y_0$</td><td><strong>主点坐标</strong>：光轴在传感器上的交点</td><td>标量</td><td>pixel</td><td>$K[0,2], K[1,2]$；理想情况下在图像中心</td></tr>
+<tr><td>$s$</td><td><strong>偏斜参数</strong>：像素是否呈菱形排列</td><td>标量</td><td>pixel</td><td>$K[0,1]$；现代传感器基本为 0</td></tr>
+<tr><td>$m_x, m_y$</td><td><strong>像素密度</strong>：每毫米多少像素</td><td>标量</td><td>pixel/mm</td><td>连接物理焦距和像素焦距的桥梁：$\alpha = v \cdot m$</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="畸变参数"><a class="header" href="#畸变参数">畸变参数</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>符号</th><th>定义</th><th>维度</th><th>单位</th><th>本章主要用途</th></tr>
+</thead>
+<tbody>
+<tr><td>$k_1, k_2, k_3$</td><td><strong>径向畸变系数</strong>（多项式分子）</td><td>标量</td><td>无量纲</td><td>桶形（$k_1&lt;0$）或枕形（$k_1&gt;0$）畸变</td></tr>
+<tr><td>$k_4, k_5, k_6$</td><td><strong>径向畸变系数</strong>（有理模型分母）</td><td>标量</td><td>无量纲</td><td>极强广角/鱼眼镜头使用</td></tr>
+<tr><td>$p_1, p_2$</td><td><strong>切向畸变系数</strong></td><td>标量</td><td>无量纲</td><td>镜头与传感器不平行导致的“拉扯“</td></tr>
+<tr><td>$s_1$–$s_4$</td><td><strong>薄棱镜畸变系数</strong></td><td>标量</td><td>无量纲</td><td>极少需要</td></tr>
+<tr><td>$\tau_x, \tau_y$</td><td><strong>移轴倾斜角</strong>：镜头平面相对传感器绕 X/Y 轴的旋转</td><td>标量</td><td>rad</td><td>移轴镜头、PIV、激光三角测量场景</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="变换矩阵与向量"><a class="header" href="#变换矩阵与向量">变换矩阵与向量</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>符号</th><th>定义</th><th>维度</th><th>单位</th><th>本章主要用途</th></tr>
+</thead>
+<tbody>
+<tr><td>$R$</td><td><strong>旋转矩阵</strong>：世界坐标系 → 相机坐标系</td><td>$(3, 3)$</td><td>无量纲</td><td>外参；本节设 $R=I$（固定相机坐标系）</td></tr>
+<tr><td>$t$ / $C$</td><td><strong>平移向量/相机中心</strong>：世界原点 → 相机中心</td><td>$(3,)$</td><td>m / mm</td><td>外参；本节设 $t=0$</td></tr>
+<tr><td>$rvec$</td><td><strong>Rodrigues 旋转向量</strong>：$R$ 的紧凑表示</td><td>$(3,)$</td><td>rad</td><td><code>cv2.projectPoints</code> 的输入格式；优化时更方便</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p><strong>记忆诀窍</strong>：内参 $K$ 描述相机“怎么看“（焦距多长、主点在哪），外参 $[R|t]$ 描述相机“在哪朝哪看“。本节固定外参为 $R=I, t=0$，只研究 $K$ 的每个元素的物理意义。</p>
+</blockquote>
 <hr>
-<h2 id="苏格拉底时刻"><a class="header" href="#苏格拉底时刻">苏格拉底时刻</a></h2>
+<h2 id="16-苏格拉底时刻"><a class="header" href="#16-苏格拉底时刻">1.6 苏格拉底时刻</a></h2>
 <ol>
 <li>
-<p><strong>如果相机矩阵 P 有 11 个自由度，为什么我们只用 9 个就能标定？那两个“多余“的自由度去哪了？</strong></p>
-<p>（提示：回想最简单的针孔模型——如果我们假设像素是正方形的、没有偏斜，K 矩阵的自由度从 5 降到了 3，加上外参的 6 个自由度，恰好就是 9。那两个“消失“的自由度被物理假设“吃掉了“——它们对应的是偏斜参数 s 和像素纵横比，在现代相机中几乎为常数。）</p>
+<p><strong>如果你的手机用超广角拍了一张合影，站在最边缘的人脸被拉得变形了——这是径向畸变的哪种类型？如果用 <code>cv2.undistort</code> 矫正后，这些人脸会恢复正常吗？还有什么副作用？</strong></p>
+<p>（提示：手机超广角通常是桶形畸变（$k_1 &lt; 0$），边缘像素被向外“推“了。去畸变会把它们“拉“回来，人脸比例恢复正常。但副作用是图像边界变成弧形，四角会损失像素——这就是为什么很多相机 APP 的“超广角矫正“会裁掉边缘 10% 的画面。）</p>
 </li>
 <li>
-<p><strong>如果我把世界坐标系的原点往左移一米，P 矩阵会变吗？会变多少？</strong></p>
-<p>（提示：这相当于对世界做了一个平移变换，等价于修改了 t。但反过来说，如果你拿到一个 P 矩阵，你能区分它是“相机在原点往右看“还是“相机在左边往原点看“吗？这引出一个深层问题：仅凭一张图像，我们无法区分场景的位移和相机的反向位移——这正是多视图几何要解决的根本歧义。）</p>
+<p><strong>为什么切向畸变 $p_1, p_2$ 通常比径向畸变 $k_1, k_2$ 小一个数量级？</strong></p>
+<p>（提示：径向畸变来自镜头本身的曲面光学设计——这是“设计固有“的，大广角镜头无法避免。切向畸变来自装配误差——现代工业镜头的装配精度很高，传感器和光轴的平行度通常在微米级。所以切向畸变是“制造误差“，理论上可以做得非常小。）</p>
+</li>
+<li>
+<p><strong>K 矩阵有 5 个自由度，但现代相机标定通常只估计 3 个（$f_x, f_y$ 加上主点）。另外 2 个自由度去哪了？</strong></p>
+<p>（提示：回想最简单的针孔模型——如果我们假设像素是正方形的、没有偏斜，K 矩阵的自由度从 5 降到了 3。那两个“消失“的自由度被物理假设“吃掉了“——它们对应的是偏斜参数 $s$ 和像素纵横比，在现代相机中几乎为常数。）</p>
 </li>
 </ol>
 <hr>
-<h2 id="关键论文清单"><a class="header" href="#关键论文清单">关键论文清单</a></h2>
+<h2 id="17-关键论文清单"><a class="header" href="#17-关键论文清单">1.7 关键论文清单</a></h2>
 <div class="table-wrapper">
 <table>
 <thead>
 <tr><th>年份</th><th>论文/书籍</th><th>一句话贡献</th></tr>
 </thead>
 <tbody>
-<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry in Computer Vision</em> (2nd Ed.)</td><td>多视图几何的圣经，定义了 P=K[R|t] 框架，本章主要参考 Ch.6</td></tr>
-<tr><td>2000</td><td>Z. Zhang, “A Flexible New Technique for Camera Calibration”, IEEE TPAMI</td><td>Zhang 标定法——用平面棋盘格标定相机，极大降低了标定门槛</td></tr>
-<tr><td>1999</td><td>P. Sturm &amp; S. Maybank, “On Plane-Based Camera Calibration”, CVPR</td><td>平面标定的理论基础</td></tr>
-<tr><td>1987</td><td>R. Tsai, “A Versatile Camera Calibration Technique”, IEEE JRA</td><td>经典两步标定法，影响了后续所有标定方法</td></tr>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>Multiple View Geometry in Computer Vision</em> (2nd Ed.)</td><td>多视图几何的圣经，定义了相机标定矩阵 K 和投影模型，本章主要参考 Ch.6</td></tr>
+<tr><td>2004</td><td>Hartley &amp; Zisserman, <em>MVG</em>, §7.4 (p.189)</td><td>径向畸变的数学模型与“直线法“标定畸变——不需要标定板</td></tr>
+<tr><td>1971</td><td>D. C. Brown, “Close-range camera calibration”, PE&amp;RS</td><td>镜头畸变模型的奠基工作，定义了径向/切向畸变标准形式</td></tr>
 </tbody>
 </table>
 </div>
 <hr>
-<h2 id="实操练习"><a class="header" href="#实操练习">实操练习</a></h2>
-<p><strong>练习 1：标定你的手机相机</strong></p>
+<h2 id="18-实操练习"><a class="header" href="#18-实操练习">1.8 实操练习</a></h2>
+<p><strong>练习 1：观察你手机镜头的畸变</strong></p>
 <ol>
-<li>在网上找一张棋盘格图片（或打印出来），用手机从 10-15 个不同角度拍摄（不要移动棋盘格，移动手机）。</li>
-<li>用上面的 OpenCV 代码跑一次标定。</li>
-<li>记录你的 $K$ 矩阵。用 $K[0,0]$ 和图像宽度估算水平视场角。</li>
-<li>回答：你的手机 camera 的像素是正方形的吗？（看 $K[0,0]$ 和 $K[1,1]$ 的比值）</li>
+<li>找一扇有笔直门框或瓷砖墙的场景，用手机主摄和超广角分别拍摄同一画面。</li>
+<li>把两张图导入电脑，用直线工具（Photoshop 或 Preview 的画笔）沿边缘画线。</li>
+<li>观察：超广角的边缘线条是否弯曲？是桶形还是枕形？</li>
+<li>（进阶）用 OpenCV <code>cv2.undistort</code> 对超广角图像做去畸变。对比矫正前后的边缘直线。</li>
 </ol>
 <p><strong>练习 2：体验“近大远小“与仿射近似</strong></p>
 <ol>
@@ -694,12 +1109,11 @@ print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
 <li>思考：如果要知道做 Structure from Motion 时该用透视模型还是仿射模型，要看什么条件？</li>
 </ol>
 <hr>
-<h2 id="延伸阅读"><a class="header" href="#延伸阅读">延伸阅读</a></h2>
+<h2 id="19-延伸阅读"><a class="header" href="#19-延伸阅读">1.9 延伸阅读</a></h2>
 <ul>
-<li>本书内：[[02 投影几何]] · [[03 多视图几何入门]] · [[05 坐标系转换]]</li>
+<li>本书内：[[02 坐标系转换]] · [[03 投影几何]] · [[04 多视图几何入门]]</li>
 <li>H&amp;Z 原书 Ch.6：完整覆盖有限相机、无限相机、相机标定矩阵的代数性质</li>
-<li>OpenCV Camera Calibration Tutorial：https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html</li>
-<li>Zhang 标定论文：https://www.microsoft.com/en-us/research/publication/a-flexible-new-technique-for-camera-calibration/</li>
+<li>OpenCV calib3d 模块文档（畸变与移轴模型）：https://docs.opencv.org/4.x/d9/d0c/group__calib3d.html</li>
 </ul>
 
                     </main>
@@ -710,7 +1124,7 @@ print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../00_basics/02_projection.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../00_basics/02_coordinates.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -724,7 +1138,7 @@ print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../00_basics/02_projection.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../00_basics/02_coordinates.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
@@ -754,6 +1168,7 @@ print(f"\nDistortion coefficients [k1, k2, p1, p2, k3]:\n{dist.ravel()}")
 
         <!-- Custom JS scripts -->
         <script src="../theme/js/mathjax-mermaid-a0d07254.js"></script>
+        <script src="../theme/js/custom-8fe3cdc6.js"></script>
 
 
 

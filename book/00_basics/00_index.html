@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/css/custom-6d107f3d.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-6128ff9d.js";
+            window.path_to_searchindex_js = "../searchindex-c0428002.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-d47b7a93.js"></script>
+        <script src="../toc-4983ef3f.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -191,7 +192,7 @@
 <p>本书所有的模块——单目深度估计、双目立体匹配、3D Gaussian Splatting——都在回答同一个问题：<strong>如何从二维图像恢复三维信息</strong>。而回答这个问题的前提，是理解相反的路径：三维是怎么“丢“进二维的。</p>
 <p>基础篇要搭建的，就是这套从三维到二维、再从二维回到三维的<strong>概念脚手架</strong>。它不涉及任何深度学习模型，只用几何和代数，把相机成像的本质讲清楚。</p>
 <h2 id="学习目标"><a class="header" href="#学习目标">学习目标</a></h2>
-<p>读完本篇六个小节，你将能够：</p>
+<p>读完本篇七个小节，你将能够：</p>
 <ol>
 <li>写出一个三维点到像素坐标的完整投影公式 $P = K[R|t]$，并解释每个符号的含义</li>
 <li>理解齐次坐标为什么是计算机视觉的“通用语言“</li>
@@ -206,21 +207,22 @@
 <tr><th>节</th><th>内容</th><th>核心收获</th><th>阅读时间</th></tr>
 </thead>
 <tbody>
-<tr><td>01 相机模型</td><td>针孔相机、内参 K、外参 R/t、投影矩阵 P</td><td>理解 $P = K[Rt]$的每一部分</td><td>40 分钟</td></tr>
-<tr><td>02 投影几何</td><td>齐次坐标、无穷远线、单应矩阵 H、变换分层</td><td>掌握“透视变换“的数学语言</td><td>45 分钟</td></tr>
-<tr><td>03 多视图几何入门</td><td>对极几何、基础矩阵 F、本质矩阵 E</td><td>理解两张图像之间的几何约束</td><td>50 分钟</td></tr>
-<tr><td>04 深度表示</td><td>深度图、视差图、点云</td><td>知道三维信息有哪几种“存法“</td><td>30 分钟</td></tr>
-<tr><td>05 坐标系转换</td><td>世界、相机、图像、像素四坐标系</td><td>不再被“各种坐标系“绕晕</td><td>30 分钟</td></tr>
+<tr><td>01 相机模型</td><td>针孔相机、内参 K、畸变模型、透视/仿射/移轴相机</td><td>理解相机如何把三维点映射到像素</td><td>40 分钟</td></tr>
+<tr><td>02 坐标系转换</td><td>世界→相机→图像→像素四坐标系、标定、PnP（已知 3D+2D 求位姿）</td><td>不再被“各种坐标系“绕晕，掌握标定与位姿估计</td><td>50 分钟</td></tr>
+<tr><td>03 投影几何</td><td>齐次坐标、无穷远线、单应矩阵 H、变换分层</td><td>掌握“透视变换“的数学语言</td><td>45 分钟</td></tr>
+<tr><td>04 多视图几何入门</td><td>对极几何、基础矩阵 F、本质矩阵 E、双目标定</td><td>理解两张图像之间的几何约束</td><td>55 分钟</td></tr>
+<tr><td>05 深度表示</td><td>深度图、视差图、点云</td><td>知道三维信息有哪几种“存法“</td><td>30 分钟</td></tr>
 <tr><td>06 优化基础</td><td>DLT、几何误差、RANSAC、Bundle Adjustment</td><td>理解 3D 视觉中“为什么需要优化“</td><td>40 分钟</td></tr>
+<tr><td>07 3D 相机与传感器</td><td>消费级/工业级 3D 传感器、ToF、LiDAR 原理与选型</td><td>理解“数学如何被硬件实现“</td><td>35 分钟</td></tr>
 </tbody>
 </table>
 </div>
 <blockquote>
-<p>建议按顺序阅读。第 01 和 02 节是后续所有内容的基础；如果你已有一定基础，第 04 和 05 节可以快速扫读。</p>
+<p>建议按顺序阅读。第 01 和 02 节是后续所有内容的基础——01 建立投影直觉，02 建立坐标系直觉；如果你已有一定基础，第 05 节可以快速扫读。第 07 节是后面实战模块的“硬件背景“，建议在进入模块 A/B/C 前通读一遍。</p>
 </blockquote>
 <h2 id="本篇如何连接到后续模块"><a class="header" href="#本篇如何连接到后续模块">本篇如何连接到后续模块</a></h2>
 <pre><code>基础篇（本篇）
-  ├── 相机模型、投影几何 ─────→ 模块 A「单目深度估计」：一张图推测深度
+  ├── 相机模型、坐标系转换 ────→ 模块 A「单目深度估计」：一张图推测深度
   │                           需要理解"世界→像素"的投影过程
   │
   ├── 相机模型、坐标变换 ─────→ 模块 C「3D Gaussian Splatting」：从多图重建三维场景
@@ -229,15 +231,23 @@
   ├── 对极几何、多视图 ───────→ 模块 B「双目立体匹配」：两张图恢复深度
   │                           需要理解对极约束和视差-深度关系
   │
-  └── DLT、RANSAC、BA ────────→ 所有模块：优化和鲁棒估计是贯穿全书的"
-                               底层工具"
+  ├── DLT、RANSAC、BA ────────→ 所有模块：优化和鲁棒估计是贯穿全书的
+  │                             底层工具
+  │
+  └── 3D 相机与传感器 ─────────→ 所有模块：理解数据从哪来、传感器如何影响算法设计
+                                 选型直接影响重建质量的上限
 </code></pre>
 <p>后续每个模块都会直接调用基础篇的概念。比如：</p>
 <ul>
 <li>模块 A 讨论“如何从像素坐标反推深度“时，用的是 $P = K[R|t]$ 的逆过程</li>
 <li>模块 B 讨论“左右图像如何匹配“时，依赖对极几何把搜索空间从整个图像压缩到一条线</li>
 <li>模块 C 的相机参数优化中，Bundle Adjustment 直接来自基础篇的优化基础</li>
+<li><strong>第 07 节（3D 相机与传感器）</strong> 回答了一个实践问题：这些数学工具需要什么样的输入数据？不同的 3D 传感器如何用不同的物理原理实现同一个目标——获取深度？读完硬件，再进入算法模块，你会更清楚“为什么这个算法这样做“。</li>
 </ul>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p><strong>阅读路径建议</strong>：01 → <strong>02</strong> → 03 → 04 → 05 → 06 → <strong>07</strong> → 按兴趣选模块 A/B/C。如果把 01-06 比作“学语法“，07 就是“认识笔“——懂语法才能写文章，但用什么笔决定了你能写多细、写多快。</p>
+</blockquote>
 <p><strong>基础篇不求贪多，但求扎实。</strong> 每个概念都将反复出现在后面的模块中。如果第一次读不太懂某个推导，先记住公式的“人话版本“和它在实践中怎么用，后面自然会越来越清晰。</p>
 <h2 id="预备知识"><a class="header" href="#预备知识">预备知识</a></h2>
 <p>本篇是全书起点，只假设你具备：</p>
@@ -250,7 +260,7 @@
 <hr>
 <h2 id="mini-case用手机拍两张照片手动算桌子的距离"><a class="header" href="#mini-case用手机拍两张照片手动算桌子的距离">Mini Case：用手机拍两张照片，手动算桌子的距离</a></h2>
 <blockquote>
-<p>这个案例贯穿基础篇全部六节的知识。完成基础篇学习后，你应该能独立完成这个任务。</p>
+<p>这个案例贯穿基础篇全部七节的知识。完成基础篇学习后，你应该能独立完成这个任务。</p>
 </blockquote>
 <h3 id="你需要"><a class="header" href="#你需要">你需要</a></h3>
 <ul>
@@ -260,11 +270,11 @@
 <h3 id="步骤概览"><a class="header" href="#步骤概览">步骤概览</a></h3>
 <ol>
 <li><strong>拍照</strong>：用手机从两个不同位置拍同一张桌子，两张照片</li>
-<li><strong>标定</strong>：用棋盘格标定手机相机，得到内参 K（对应 §1 相机模型）</li>
+<li><strong>标定</strong>：用棋盘格标定手机相机，得到内参 K（对应 §2 坐标系转换）</li>
 <li><strong>找对应点</strong>：在两张照片中手动选取至少 8 对同名点（桌子角、杯子边缘等）</li>
-<li><strong>算基础矩阵</strong>：用 8 点法 + RANSAC 从对应点算 F（对应 §3 多视图几何）</li>
-<li><strong>恢复位姿</strong>：从 F 和 K 得到 E，SVD 分解得到 R 和 t（对应 §5 坐标系转换）</li>
-<li><strong>三角化</strong>：对每对同名点，用 R、t 恢复 3D 坐标（对应 §4 深度表示）</li>
+<li><strong>算基础矩阵</strong>：用 8 点法 + RANSAC 从对应点算 F（对应 §4 多视图几何）</li>
+<li><strong>恢复位姿</strong>：从 F 和 K 得到 E，SVD 分解得到 R 和 t（对应 §4 多视图几何）</li>
+<li><strong>三角化</strong>：对每对同名点，用 R、t 恢复 3D 坐标（对应 §4 多视图几何）</li>
 <li><strong>算距离</strong>：从 3D 点云的尺度还原桌子的实际宽度</li>
 </ol>
 <h3 id="代码骨架"><a class="header" href="#代码骨架">代码骨架</a></h3>
@@ -406,6 +416,7 @@ print(f"Pairwise distances (unscaled): {np.sort(distances)[::-1][:5]}")
 
         <!-- Custom JS scripts -->
         <script src="../theme/js/mathjax-mermaid-a0d07254.js"></script>
+        <script src="../theme/js/custom-8fe3cdc6.js"></script>
 
 
 

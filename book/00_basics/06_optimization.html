@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/css/custom-6d107f3d.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-6128ff9d.js";
+            window.path_to_searchindex_js = "../searchindex-c0428002.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-d47b7a93.js"></script>
+        <script src="../toc-4983ef3f.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -181,20 +182,20 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="06-优化基础从有噪声的数据中得到最好的估计"><a class="header" href="#06-优化基础从有噪声的数据中得到最好的估计">06 优化基础：从有噪声的数据中得到最好的估计</a></h1>
-<blockquote>
-<p>预计阅读时间：40 分钟
-前置知识：基础篇第 01-05 节
-读完本节后，你可以：理解 DLT、几何误差、RANSAC、Bundle Adjustment 的基本原理，知道何时用何种方法，能用 NumPy 实现 DLT 和简单 RANSAC。</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p><strong>预计阅读时间</strong>：40 分钟 · <strong>前置知识</strong>：基础篇第 01-05 节</p>
+<p><strong>读完本节后，你可以</strong>：理解 DLT、几何误差、RANSAC、Bundle Adjustment 的基本原理，知道何时用何种方法，能用 NumPy 实现 DLT 和简单 RANSAC。</p>
 </blockquote>
 <hr>
-<h2 id="第一阶直观理解"><a class="header" href="#第一阶直观理解">第一阶：直观理解</a></h2>
-<h3 id="一个场景"><a class="header" href="#一个场景">一个场景</a></h3>
+<h2 id="61-直观理解"><a class="header" href="#61-直观理解">6.1 直观理解</a></h2>
+<h3 id="611-一个场景"><a class="header" href="#611-一个场景">6.1.1 一个场景</a></h3>
 <p>前面的五节教你了一套完整的“几何语言“——你知道如何用 $P = K[R|t]$ 描述相机，知道两张图之间的对极约束 $x’^T F x = 0$，知道三角测量可以从两个视角恢复 3D 点。</p>
 <p>但这一切都建立在一个假设上：你测量到的像素坐标是<strong>精确的</strong>。</p>
 <p>现实中不是这样。你手动点选的对应点会有像素偏差，自动特征匹配也有误配，甚至传感器本身也有噪声。如果你把有噪声的测量直接扔进 $x’^T F x = 0$，方程两边很可能不等于零——它不是 0，而是某个小量。</p>
 <p><strong>问题来了：当数据有噪声时，如何仍然得到最好的估计？</strong></p>
 <p>这就是优化的用武之地。优化不是 3D 视觉的特产，而是贯穿整个领域的“底层工具“——从最简单的直线拟合，到上千张图片的全局 Bundle Adjustment，本质上都是在回答同一个问题：在数据不完美的情况下，怎么找到最接近真相的解。</p>
-<h3 id="核心直觉三种估计范式"><a class="header" href="#核心直觉三种估计范式">核心直觉：三种估计范式</a></h3>
+<h3 id="612-核心直觉三种估计范式"><a class="header" href="#612-核心直觉三种估计范式">6.1.2 核心直觉：三种估计范式</a></h3>
 <p>3D 视觉中的参数估计方法可以按“精度 vs 速度“分成三种范式：</p>
 <ol>
 <li>
@@ -208,35 +209,35 @@
 </li>
 </ol>
 <p>实践中，这三者通常是串联使用的：<strong>RANSAC 剔除 outlier → DLT 给出初值 → 几何优化精细打磨</strong>。这是 3D 视觉中最常见的估计流水线。</p>
-<h3 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h3>
+<h3 id="613-技术全景"><a class="header" href="#613-技术全景">6.1.3 技术全景</a></h3>
 <pre class="mermaid">mindmap
-  root((Optimization))
-    Algebraic Methods
-      DLT Direct Linear Transformation
-      Ah=0 SVD solution
-      Factorization Tomasi-Kanade
-    Geometric Methods
-      Reprojection error
-      Symmetric transfer error
-      Gold Standard algorithm
-      Bundle Adjustment BA
-    Approximate Methods
-      Sampson error
-      First-order correction
-      Closed form
-    Robust Estimation
+  root((优化方法))
+    代数方法
+      DLT 直接线性变换
+      Ah=0 SVD求解
+      因子分解法 Tomasi-Kanade
+    几何方法
+      重投影误差
+      对称转移误差
+      Gold Standard 算法
+      集束调整 BA
+    近似方法
+      Sampson 误差
+      一阶校正
+      闭式解
+    鲁棒估计
       RANSAC
-      M-estimators
+      M-估计器
       MLESAC
       LMEDS
-    Iterative Solvers
-      Gauss-Newton
+    迭代求解器
+      高斯-牛顿法
       Levenberg-Marquardt
-      Schur complement
-      Sparse BA
+      Schur 补
+      稀疏 BA
 </pre>
 
-<h3 id="mini-case用最小二乘法拟合一条直线"><a class="header" href="#mini-case用最小二乘法拟合一条直线">Mini Case：用最小二乘法拟合一条直线</a></h3>
+<h3 id="614-mini-case用最小二乘法拟合一条直线"><a class="header" href="#614-mini-case用最小二乘法拟合一条直线">6.1.4 Mini Case：用最小二乘法拟合一条直线</a></h3>
 <p>先忘掉 3D 和相机。最简单的问题：平面上有一堆带噪声的点，你想找到穿过它们的“最佳直线“。</p>
 <pre><code class="language-python">import numpy as np
 import matplotlib.pyplot as plt
@@ -258,6 +259,10 @@ a_hat, b_hat = theta
 print(f"True:      y = 2.00x + 1.00")
 print(f"Estimated: y = {a_hat:.2f}x + {b_hat:.2f}")
 </code></pre>
+<p><strong>输出</strong>：</p>
+<pre><code>True:      y = 2.00x + 1.00
+Estimated: y = 1.91x + 1.10
+</code></pre>
 <p>这个简单的直线拟合包含了优化的所有核心要素：</p>
 <ul>
 <li><strong>模型</strong>：直线 $y = ax + b$（就像 $x’^T F x = 0$）</li>
@@ -267,9 +272,9 @@ print(f"Estimated: y = {a_hat:.2f}x + {b_hat:.2f}")
 </ul>
 <p>从直线拟合到 Bundle Adjustment，本质上只是<strong>模型变复杂了、参数变多了、代价函数从直线距离变成了像素距离</strong>罢了。</p>
 <hr>
-<h2 id="第二阶原理解析"><a class="header" href="#第二阶原理解析">第二阶：原理解析</a></h2>
-<h3 id="第一性原理问题的本质是什么"><a class="header" href="#第一性原理问题的本质是什么">第一性原理：问题的本质是什么？</a></h3>
-<p>3D 视觉中的估计问题，本质上都是<strong>从含噪声的观测量中推断隐藏的几何参数</strong>。观测量是图像坐标（可测量的像素位置），隐藏参数可能是单应矩阵 H、相机位姿 R/t、三维点坐标 X。</p>
+<h2 id="62-原理解析"><a class="header" href="#62-原理解析">6.2 原理解析</a></h2>
+<h3 id="621-第一性原理问题的本质是什么"><a class="header" href="#621-第一性原理问题的本质是什么">6.2.1 第一性原理：问题的本质是什么？</a></h3>
+<p>3D 视觉中的估计问题，本质上都是<strong>从含噪声的观测量中推断隐藏的几何参数</strong>。观测量是图像坐标（可测量的像素位置），隐藏参数可能是单应矩阵 $H$、相机位姿 R/t、三维点坐标 X。</p>
 <p>噪声来自哪里？</p>
 <ul>
 <li><strong>特征检测不精确</strong>：SIFT、ORB 等检测到的特征点位置有亚像素级别的误差</li>
@@ -277,9 +282,9 @@ print(f"Estimated: y = {a_hat:.2f}x + {b_hat:.2f}")
 <li><strong>镜头畸变残差</strong>：即使标定过，畸变校正也不会完美</li>
 </ul>
 <p>在数学上，我们假设观测噪声服从某种概率分布（最常见的是均值为零的高斯分布），然后问：<strong>给定这些有噪声的观测，最可能的“真实参数“是什么？</strong> 这就是参数估计的核心问题。</p>
-<h3 id="长链推演从线性代数到全局优化"><a class="header" href="#长链推演从线性代数到全局优化">长链推演：从线性代数到全局优化</a></h3>
+<h3 id="622-长链推演从线性代数到全局优化"><a class="header" href="#622-长链推演从线性代数到全局优化">6.2.2 长链推演：从线性代数到全局优化</a></h3>
 <h4 id="步骤-1dlt--把非线性约束变成线性方程组"><a class="header" href="#步骤-1dlt--把非线性约束变成线性方程组">步骤 1：DLT —— 把非线性约束变成线性方程组</a></h4>
-<p>以估计单应矩阵 H 为例。已知四组或更多对应点 $x_i = (x_i, y_i, 1)^T$ 和 $x’_i = (x’_i, y’_i, 1)^T$，满足 $x’_i = H x_i$。</p>
+<p>以估计单应矩阵 $H$ 为例。已知四组或更多对应点 $x_i = (x_i, y_i, 1)^T$ 和 $x’_i = (x’_i, y’_i, 1)^T$，满足 $x’_i = H x_i$。</p>
 <p>这是一个非线性关系（齐次坐标下 H 有 9 个未知数）。DLT（Direct Linear Transformation）的妙处是把约束改写为：</p>
 <p>$$x’_i \times H x_i = 0$$</p>
 <p>展开后，每个点对提供两个独立的线性方程（第三个是前两个的线性组合）。把所有点对的方程堆在一起，得到：</p>
@@ -332,38 +337,44 @@ $$\epsilon_{sym} = \sum_i d(x_i, \hat{x}_i)^2 + d(x’_i, \hat{x}’_i)^2$$</p>
 <p><strong>迭代次数公式</strong>（H&amp;Z §4.7, p.119）：</p>
 <p>$$N = \frac{\log(1-p)}{\log(1-(1-\varepsilon)^s)}$$</p>
 <p>其中 <code>p</code> 是期望的成功概率（通常设 0.99），<code>ε</code> 是 outlier 比例（需要估计），<code>s</code> 是采样点数量（算 H 用 4，算 F 用 7 或 8）。</p>
-<p><strong>人话翻译</strong>：假设数据里 30% 是错配，采样 4 个点，要想 99% 把握至少有一次全是好点——需要多少次尝试？公式告诉你答案。</p>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>假设数据里 30% 是错配，采样 4 个点，要想 99% 把握至少有一次全是好点——需要多少次尝试？公式告诉你答案。</p>
+</blockquote>
 <p>RANSAC 不是优化的替代品，而是优化<strong>之前</strong>的“清洗步骤“——先用 RANSAC 把 outlier 过滤掉，再用几何优化在干净数据上精细调整。</p>
 <h4 id="步骤-5bundle-adjustment--全局最优的最后一步"><a class="header" href="#步骤-5bundle-adjustment--全局最优的最后一步">步骤 5：Bundle Adjustment —— 全局最优的“最后一步“</a></h4>
 <p>当你有多张图片和很多 3D 点，前面几步给了你初始的相机参数和 3D 点位置，但每个量都不太准。Bundle Adjustment 的做法是：<strong>把所有的相机参数和所有的 3D 点同时优化，使重投影误差的总和最小</strong>。</p>
 <p>（H&amp;Z §18.1, p.434-436）</p>
-<p>$$\min_{P^i, X_j} \sum_{i,j} d(P^i \hat{X}_j, x^i_j)^2$$</p>
+<p>$$\min_{P^i, X_j} \sum_{i,j} d(P^i X_j, x^i_j)^2$$</p>
 <p>这句话的含义：对于第 <code>i</code> 个相机和第 <code>j</code> 个 3D 点，如果这个 3D 点在第 <code>i</code> 张图中可见（有对应像素 $x^i_j$），就计算“把 <code>X_j</code> 投影到第 <code>i</code> 张图上得到的像素“与“实际观测到的像素 $x^i_j$“之间的距离。把所有这样的距离的平方加起来，调整所有的相机矩阵 $P^i$ 和 3D 点 <code>X_j</code>，使这个和最小。</p>
 <p><strong>问题的规模</strong>：m 个相机，n 个 3D 点 → 3n + 11m 个参数（每个 3D 点 3 DOF，每个透视相机 11 DOF）。</p>
 <p><strong>为什么能解</strong>：这时候你可能会问——几千个未知数，怎么优化？答案在于<strong>稀疏性</strong>。每个重投影误差只涉及一个相机和一个 3D 点，与其他的相机和点<strong>无关</strong>。这意味着 Hessian 矩阵（二阶导数矩阵）具有“块对角 + 低秩边缘“的结构。</p>
 <p>利用这个结构，可以用 <strong>Schur 补</strong>（也叫 Marginalization）把 3D 点参数“消去“，先解相机参数（规模小得多），再回代解 3D 点。（H&amp;Z Appendix 6, p.597）</p>
-<p><strong>人话翻译</strong>：几千个未知数的优化问题看起来不可能，但因为相机和点之间的交互是“稀疏的“（不是每对相机-点都相关），可以用线性代数技巧把大问题分解成几个小问题。这就是 BA 在实践中有用的原因。</p>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>几千个未知数的优化问题看起来不可能，但因为相机和点之间的交互是“稀疏的“（不是每对相机-点都相关），可以用线性代数技巧把大问题分解成几个小问题。这就是 BA 在实践中有用的原因。</p>
+</blockquote>
 <h4 id="步骤-6因子分解法--仿射相机下的优雅解法"><a class="header" href="#步骤-6因子分解法--仿射相机下的优雅解法">步骤 6：因子分解法 —— 仿射相机下的优雅解法</a></h4>
 <p>在仿射相机的假设下，有一个不需要迭代的全局方法——Tomasi-Kanade 因子分解法。</p>
 <p>把所有观测点坐标（减均值后）堆成一个 2m x n 的<strong>测量矩阵 W</strong>。在仿射相机下，W 可以分解为：</p>
 <p>$$W = M X$$</p>
 <p>其中 M（2m x 3）包含所有相机的运动信息，X（3 x n）包含所有 3D 点的结构信息。对 W 做 SVD 取前 3 个奇异值，就同时得到了运动和结构。（H&amp;Z §18.2, p.436-440）</p>
 <p>这是整个 3D 视觉中最优雅的算法之一——不需要迭代，SVD 一步到位；在等方差各向同性高斯噪声假设下，它是最大似然估计。（H&amp;Z §18.2, p.439）可惜它要求仿射相机假设和稠密对应（每个点在每个视图中都被观测到），限制了它的实际应用。</p>
-<h3 id="完整流程从原始匹配到最终解"><a class="header" href="#完整流程从原始匹配到最终解">完整流程：从原始匹配到最终解</a></h3>
+<h3 id="623-完整流程从原始匹配到最终解"><a class="header" href="#623-完整流程从原始匹配到最终解">6.2.3 完整流程：从原始匹配到最终解</a></h3>
 <pre class="mermaid">flowchart TD
-    A[Raw Feature Matches] --&gt; B{RANSAC}
-    B --&gt;|Reject| C[Outlier Pairs: discard]
-    B --&gt;|Accept| D[Inlier Pairs]
-    D --&gt; E[DLT: Ah=0 SVD]
-    E --&gt; F{Algebraic Solution}
-    F --&gt; G[Nonlinear Optimization LM]
-    G --&gt; H{Converged?}
-    H --&gt;|No| G
-    H --&gt;|Yes| I[Golden Standard MLE]
-    I --&gt; J[Final Estimates: H E P X]
+    A["原始特征匹配"] --&gt; B{"RANSAC&lt;br/&gt;鲁棒筛选"}
+    B --&gt;|"剔除"| C["野点对: 丢弃"]
+    B --&gt;|"保留"| D["内点对集合"]
+    D --&gt; E["DLT: Ah=0 SVD 求解"]
+    E --&gt; F{"代数解&lt;br/&gt;作为初值"}
+    F --&gt; G["非线性优化 LM"]
+    G --&gt; H{"已收敛?"}
+    H --&gt;|"否"| G
+    H --&gt;|"是"| I["Gold Standard MLE&lt;br/&gt;统计最优解"]
+    I --&gt; J["最终估计: H E P X"]
 </pre>
 
-<h3 id="code-lens用-numpy-实现-dlt-和简单-ransac"><a class="header" href="#code-lens用-numpy-实现-dlt-和简单-ransac">Code Lens：用 NumPy 实现 DLT 和简单 RANSAC</a></h3>
+<h3 id="624-code-lens用-numpy-实现-dlt-和简单-ransac"><a class="header" href="#624-code-lens用-numpy-实现-dlt-和简单-ransac">6.2.4 Code Lens：用 NumPy 实现 DLT 和简单 RANSAC</a></h3>
 <pre><code class="language-python">import numpy as np
 from numpy.linalg import svd, norm
 
@@ -501,8 +512,8 @@ if __name__ == "__main__":
     print(f"Estimated H:\n{H_est.round(2)}")
 </code></pre>
 <hr>
-<h2 id="第三阶部署实战"><a class="header" href="#第三阶部署实战">第三阶：部署实战</a></h2>
-<h3 id="方法选型何时用-dlt何时用几何优化"><a class="header" href="#方法选型何时用-dlt何时用几何优化">方法选型：何时用 DLT，何时用几何优化</a></h3>
+<h2 id="63-部署实战"><a class="header" href="#63-部署实战">6.3 部署实战</a></h2>
+<h3 id="631-方法选型何时用-dlt何时用几何优化"><a class="header" href="#631-方法选型何时用-dlt何时用几何优化">6.3.1 方法选型：何时用 DLT，何时用几何优化</a></h3>
 <div class="table-wrapper">
 <table>
 <thead>
@@ -518,7 +529,7 @@ if __name__ == "__main__":
 </table>
 </div>
 <p><strong>速度 vs 精度权衡</strong>：DLT 可以在微秒级完成（SVD 很快），但精度有限；完整的几何优化可能需要秒级甚至分钟级（取决于数据量），但精度最优。实践中绝大多数系统采用“DLT 初始化 + 几步 Levenberg-Marquardt 迭代“的折中方案。</p>
-<h3 id="ransac-参数调优"><a class="header" href="#ransac-参数调优">RANSAC 参数调优</a></h3>
+<h3 id="632-ransac-参数调优"><a class="header" href="#632-ransac-参数调优">6.3.2 RANSAC 参数调优</a></h3>
 <p>选择正确的参数是 RANSAC 成败的关键：</p>
 <ul>
 <li><strong>内点距离阈值</strong>（H&amp;Z §4.7.1, p.118）：对图像特征匹配，典型值是 <strong>1-3 像素</strong>。设得太大会把 outlier 也纳入内点，设得太小会把真实内点排除。可根据特征点定位精度（通常 0.5-2 像素级的 SIFT）来设定。</li>
@@ -526,7 +537,7 @@ if __name__ == "__main__":
 <li><strong>最少采样数 s</strong>：取决于模型——H 需 4 对（H&amp;Z §4.1, p.88），F 需 7 或 8 对（H&amp;Z §9.2, p.245），E 在校准情形下只需 5 对（H&amp;Z §9.6, p.258）。</li>
 <li><strong>最大迭代次数 N</strong>：用公式 $N = log(1-p) / log(1-(1-ε)^s)$ 计算，或设一个保守的上界（如 2000）。在实践中常做一个 <strong>adaptive</strong> 版本：每当发现更好的模型时，根据当前估计的 outlier 比例更新 N，可以提前终止。</li>
 </ul>
-<h3 id="实践中的函数"><a class="header" href="#实践中的函数">实践中的函数</a></h3>
+<h3 id="633-实践中的函数"><a class="header" href="#633-实践中的函数">6.3.3 实践中的函数</a></h3>
 <p>在 OpenCV 中，许多关键函数内部都使用了 DLT + RANSAC 的组合：</p>
 <pre><code class="language-python">import cv2
 
@@ -544,11 +555,12 @@ E, mask = cv2.findEssentialMat(pts1, pts2,
                                  threshold=1.0)
 
 # PnP: solve camera pose from 2D-3D correspondences
+# 详见基础篇 §2.2.8 的完整讲解
 ret, rvec, tvec, inliers = cv2.solvePnPRansac(
     objectPoints, imagePoints, K, distCoeffs=None)
 </code></pre>
 <p>这些函数的底层都遵循“RANSAC 选内点 + DLT 初始化 + 迭代优化“的范式。</p>
-<h3 id="bundle-adjustment-在实践中的工具"><a class="header" href="#bundle-adjustment-在实践中的工具">Bundle Adjustment 在实践中的工具</a></h3>
+<h3 id="634-bundle-adjustment-在实践中的工具"><a class="header" href="#634-bundle-adjustment-在实践中的工具">6.3.4 Bundle Adjustment 在实践中的工具</a></h3>
 <p>大型 BA 问题需要专门的求解器来利用稀疏结构：</p>
 <ul>
 <li><strong>Ceres Solver</strong>（Google）：C++ 库，COLMAP 使用它做 BA。支持自动微分，建模灵活。Google 的街景重建也依赖它。</li>
@@ -556,7 +568,7 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
 <li><strong>COLMAP</strong>：完整的 SfM + MVS 流程，内部使用 Ceres 做 BA。</li>
 <li><strong>SciPy / PyTorch</strong>：对于小规模问题（&lt; 100 个参数），$scipy.optimize.least_squares$ 或 PyTorch 的 autograd 也完全可用。</li>
 </ul>
-<h3 id="常见陷阱"><a class="header" href="#常见陷阱">常见陷阱</a></h3>
+<h3 id="635-常见陷阱"><a class="header" href="#635-常见陷阱">6.3.5 常见陷阱</a></h3>
 <ol>
 <li>
 <p><strong>局部极小值</strong>：非线性优化（Levenberg-Marquardt）从差初值出发很容易收敛到局部极小而不是全局最优。<strong>解决方案</strong>：永远用 DLT 或类似方法提供好的初值。（H&amp;Z §4.3, p.103-104）</p>
@@ -565,7 +577,7 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
 <p><strong>退化配置</strong>：所有点共面、相机纯旋转无平移、所有点都在一条线上——这些退化情况导致约束不足，解不唯一。<strong>解决方案</strong>：检查矩阵的条件数，退化时主动切换到更稳定的求解策略。</p>
 </li>
 <li>
-<p><strong>参数化问题</strong>：旋转矩阵 R 有 9 个元素但只有 3 DOF——直接在 9 个数上优化会破坏正交性。<strong>解决方案</strong>：用轴角表示（3 参数）、四元数（4 参数+单位范数约束）或李代数 se(3) 来参数化旋转。</p>
+<p><strong>参数化问题</strong>：旋转矩阵 $R$ 有 9 个元素但只有 3 DOF——直接在 9 个数上优化会破坏正交性。<strong>解决方案</strong>：用轴角表示（3 参数）、四元数（4 参数+单位范数约束）或李代数 se(3) 来参数化旋转。</p>
 </li>
 <li>
 <p><strong>尺度漂移</strong>：在未标定的 SfM 中，不同部分的尺度可能不一致（因为 t 只有方向没有大小）。<strong>解决方案</strong>：BA 时可以添加尺度一致性约束，或者在标定相机后用 E 而非 F。</p>
@@ -575,7 +587,7 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
 </li>
 </ol>
 <hr>
-<h2 id="苏格拉底时刻"><a class="header" href="#苏格拉底时刻">苏格拉底时刻</a></h2>
+<h2 id="64-苏格拉底时刻"><a class="header" href="#64-苏格拉底时刻">6.4 苏格拉底时刻</a></h2>
 <ol>
 <li>
 <p><strong>BA 同时优化相机和三维点——但如果所有的相机位置都错了，三维点也错了，你怎么知道“真值“是什么？优化方法在什么意义上保证收敛到正确解？</strong></p>
@@ -587,7 +599,7 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
 </li>
 </ol>
 <hr>
-<h2 id="关键论文清单"><a class="header" href="#关键论文清单">关键论文清单</a></h2>
+<h2 id="65-关键论文清单"><a class="header" href="#65-关键论文清单">6.5 关键论文清单</a></h2>
 <div class="table-wrapper">
 <table>
 <thead>
@@ -605,7 +617,7 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
 </table>
 </div>
 <hr>
-<h2 id="实操练习"><a class="header" href="#实操练习">实操练习</a></h2>
+<h2 id="66-实操练习"><a class="header" href="#66-实操练习">6.6 实操练习</a></h2>
 <ol>
 <li>
 <p><strong>用上面的 Code Lens 代码，生成 20 对对应点（带 0.5 像素高斯噪声），验证 DLT 能恢复 H。再混入 5 个随机 outlier，看纯 DLT（不用 RANSAC）的误差有多大，加上 RANSAC 后能恢复到什么程度。</strong></p>
@@ -618,23 +630,57 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
 </li>
 </ol>
 <hr>
-<h2 id="延伸阅读"><a class="header" href="#延伸阅读">延伸阅读</a></h2>
+<h2 id="67-延伸阅读"><a class="header" href="#67-延伸阅读">6.7 延伸阅读</a></h2>
 <ul>
-<li>本书内：[[03 多视图几何入门]]（F 矩阵的 8 点法就是 DLT 的具体应用）、[[01 相机模型]]（BA 中优化的相机参数来源）</li>
+<li>本书内：[[04 多视图几何入门]]（F 矩阵的 8 点法就是 DLT 的具体应用）、[[01 相机模型]]（BA 中优化的相机参数来源）</li>
 <li>H&amp;Z 原书：第 4 章（DLT、代价函数、MLE、RANSAC）、第 18 章（BA 和因子分解法）、附录 6（稀疏 BA 的 Schur 补推导）</li>
 <li>Triggs et al., “Bundle Adjustment — A Modern Synthesis”: BA 的经典综述，涵盖稀疏求解、协方差估计、规范自由度处理</li>
 <li>Ceres Solver 官方教程：http://ceres-solver.org/tutorial.html — 手把手教你建模和求解 BA 问题</li>
 </ul>
+<hr>
+<h2 id="68-基础篇小结从数学到物理世界"><a class="header" href="#68-基础篇小结从数学到物理世界">6.8 基础篇小结：从数学到物理世界</a></h2>
+<p>七章下来，你手里已经有了一套完整的数学工具：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>章节</th><th>你学到了</th><th>核心公式 / 概念</th></tr>
+</thead>
+<tbody>
+<tr><td>01 相机模型</td><td>世界如何变成图像</td><td>$P = K[R \mid t]$</td></tr>
+<tr><td>02 坐标系转换</td><td>在不同参考系之间穿梭</td><td>世界→相机→图像→像素、PnP</td></tr>
+<tr><td>03 投影几何</td><td>透视变换的数学语言</td><td>齐次坐标、单应矩阵 $H$</td></tr>
+<tr><td>04 多视图几何</td><td>两张图之间的几何关系</td><td>$x’^T F x = 0$、本质矩阵 $E$、双目标定</td></tr>
+<tr><td>05 深度表示</td><td>三维信息如何编码</td><td>深度图、视差图、点云</td></tr>
+<tr><td>06 优化基础</td><td>有噪声时如何找最优解</td><td>DLT、RANSAC、BA</td></tr>
+</tbody>
+</table>
+</div>
+<p>这套工具足以让你从多张 2D 图像重建出 3D 场景——这就是模块 A/B/C 要做的事情。</p>
+<p>但有一个前提：<strong>你首先需要高质量的输入数据</strong>。在研究中，你可以从公开数据集下载标定好的图像序列；在实践中，你得自己选择传感器、部署硬件、面对噪声和光照变化。</p>
+<p>这时一个自然的问题是：<strong>这些数学原理，在物理世界里是怎么被实现的？</strong></p>
+<p>答案就在下一节。不同的 3D 传感器用不同的物理原理——结构光三角测量、飞行时间相位分析、激光脉冲计时——实现了同一个目标：获取深度。理解这些硬件，不仅能帮你在实际项目中选型，更能让你在进入后续算法模块时，清楚这些算法是为怎样的数据特性设计的。</p>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p><strong>两条路从基础篇分岔</strong>：</p>
+<ul>
+<li><strong>主动传感</strong>（下一节：3D 相机与传感器）——硬件直接测量深度，用物理替代部分数学</li>
+<li><strong>被动重建</strong>（模块 A/B/C）——从图像间接推断深度，用数学弥补物理的不足</li>
+</ul>
+<p>两条路最后殊途同归：都是把三维世界装进计算机的表示里。
+[!NOTE]
+<strong>预计阅读时间：40 分钟</strong> · <strong>前置知识：基础篇第 01-05 节</strong></p>
+<p><strong>读完本节后，你可以：理解 DLT、几何误差、RANSAC、Bundle Adjustment 的基本原理，知道何时用何种方法，能用 NumPy 实现 DLT 和简单 RANSAC。</strong></p>
+</blockquote>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../00_basics/05_coordinates.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../00_basics/05_depth_repr.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../01_monocular_depth/00_index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../00_basics/07_3d_cameras.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -644,11 +690,11 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../00_basics/05_coordinates.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../00_basics/05_depth_repr.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../01_monocular_depth/00_index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../00_basics/07_3d_cameras.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
@@ -678,6 +724,7 @@ ret, rvec, tvec, inliers = cv2.solvePnPRansac(
 
         <!-- Custom JS scripts -->
         <script src="../theme/js/mathjax-mermaid-a0d07254.js"></script>
+        <script src="../theme/js/custom-8fe3cdc6.js"></script>
 
 
 
