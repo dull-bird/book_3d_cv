@@ -832,33 +832,39 @@ $$K_{tilt} = K \cdot R_{tilt}$$
 
 在 OpenCV 的标定框架中，tilt 被建模为对**归一化图像坐标**的额外透视变换（OpenCV 文档 `calib3d`，`CALIB_TILTED_MODEL`）。如果你启用了这个模型，标定函数会额外估计两个参数 $\tau_x$ 和 $\tau_y$——它们描述镜头平面相对传感器绕 X 轴和 Y 轴的旋转角度。
 
-数学上，tilt 的效果分两步施加在**归一化图像坐标** $(x'', y'')$ 上：
+数学上，tilt 的效果分两步施加在**归一化图像坐标** $(x', y')$ 上：
+
+**第一步：倾斜旋转。** 用 $R(\tau_x, \tau_y)$ 将归一化坐标旋转到倾斜平面：
 
 $$
-s \begin{bmatrix} x''' \cr y''' \cr 1 \end{bmatrix} = \underbrace{\begin{bmatrix} R_{33} & 0 & -R_{13} \cr 0 & R_{33} & -R_{23} \cr 0 & 0 & 1 \end{bmatrix}}_{\text{透视校正矩阵}} \cdot \underbrace{R(\tau_x, \tau_y)}_{\text{倾斜旋转}} \begin{bmatrix} x'' \cr y'' \cr 1 \end{bmatrix}
+\begin{bmatrix} \tilde{x} \cr \tilde{y} \cr \tilde{z} \end{bmatrix} = R(\tau_x, \tau_y) \; \begin{bmatrix} x' \cr y' \cr 1 \end{bmatrix}
 $$
 
-第一步：$R(\tau_x, \tau_y)$ 是倾斜旋转矩阵——先绕 X 轴转 $\tau_x$，再绕 Y 轴转 $\tau_y$：
+其中 $R(\tau_x, \tau_y)$ 先绕 X 轴转 $\tau_x$，再绕 Y 轴转 $\tau_y$：
 
 $$
 R(\tau_x, \tau_y) = \begin{bmatrix} \cos\tau_y & \sin\tau_y\sin\tau_x & -\sin\tau_y\cos\tau_x \cr 0 & \cos\tau_x & \sin\tau_x \cr \sin\tau_y & -\cos\tau_y\sin\tau_x & \cos\tau_y\cos\tau_x \end{bmatrix}
 $$
 
-第二步：旋转改变了齐次第三分量（不再为 1），需要通过**透视校正矩阵**把倾斜平面上的点映射回传感器平面。
+**第二步：透视校正。** 倾斜后 $\tilde{z} \neq 1$，需要用**透视校正矩阵**把坐标从倾斜平面的 3D 点映射回传感器的 $z=1$ 平面。这个矩阵的元素 $R_{13}$、$R_{23}$、$R_{33}$ 直接取自 $R(\tau_x, \tau_y)$——不是新的自由参数：
+
+$$
+s \begin{bmatrix} x'' \cr y'' \cr 1 \end{bmatrix} = \begin{bmatrix} R_{33} & 0 & -R_{13} \cr 0 & R_{33} & -R_{23} \cr 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} \tilde{x} \cr \tilde{y} \cr \tilde{z} \end{bmatrix}
+$$
+
+$$
+R(\tau_x, \tau_y) = \begin{bmatrix} \cos\tau_y & \sin\tau_y\sin\tau_x & -\sin\tau_y\cos\tau_x \cr 0 & \cos\tau_x & \sin\tau_x \cr \sin\tau_y & -\cos\tau_y\sin\tau_x & \cos\tau_y\cos\tau_x \end{bmatrix}
+$$
 
 #### 透视校正矩阵的推导
 
-记 $R = R(\tau_x, \tau_y)$。第一步后的坐标为：
-
-$$\begin{bmatrix} x_t \cr y_t \cr z_t \end{bmatrix} = R \begin{bmatrix} x' \cr y' \cr 1 \end{bmatrix} = \begin{bmatrix} R_{11}x' + R_{12}y' + R_{13} \cr R_{21}x' + R_{22}y' + R_{23} \cr R_{31}x' + R_{32}y' + R_{33} \end{bmatrix}$$
-
-如果简单地除以 $z_t$ 做透视投影（$x''' = x_t/z_t$, $y''' = y_t/z_t$），这只是把旋转后的 3D 点投影回 $z=1$ 平面。但这相当于**传感器本身旋转**的效果——不等于镜头倾斜。
+为什么需要这个矩阵？倾斜旋转后 $\tilde{z} \neq 1$。如果简单地除以 $\tilde{z}$（$x'' = \tilde{x}/\tilde{z}, y'' = \tilde{y}/\tilde{z}$），这只是把旋转后的 3D 点投影回 $z=1$ 平面——相当于**传感器本身旋转**的效果，不是镜头倾斜。
 
 镜头倾斜的效果更微妙：它等价于在归一化平面上施加一个**单应变换（homography）**。这个单应把"理想正对平面"映射到"倾斜后的像平面"，并由 $R$ 的元素决定。OpenCV 的透视校正矩阵：
 
 $$\begin{bmatrix} R_{33} & 0 & -R_{13} \cr 0 & R_{33} & -R_{23} \cr 0 & 0 & 1 \end{bmatrix}$$
 
-是把这个单应写成"先旋转，再透视校正"的两步形式。展开乘积分量，利用 $R^{-1} = R^T$（旋转矩阵的正交性），分子中的交叉项会消成 $R$ 的子式（cofactor）——最终 $x'''$ 和 $y'''$ 的表达式恰好是 $x'$, $y'$ 的有理函数，分母都是 $R_{31}x' + R_{32}y' + R_{33}$。这正是**平面单应**的标准形式。
+是把这个单应写成"先旋转，再透视校正"的两步形式。展开乘积分量，利用 $R^{-1} = R^T$（旋转矩阵的正交性），分子中的交叉项会消成 $R$ 的子式（cofactor）——最终 $x''$ 和 $y''$ 的表达式恰好是 $x'$, $y'$ 的有理函数，分母都是 $R_{31}x' + R_{32}y' + R_{33}$。这正是**平面单应**的标准形式。
 
 > [!TIP]
 > 可以这样直观理解：倾斜的镜头让图像像被"透视扭曲"了一样——画面不再是单纯的旋转，而是近处和远处的缩放比例不同。那个带 $R_{33}$ 和 $-R_{13}$ 的矩阵，做的就是把这层透视扭曲从旋转中"剥离"出来。整个过程只引入了两个额外参数（$\tau_x, \tau_y$）——透视校正矩阵的所有元素都取自同一个 $R$，不是新的自由度。
