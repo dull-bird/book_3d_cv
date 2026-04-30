@@ -5,3 +5,4 @@ __pycache__/
 *.pdf
 # Diagnostic PDFs from TikZ compilation
 book/
+hz_extracted/
