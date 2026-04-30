@@ -364,7 +364,7 @@ $$x_{pixel} = (u/w, \; v/w)$$
 数学上，OpenCV 采用多项式模型来描述这种径向拉伸/压缩（H&Z §7.4, p.189；OpenCV 文档 `calib3d`）：
 
 $$
-\begin{bmatrix} x_d \\ y_d \end{bmatrix} = \underbrace{(1 + k_1 r^2 + k_2 r^4 + k_3 r^6)}_{\text{畸变因子}} \begin{bmatrix} x' \\ y' \end{bmatrix}
+\begin{bmatrix} x_d \cr y_d \end{bmatrix} = \underbrace{(1 + k_1 r^2 + k_2 r^4 + k_3 r^6)}_{\text{畸变因子}} \begin{bmatrix} x' \cr y' \end{bmatrix}
 $$
 
 其中 $(x', y')$ 是理想针孔投影后的**归一化坐标**，$r^2 = x'^2 + y'^2$ 是到中心的距离，$(x_d, y_d)$ 是畸变后的实际坐标。$k_1$、$k_2$、$k_3$ 是**径向畸变系数**。
@@ -411,7 +411,7 @@ $$
 
 $$
 \begin{aligned}
-x_d &= x' + 2p_1 x' y' + p_2(r^2 + 2x'^2) \\
+x_d &= x' + 2p_1 x' y' + p_2(r^2 + 2x'^2) \cr
 y_d &= y' + p_1(r^2 + 2y'^2) + 2p_2 x' y'
 \end{aligned}
 $$
@@ -835,13 +835,13 @@ $$K_{tilt} = K \cdot R_{tilt}$$
 数学上，tilt 的效果分两步施加在**归一化图像坐标** $(x'', y'')$ 上：
 
 $$
-s \begin{bmatrix} x''' \\ y''' \\ 1 \end{bmatrix} = \underbrace{\begin{bmatrix} R_{33} & 0 & -R_{13} \\ 0 & R_{33} & -R_{23} \\ 0 & 0 & 1 \end{bmatrix}}_{\text{透视校正矩阵}} \cdot \underbrace{R(\tau_x, \tau_y)}_{\text{倾斜旋转}} \begin{bmatrix} x'' \\ y'' \\ 1 \end{bmatrix}
+s \begin{bmatrix} x''' \cr y''' \cr 1 \end{bmatrix} = \underbrace{\begin{bmatrix} R_{33} & 0 & -R_{13} \cr 0 & R_{33} & -R_{23} \cr 0 & 0 & 1 \end{bmatrix}}_{\text{透视校正矩阵}} \cdot \underbrace{R(\tau_x, \tau_y)}_{\text{倾斜旋转}} \begin{bmatrix} x'' \cr y'' \cr 1 \end{bmatrix}
 $$
 
 第一步：$R(\tau_x, \tau_y)$ 是倾斜旋转矩阵——先绕 X 轴转 $\tau_x$，再绕 Y 轴转 $\tau_y$：
 
 $$
-R(\tau_x, \tau_y) = \begin{bmatrix} \cos\tau_y & \sin\tau_y\sin\tau_x & -\sin\tau_y\cos\tau_x \\ 0 & \cos\tau_x & \sin\tau_x \\ \sin\tau_y & -\cos\tau_y\sin\tau_x & \cos\tau_y\cos\tau_x \end{bmatrix}
+R(\tau_x, \tau_y) = \begin{bmatrix} \cos\tau_y & \sin\tau_y\sin\tau_x & -\sin\tau_y\cos\tau_x \cr 0 & \cos\tau_x & \sin\tau_x \cr \sin\tau_y & -\cos\tau_y\sin\tau_x & \cos\tau_y\cos\tau_x \end{bmatrix}
 $$
 
 第二步：旋转改变了齐次第三分量（不再为 1），需要通过**透视校正矩阵**把倾斜平面上的点映射回传感器平面。
@@ -850,13 +850,13 @@ $$
 
 记 $R = R(\tau_x, \tau_y)$。第一步后的坐标为：
 
-$$\begin{bmatrix} x_t \\ y_t \\ z_t \end{bmatrix} = R \begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix} = \begin{bmatrix} R_{11}x' + R_{12}y' + R_{13} \\ R_{21}x' + R_{22}y' + R_{23} \\ R_{31}x' + R_{32}y' + R_{33} \end{bmatrix}$$
+$$\begin{bmatrix} x_t \cr y_t \cr z_t \end{bmatrix} = R \begin{bmatrix} x' \cr y' \cr 1 \end{bmatrix} = \begin{bmatrix} R_{11}x' + R_{12}y' + R_{13} \cr R_{21}x' + R_{22}y' + R_{23} \cr R_{31}x' + R_{32}y' + R_{33} \end{bmatrix}$$
 
 如果简单地除以 $z_t$ 做透视投影（$x''' = x_t/z_t$, $y''' = y_t/z_t$），这只是把旋转后的 3D 点投影回 $z=1$ 平面。但这相当于**传感器本身旋转**的效果——不等于镜头倾斜。
 
 镜头倾斜的效果更微妙：它等价于在归一化平面上施加一个**单应变换（homography）**。这个单应把"理想正对平面"映射到"倾斜后的像平面"，并由 $R$ 的元素决定。OpenCV 的透视校正矩阵：
 
-$$\begin{bmatrix} R_{33} & 0 & -R_{13} \\ 0 & R_{33} & -R_{23} \\ 0 & 0 & 1 \end{bmatrix}$$
+$$\begin{bmatrix} R_{33} & 0 & -R_{13} \cr 0 & R_{33} & -R_{23} \cr 0 & 0 & 1 \end{bmatrix}$$
 
 是把这个单应写成"先旋转，再透视校正"的两步形式。展开乘积分量，利用 $R^{-1} = R^T$（旋转矩阵的正交性），分子中的交叉项会消成 $R$ 的子式（cofactor）——最终 $x'''$ 和 $y'''$ 的表达式恰好是 $x'$, $y'$ 的有理函数，分母都是 $R_{31}x' + R_{32}y' + R_{33}$。这正是**平面单应**的标准形式。
 
