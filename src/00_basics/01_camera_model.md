@@ -742,7 +742,7 @@ for pt, (u, v) in zip(points_cam, pixels):
 
 ---
 
-## 1.4 部署实战
+## 1.4 拓展
 
 ### 1.4.1 透视相机 vs 仿射相机
 
