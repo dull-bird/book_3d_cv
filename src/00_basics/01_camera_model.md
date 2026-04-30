@@ -988,7 +988,61 @@ print(f"Tilt angles: tau_x={dist[12]:.4f}, tau_y={dist[13]:.4f} (radians)")
 1. 找一扇有笔直门框或瓷砖墙的场景，用手机主摄和超广角分别拍摄同一画面。
 2. 把两张图导入电脑，用直线工具（Photoshop 或 Preview 的画笔）沿边缘画线。
 3. 观察：超广角的边缘线条是否弯曲？是桶形还是枕形？
-4. （进阶）用 OpenCV `cv2.undistort` 对超广角图像做去畸变。对比矫正前后的边缘直线。
+
+**（进阶）用手机自己做标定、做去畸变**
+
+去畸变需要两个东西——**内参矩阵 $K$** 和**畸变系数 `distCoeffs`**。手机不会把这些参数告诉你，但你可以自己标定出来。
+
+最简单的做法：打印一张棋盘格（网上搜"chessboard pattern"，A4 打印），贴在平整的墙上或桌面上。然后用手机超广角，从**不同角度、不同距离**拍 15–20 张（关键是让棋盘格出现在画面的各个位置，包括四个角落）。
+
+代码框架：
+
+```python
+import cv2
+import numpy as np
+import glob
+
+# 1. 准备棋盘格角点（世界坐标系）
+chessboard_size = (9, 6)  # 内部角点数，根据你打印的棋盘格调整
+square_size = 25.0  # 每个格子的边长，单位 mm（用尺子量一下）
+objp = np.zeros((chessboard_size[0] * chessboard_size[1], 3), np.float32)
+objp[:, :2] = np.mgrid[0:chessboard_size[0], 0:chessboard_size[1]].T.reshape(-1, 2) * square_size
+
+obj_points, img_points = [], []
+images = glob.glob("chessboard_*.jpg")  # 你拍的棋盘格照片
+
+for fname in images:
+    img = cv2.imread(fname)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    ret, corners = cv2.findChessboardCorners(gray, chessboard_size, None)
+    if ret:
+        obj_points.append(objp)
+        # 亚像素精细化
+        corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1),
+            (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001))
+        img_points.append(corners2)
+
+# 2. 标定
+ret, K, dist, rvecs, tvecs = cv2.calibrateCamera(
+    obj_points, img_points, gray.shape[::-1], None, None
+)
+print(f"K = \n{K}")
+print(f"dist = {dist.ravel()}")
+
+# 3. 对任意一张超广角照片做去畸变
+img = cv2.imread("your_ultrawide_photo.jpg")
+undistorted = cv2.undistort(img, K, dist)
+
+# 并排对比
+cv2.imshow("original", img)
+cv2.imshow("undistorted", undistorted)
+cv2.waitKey(0)
+```
+
+> [!TIP]
+> 标定质量取决于三点：**棋盘格照片数量够多**（15 张以上）、**角度覆盖够广**（平拍、俯拍、斜拍都要有）、**角点检测成功率高**（照片不要太模糊、棋盘格要占画面 1/4 以上）。如果标定后重投影误差（`ret`）超过 1 像素，说明角点检测有问题——检查打印的棋盘格是否平整、照片是否对焦清晰。
+>
+> 如果你不想自己标定，也可以在网上搜索同机型的标定参数（比如搜"iPhone 15 Pro ultrawide camera calibration"）。但别人标定的参数**不一定适用于你的手机**——同一型号的不同个体，镜头装配有公差，内参可能差几个像素。自己做标定虽然麻烦，但结果最可靠。
 
 **练习 2：体验"近大远小"与仿射近似**
 
