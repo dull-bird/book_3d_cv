@@ -323,13 +323,28 @@ $$(u_{pixel}, v_{pixel}) = \left(\frac{u}{w}, \frac{v}{w}\right) = \left(\frac{\
 
 #### 核心公式：相机坐标系下的投影
 
-本节固定相机坐标系（$R=I, t=0$），投影只需要一步：
+本节固定相机坐标系（$R=I, t=0$）。**无畸变的理想针孔**只需一步矩阵乘法：
 
-$$x_{homo} = K \, X_{cam}$$
+$$x_{homo} = K \, X_{cam}, \quad x_{pixel} = (u/w, \; v/w)$$
 
-其中 $X_{cam} = (X, Y, Z)^T$ 是三维点，$K$ 是 $3 \times 3$ 内参矩阵，$x_{homo} = (u, v, w)^T$ 是齐次像素坐标。实际像素位置：
+其中 $X_{cam} = (X, Y, Z)^T$（3-向量，单位 m/mm），$K$（$3 \times 3$），$x_{homo} = (u, v, w)^T$ 是齐次像素坐标。
 
-$$x_{pixel} = (u/w, \; v/w)$$
+**含畸变的完整公式**则要多走两步——先从 $X_{cam}$ 归一化，在归一化平面上施加畸变，最后再用 $K$ 映射到像素：
+
+$$
+\boxed{
+\begin{aligned}
+x' &= \frac{X}{Z}, \quad y' = \frac{Y}{Z} \\[4pt]
+r^2 &= x'^2 + y'^2 \\[4pt]
+\begin{bmatrix} x_d \\ y_d \end{bmatrix} &=
+(1 + k_1 r^2 + k_2 r^4 + k_3 r^6) \begin{bmatrix} x' \\ y' \end{bmatrix}
++ \begin{bmatrix} 2p_1 x' y' + p_2(r^2 + 2x'^2) \\ p_1(r^2 + 2y'^2) + 2p_2 x' y' \end{bmatrix} \\[4pt]
+\begin{bmatrix} u \\ v \\ w \end{bmatrix} &= K \begin{bmatrix} x_d \\ y_d \\ 1 \end{bmatrix}, \quad
+(u_{\,pixel}, v_{\,pixel}) = \left( \frac{u}{w}, \frac{v}{w} \right)
+\end{aligned}
+$$
+
+三步走：① 除以 $Z$ 得到归一化坐标 $(x', y')$——去掉尺度信息；② 在归一化平面上施加径向畸变（乘 $k$ 因子）和切向畸变（加 $p$ 偏移）；③ 用 $K$ 矩阵把畸变后的坐标缩放到像素。**核心思想**：畸变是镜头的光学属性，必须在归一化平面（与传感器分辨率无关的空间）施加，$K$ 只负责最后的缩放和偏移。
 
 > [!TIP]
 > 本节只讨论"相机坐标系 → 像素"这一步。世界坐标系 → 相机坐标系的变换（相机"在哪"、"朝哪看"），那是下一节「坐标系转换」的内容——那里会引入 $3 \times 4$ 的投影矩阵 $P = K[R|t]$，$X$ 才会扩成 4 维。
