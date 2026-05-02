@@ -29,6 +29,8 @@
   - [直观理解](03_3dgs/01_intuition.md)
   - [原理解析](03_3dgs/02_principles.md)
   - [部署实战](03_3dgs/03_deployment.md)
+- [COLMAP：SfM + MVS 实战](04_colmap/colmap.md)
+- [NeRF：神经辐射场](05_nerf/nerf.md)
 
 # 附录
 
