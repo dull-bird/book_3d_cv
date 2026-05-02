@@ -31,6 +31,8 @@
   - [部署实战](03_3dgs/03_deployment.md)
 - [COLMAP：SfM + MVS 实战](04_colmap/colmap.md)
 - [NeRF：神经辐射场](05_nerf/nerf.md)
+- [视觉 SLAM：同时定位与建图](06_slam/slam.md)
+- [嵌入式部署：模型优化与芯片选型](07_depth_completion/embedded.md)
 
 # 附录
 
