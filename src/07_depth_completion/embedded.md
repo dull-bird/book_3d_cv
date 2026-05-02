@@ -175,6 +175,53 @@ flowchart TD
 
 > 嵌入式部署的第一性原理：**不是在服务器上跑出最高的 benchmark，而是在给定的功耗和成本下，找到刚好够用的精度的最快方案。**
 
+## 地瓜 RDK X5 能跑哪些前沿模型？
+
+旭日 5 的 BPU 是 **贝叶斯架构（Bayes-e）**，10 TOPS / 3W，专门针对机器人场景优化了卷积和特征变换算子。但它不是通用 GPU——对前沿模型的约束非常具体。
+
+### BPU 天生擅长的
+
+| 任务 | 支持情况 | 说明 |
+|------|---------|------|
+| **YOLO 全家桶** | ✅ 原生 | YOLOv5/v8/v10/v11 + YOLO World。BPU 对 Conv 3×3/1×1 极致优化，YOLOv5n ~122 FPS |
+| **双目深度估计** | ✅ BPU 加速 | 近距 3m 内 ~1% 精度，专为户外场景调试 |
+| **VSLAM** | ✅ BPU 加速 | 特征提取 + 跟踪移植 BPU |
+| **多传感器融合** | ✅ 硬加速 | 6 通道视频预处理（VSE 模块） + GDC 4K@60fps |
+| **ResNet / MobileNet 分类** | ✅ | 一切标准卷积网络 |
+
+### BPU 有限支持（需要算子替换）
+
+| 模型类型 | 瓶颈算子 | 解决方案 |
+|---------|---------|---------|
+| **轻量 Transformer** | `MatMul` 转为 Conv（shape 严格约束）、`Softmax` CPU 回退 | 可行，但部分 attention 层在 CPU 上 |
+| **ViT 编码器**（如 DINOv2-Small） | `LayerNorm` CPU、`GELU` CPU、`PatchEmbed` 需用 Conv 替代 | 理论上可部署，但大部分层在 CPU——**推理时间可能 >100ms** |
+| **单目深度（Depth Anything V2 Small）** | 整模型 ViT 架构 + 上采样 | **不推荐直接用 BPU 推理**——DINOv2 编码器几乎全在 CPU 上跑 |
+
+### BPU 完全不能跑的
+
+| 模型类型 | 致命问题 |
+|---------|---------|
+| **BEV（鸟瞰感知）** | **`GridSample` 算子完全不支持**。BEV 的特征采样全靠 GridSample，无替代方案 |
+| **Occupancy 网络** | 需要 3D 卷积 + `GridSample` + 动态 shape——全部不支持 |
+| **扩散模型（Stable Diffusion / Marigold）** | UNet 的大量 `GroupNorm`、`SiLU`、`CrossAttention` 算子不支持；推理步数 × 每步 CPU 回退 = 不可接受 |
+| **NeRF / 3DGS** | 体积渲染和光栅化是纯 CUDA kernel，与 BPU 架构完全不兼容 |
+| **LLM（语言模型）** | `Gather`、`Einsum`、`If` 控制流均不支持 |
+| **End-to-end Transformer（如 DETR）** | `GridSample` + `Einsum` 不支持；`Softmax` 大批量时极慢 |
+
+### 关键算子清单
+
+| BPU 支持的 | BPU 不支持的（致命） |
+|-----------|---------------------|
+| Conv 3×3/1×1, ConvTranspose | `GridSample` ❌ |
+| MaxPool, AveragePool, GlobalPool | `NonZero` ❌ |
+| Add, Mul, Div, Exp, Pow（标量） | `If / Loop` ❌ |
+| Resize（2 的幂）、Concat | `Einsum` ❌ |
+| LSTM（batch=1） | `Gather`（部分） |
+| ReduceMean（仅 H,W 轴） | `GroupNorm` |
+| ArgMax（仅 C 轴, C≤64） | `SiLU`（部分版本） |
+
+> 关键结论：**RDK X5 是一颗优秀的"感知+控制"芯片，不是"通用 AI 加速卡"。** CNN 类模型（检测/分割/深度）是主场，Transformer 需要精心裁剪算子，生成式模型和端到端大模型不在射程内。如果你的模型有 GridSample、Einsum、或 UNet 风格的 GroupNorm，老老实实上 Jetson Orin。
+
 ## 手把手：地瓜 RDK X5 部署一个 YOLO 模型
 
 以 549 元的 RDK X5 开发板为例，完整走一遍"模型转换 → 量化 → 板端推理"流程。
