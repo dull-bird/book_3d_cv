@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>导读 - 3D 视觉：从原理到实践</title>
+        <title>第 0 章 基础篇导读 - 3D 视觉：从原理到实践</title>
 
 
         <!-- Custom HTML head -->
@@ -28,7 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
-        <link rel="stylesheet" href="../theme/css/custom-6d107f3d.css">
+        <link rel="stylesheet" href="../theme/css/custom-a8b5dea7.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-c0428002.js";
+            window.path_to_searchindex_js = "../searchindex-f41790b9.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4983ef3f.js"></script>
+        <script src="../toc-bfa4cbe2.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -181,7 +181,7 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="基础篇导读"><a class="header" href="#基础篇导读">基础篇导读</a></h1>
+                        <h1 id="第-0-章-基础篇导读"><a class="header" href="#第-0-章-基础篇导读">第 0 章 基础篇导读</a></h1>
 <blockquote>
 <p>预计总阅读时间：3-4 小时
 前置知识：无（本篇是全书起点）
@@ -192,7 +192,7 @@
 <p>本书所有的模块——单目深度估计、双目立体匹配、3D Gaussian Splatting——都在回答同一个问题：<strong>如何从二维图像恢复三维信息</strong>。而回答这个问题的前提，是理解相反的路径：三维是怎么“丢“进二维的。</p>
 <p>基础篇要搭建的，就是这套从三维到二维、再从二维回到三维的<strong>概念脚手架</strong>。它不涉及任何深度学习模型，只用几何和代数，把相机成像的本质讲清楚。</p>
 <h2 id="学习目标"><a class="header" href="#学习目标">学习目标</a></h2>
-<p>读完本篇七个小节，你将能够：</p>
+<p>读完本篇导读和七个基础章节后，你将能够：</p>
 <ol>
 <li>写出一个三维点到像素坐标的完整投影公式 $P = K[R|t]$，并解释每个符号的含义</li>
 <li>理解齐次坐标为什么是计算机视觉的“通用语言“</li>
@@ -207,18 +207,19 @@
 <tr><th>节</th><th>内容</th><th>核心收获</th><th>阅读时间</th></tr>
 </thead>
 <tbody>
-<tr><td>01 相机模型</td><td>针孔相机、内参 K、畸变模型、透视/仿射/移轴相机</td><td>理解相机如何把三维点映射到像素</td><td>40 分钟</td></tr>
-<tr><td>02 坐标系转换</td><td>世界→相机→图像→像素四坐标系、标定、PnP（已知 3D+2D 求位姿）</td><td>不再被“各种坐标系“绕晕，掌握标定与位姿估计</td><td>50 分钟</td></tr>
-<tr><td>03 投影几何</td><td>齐次坐标、无穷远线、单应矩阵 H、变换分层</td><td>掌握“透视变换“的数学语言</td><td>45 分钟</td></tr>
-<tr><td>04 多视图几何入门</td><td>对极几何、基础矩阵 F、本质矩阵 E、双目标定</td><td>理解两张图像之间的几何约束</td><td>55 分钟</td></tr>
-<tr><td>05 深度表示</td><td>深度图、视差图、点云</td><td>知道三维信息有哪几种“存法“</td><td>30 分钟</td></tr>
-<tr><td>06 优化基础</td><td>DLT、几何误差、RANSAC、Bundle Adjustment</td><td>理解 3D 视觉中“为什么需要优化“</td><td>40 分钟</td></tr>
-<tr><td>07 3D 相机与传感器</td><td>消费级/工业级 3D 传感器、ToF、LiDAR 原理与选型</td><td>理解“数学如何被硬件实现“</td><td>35 分钟</td></tr>
+<tr><td>第 0 章 基础篇导读</td><td>基础篇的学习路径、目标和后续模块连接</td><td>知道为什么要先学几何脚手架</td><td>10 分钟</td></tr>
+<tr><td>第 1 章 相机模型</td><td>针孔相机、内参 K、畸变模型、透视/仿射/移轴相机</td><td>理解相机如何把三维点映射到像素</td><td>40 分钟</td></tr>
+<tr><td>第 2 章 坐标系转换</td><td>外参 $R,t$、旋转表示、PnP、标定输出物</td><td>理解相机在世界里的位置和姿态</td><td>50 分钟</td></tr>
+<tr><td>第 3 章 投影几何</td><td>齐次坐标、单应矩阵 H、DLT、张氏标定法</td><td>理解平面棋盘格为什么能标定相机</td><td>50 分钟</td></tr>
+<tr><td>第 4 章 多视图几何入门</td><td>对极几何、$F/E$、位姿恢复、三角测量、立体矫正</td><td>理解两张图如何恢复相对三维</td><td>55 分钟</td></tr>
+<tr><td>第 5 章 深度表示</td><td>深度图、视差图、点云、mesh、TSDF、3DGS</td><td>知道三维信息有哪些存法和边界</td><td>40 分钟</td></tr>
+<tr><td>第 6 章 优化基础</td><td>残差、最小二乘、RANSAC、鲁棒损失、Bundle Adjustment</td><td>理解有噪声时如何求最好解释</td><td>45 分钟</td></tr>
+<tr><td>第 7 章 3D 相机与传感器</td><td>双目、结构光、ToF、LiDAR、线激光、选型指标</td><td>理解深度数据如何由硬件产生</td><td>45 分钟</td></tr>
 </tbody>
 </table>
 </div>
 <blockquote>
-<p>建议按顺序阅读。第 01 和 02 节是后续所有内容的基础——01 建立投影直觉，02 建立坐标系直觉；如果你已有一定基础，第 05 节可以快速扫读。第 07 节是后面实战模块的“硬件背景“，建议在进入模块 A/B/C 前通读一遍。</p>
+<p>建议按顺序阅读。第 0 章先给出全局地图；第 1 和第 2 章是后续所有内容的基础——第 1 章建立投影直觉，第 2 章建立坐标系直觉；如果你已有一定基础，第 5 章可以快速扫读。第 7 章是后面实战模块的“硬件背景“，建议在进入模块 A/B/C 前通读一遍。</p>
 </blockquote>
 <h2 id="本篇如何连接到后续模块"><a class="header" href="#本篇如何连接到后续模块">本篇如何连接到后续模块</a></h2>
 <pre><code>基础篇（本篇）
@@ -242,7 +243,7 @@
 <li>模块 A 讨论“如何从像素坐标反推深度“时，用的是 $P = K[R|t]$ 的逆过程</li>
 <li>模块 B 讨论“左右图像如何匹配“时，依赖对极几何把搜索空间从整个图像压缩到一条线</li>
 <li>模块 C 的相机参数优化中，Bundle Adjustment 直接来自基础篇的优化基础</li>
-<li><strong>第 07 节（3D 相机与传感器）</strong> 回答了一个实践问题：这些数学工具需要什么样的输入数据？不同的 3D 传感器如何用不同的物理原理实现同一个目标——获取深度？读完硬件，再进入算法模块，你会更清楚“为什么这个算法这样做“。</li>
+<li><strong>第 7 章（3D 相机与传感器）</strong> 回答了一个实践问题：这些数学工具需要什么样的输入数据？不同的 3D 传感器如何用不同的物理原理实现同一个目标——获取深度？读完硬件，再进入算法模块，你会更清楚“为什么这个算法这样做“。</li>
 </ul>
 <blockquote class="blockquote-tag blockquote-tag-note">
 <p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
@@ -260,7 +261,7 @@
 <hr>
 <h2 id="mini-case用手机拍两张照片手动算桌子的距离"><a class="header" href="#mini-case用手机拍两张照片手动算桌子的距离">Mini Case：用手机拍两张照片，手动算桌子的距离</a></h2>
 <blockquote>
-<p>这个案例贯穿基础篇全部七节的知识。完成基础篇学习后，你应该能独立完成这个任务。</p>
+<p>这个案例贯穿基础篇第 1-7 章的知识。完成基础篇学习后，你应该能独立完成这个任务。</p>
 </blockquote>
 <h3 id="你需要"><a class="header" href="#你需要">你需要</a></h3>
 <ul>
@@ -399,6 +400,22 @@ print(f"Pairwise distances (unscaled): {np.sort(distances)[::-1][:5]}")
         <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
         <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
         <script>

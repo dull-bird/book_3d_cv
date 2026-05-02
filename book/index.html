@@ -28,7 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
-        <link rel="stylesheet" href="theme/css/custom-6d107f3d.css">
+        <link rel="stylesheet" href="theme/css/custom-a8b5dea7.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-c0428002.js";
+            window.path_to_searchindex_js = "searchindex-f41790b9.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-4983ef3f.js"></script>
+        <script src="toc-bfa4cbe2.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -182,32 +182,46 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="前言"><a class="header" href="#前言">前言</a></h1>
-<p>2019 年的一个下午，我从图书馆借出 Hartley &amp; Zisserman 的 <em>Multiple View Geometry in Computer Vision</em>。这本书被 CV 领域奉为圣经，封面上印着牛津大学出版社的标志。我翻开第一章，读到第三页就开始头疼。</p>
-<p>不是因为数学太难。是因为我不知道<strong>这些数学在解决什么问题</strong>。</p>
-<p>等到我在项目里被相机标定、深度估计、3D 重建轮番揍过一遍之后，再回去翻 H&amp;Z，才突然意识到它是一本极好的书——但它的好，需要你先“受够了罪“才能体会到。</p>
-<p>这本书想做的，就是让你少受点罪。</p>
+<p>我不是很早就进入 3D 视觉这个领域的人。</p>
+<p>在 2023 年开始工作、真正接触 3D 视觉之前，我研究的方向是 AI for financial engineering。那是一套很不一样的问题意识：数据、建模、预测、风险、决策。相机模型、坐标系、深度、点云、多视图几何，这些词对当时的我来说并不是熟悉的工具箱，而更像是一片突然展开的新地形。</p>
+<p>所以我进入 3D 视觉，几乎是从零开始的。</p>
+<p>这件事一开始当然不轻松。传统 3D 视觉有很深的几何传统，许多概念一上来就是坐标系、齐次坐标、投影矩阵、对极约束、Bundle Adjustment。它们都很重要，但对一个刚进门的人来说，最难的往往不是某个公式本身，而是：<strong>这个公式到底在解决什么问题？它在真实系统里处在什么位置？我为什么非学它不可？</strong></p>
+<p>这本书就是从这个困惑里长出来的。</p>
+<h2 id="为什么写这本书"><a class="header" href="#为什么写这本书">为什么写这本书</a></h2>
+<p>我写这本书，不是因为我比别人更早进入这个领域，也不是因为我已经把 3D 视觉的所有问题都想明白了。恰恰相反，我进入得很晚，所以更能记得一个新手第一次面对这些概念时卡在哪里。</p>
+<p>我想把自己的学习过程、项目理解、踩过的坑，以及用 AI 帮助我学习和总结的笔记，整理成一本对后来者更友好的书。</p>
+<p>这里的“用 AI 学习”不是让 AI 替代思考。相反，AI 更像一个高频对话的学习伙伴：它可以帮我改写一个难懂的解释，追问一个公式的直觉，比较几篇论文的差异，把零散笔记重新组织成结构。但最后判断什么是对的、什么是重要的、什么应该放进书里，仍然需要人自己负责。</p>
+<p>我希望这本书保留这种学习痕迹：不是从高处俯视初学者，而是沿着“我当时为什么不懂、后来怎么想通”的路径，把概念讲清楚。</p>
+<h2 id="这个时代的-3d-视觉"><a class="header" href="#这个时代的-3d-视觉">这个时代的 3D 视觉</a></h2>
+<p>我进入 3D 视觉的时间虽然晚，但也正好赶上 AI 在这个领域大放异彩的时代。</p>
+<p>NeRF、3D Gaussian Splatting、单目深度基础模型、视觉语言模型、生成式 3D、端到端重建和定位方法，都在不断改变 3D 视觉的边界。过去很多依赖手工几何建模、特征匹配和优化的流程，正在被学习方法重新组织；但另一方面，几何并没有消失。相机模型、坐标变换、投影关系、误差定义、传感器限制，仍然决定了一个系统能不能落地。</p>
+<p>更难的问题是：我们对 AI 在 3D 视觉里到底扮演什么角色，其实还没有足够深入的理解。</p>
+<p>AI 是替代传统几何，还是补全传统几何？是端到端地输出结果，还是为局部模块提供更强的先验？一个在服务器上表现很好的模型，如何落地到计算资源、功耗、延迟都受限的真实产品里？当模型遇到长尾场景、弱纹理、反光、动态物体、低光照时，系统该相信学习结果，还是退回几何约束？</p>
+<p>这些问题没有简单答案。但正因为没有简单答案，才值得认真写下来。</p>
 <h2 id="写给谁"><a class="header" href="#写给谁">写给谁</a></h2>
-<p>这本书写给对 3D 视觉有兴趣、但被传统教材的门槛挡在外面的人。你可能是：</p>
+<p>这本书写给三类读者：</p>
 <ul>
-<li>刚入门 CV 的学生，想理解“深度估计““SfM”“NeRF“到底是什么</li>
-<li>做机器人/自动驾驶/AR/VR 的工程师，需要快速搞明白传感器选型、坐标变换、多视图几何</li>
-<li>转行进入 3D 视觉的开发者，被 H&amp;Z 的数学密度劝退过一次</li>
+<li>刚开始学习 3D 视觉的学生，希望先建立一条清晰主线，而不是一上来就被公式淹没。</li>
+<li>转到 3D 视觉方向的工程师，希望知道相机、深度、点云、多视图、优化和部署之间如何连接。</li>
+<li>已经接触 AI 视觉模型的人，希望补上几何和工程边界，理解为什么一个模型在真实产品里不能只看 benchmark。</li>
 </ul>
-<p><strong>你不需要读完 H&amp;Z 才能看这本书。</strong> 每一个概念都从直观场景出发——先告诉你“这解决什么问题“，再推导原理，最后落到代码。</p>
-<h2 id="为什么写"><a class="header" href="#为什么写">为什么写</a></h2>
-<p>三个原因。</p>
-<p><strong>第一，面向初学者的 3D 视觉书太少。</strong> H&amp;Z 是写给研究者看的——它追求严谨、完备，但不太关心“一个新手第一次接触对极几何时脑子里在想什么“。Szeliski 的《Computer Vision: Algorithms and Applications》覆盖面广，但 1200 页的体量让人望而生畏。3D 视觉需要一个温和的入口，这本书就是。</p>
-<p><strong>第二，AI 发展太快，缺少“拆解知识“的书。</strong> NeRF 出来三年，3D Gaussian Splatting 横空出世；基础模型一年一换代，端到端方法正在挑战传统的几何路线。论文能告诉你在某个 benchmark 上提升了几个点，但很少告诉你“它为什么有效““它跟前人的区别在哪”“你为什么需要学它”。这本书试图做这种拆解——把前沿工作的核心思想提炼出来，放进统一的框架里。</p>
-<p><strong>第三，我希望中文社区有一个好的前沿论文入口。</strong> 很多高质量的 3D 视觉教程是英文的。这本书不打算翻译它们——我要做的是把它们消化之后，用我自己的语言重新组织，融入我在实际项目里踩过的坑。每一章末尾的“关键论文清单“，就是我帮你选的起点。</p>
+<p>你不需要先读完 Hartley &amp; Zisserman 才能看这本书。那当然是一本非常重要的书，但它更像严谨的地图；而这本书更像一条入门路线：先告诉你要去哪里，为什么要走这条路，再逐步补上必要的数学和代码。</p>
 <h2 id="怎么读"><a class="header" href="#怎么读">怎么读</a></h2>
-<p>这本书分两层：</p>
-<p><strong>基础篇（01-07）</strong> 是必修的。它从“相机怎么成像“讲到“用什么传感器获取深度“，搭建了 3D 视觉的概念脚手架。如果你只有一周时间，把基础篇读完——它够你用很久。</p>
-<p><strong>主题模块（A/B/C）</strong> 是选修的。每个模块深入一个具体子领域，包含直观理解、原理解析、部署实战三阶。你可以根据自己的项目需要跳着读。</p>
-<p><strong>附录</strong> 里收录了一些值得读的延伸文章，包括一篇关于“3D 几何会不会被端到端方法替代“的讨论——也许是你读完基础篇之后最想找人聊的话题。</p>
+<p>这本书分成两层。</p>
+<p><strong>基础篇（第 0-7 章）</strong> 是必修的。它从基础篇导读开始，再讲相机模型、坐标系转换、投影几何、多视图几何、深度表示、优化基础和 3D 传感器。这里不急着追逐最新模型，而是先建立所有 3D 视觉任务都要反复使用的概念脚手架。</p>
+<p><strong>主题模块（A/B/C）</strong> 是选修的。每个模块深入一个具体方向，例如单目深度估计、双目立体匹配和 3D Gaussian Splatting。你可以根据自己的项目需要跳着读，但基础篇最好先通读。</p>
+<p>读这本书时，我建议你不断问三个问题：</p>
+<ol>
+<li>这个概念解决什么问题？</li>
+<li>它在真实系统里输入是什么、输出是什么？</li>
+<li>它的边界在哪里，什么时候会失效？</li>
+</ol>
+<p>如果一个公式暂时没有完全推懂，也没关系。先抓住它的人话版本、工程位置和使用条件，后面反复遇到时会越来越清楚。</p>
 <h2 id="致谢"><a class="header" href="#致谢">致谢</a></h2>
-<p>感谢 Vincent Sitzmann 写下 <a href="https://www.vincentsitzmann.com/blog/bitter_lesson_of_cv/">The Flavor of the Bitter Lesson for Computer Vision</a>，促使我把“苦涩教训“收入附录。感谢 Hartley 和 Zisserman 写了一本让我既头疼又感激的书。感谢所有开源了论文代码的研究者。</p>
-<p><strong>这是一本活的书。</strong> 如果你发现错误、有改进建议、或者想贡献某个模块的章节，请直接到 <a href="https://github.com/dull-bird/book_3d_cv">GitHub</a> 上开 Issue 或 PR。</p>
-<p>戴智文<br>2026 年 4 月</p>
+<p>感谢这个时代的开源论文、代码、教程和社区讨论。它们让一个后来者也有机会快速进入一个复杂领域。</p>
+<p>也感谢 AI 工具参与了这本书的形成过程。它们帮助我整理资料、追问概念、比较表达，但这本书里的取舍、判断和责任，仍然由我承担。</p>
+<p><strong>这是一本活的书。</strong> 如果你发现错误、有改进建议，或者希望补充某个模块，欢迎到 <a href="https://github.com/dull-bird/book_3d_cv">GitHub</a> 提 Issue 或 PR。</p>
+<p>戴智文<br>2026 年 5 月</p>
 
                     </main>
 
@@ -238,6 +252,22 @@
         <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
         <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
         <script>

@@ -28,7 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
-        <link rel="stylesheet" href="../theme/css/custom-6d107f3d.css">
+        <link rel="stylesheet" href="../theme/css/custom-a8b5dea7.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-c0428002.js";
+            window.path_to_searchindex_js = "../searchindex-f41790b9.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4983ef3f.js"></script>
+        <script src="../toc-bfa4cbe2.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -181,7 +181,81 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="直观理解"><a class="header" href="#直观理解">直观理解</a></h1>
+                        <h1 id="c1-直观理解"><a class="header" href="#c1-直观理解">C.1 直观理解</a></h1>
+<blockquote>
+<p><strong>要回答的问题</strong>：3D Gaussian Splatting 到底在做什么？为什么它能替代 NeRF？为什么椭球体比神经网络更适合做渲染？“Splatting“这个词是什么意思？</p>
+</blockquote>
+<h2 id="一个场景"><a class="header" href="#一个场景">一个场景</a></h2>
+<p>你用手机绕着桌上的盆栽拍了 50 张不同角度的照片。现在你想做到两件事：</p>
+<ol>
+<li><strong>在任意新角度看到这盆盆栽</strong>（比如从正上方往下看，但你并没有拍这个角度）。</li>
+<li><strong>以 60 FPS 实时旋转视角</strong>——像打游戏一样流畅。</li>
+</ol>
+<p>传统做法：先用 COLMAP（SfM）恢复相机位姿和稀疏 3D 点云，然后用这些信息做多视图立体匹配（MVS）生成稠密点云，再用泊松重建生成网格，贴上纹理 → 得到一个带纹理的 3D 模型。这个流程极其漫长且 fragile——每一步都可能失败，而且最终的纹理质量往往很差。</p>
+<p>2020 年的 NeRF 给了一个完全不同的方案：用一个神经网络记住整个场景的“辐射场“——输入是 3D 坐标 + 视角方向，输出是该点的颜色和密度。<strong>但 NeRF 太慢了</strong>——渲染一个像素需要沿射线采样几十个点，每个点都要调用神经网络。一张 1080p 图像需要几千万次网络前向——几秒甚至几十秒一帧。</p>
+<h2 id="核心直觉从体积采样到直接投影"><a class="header" href="#核心直觉从体积采样到直接投影">核心直觉：从“体积采样“到“直接投影“</a></h2>
+<p>3DGS 的核心直觉是：<strong>把场景表示为一堆可见的椭球体，直接投影到屏幕上，跳过体积采样。</strong></p>
+<pre><code>NeRF 的做法：                        3DGS 的做法：
+像素 ← 沿射线采样100个点 ← 神经网络     像素 ← 投影一堆椭球 ← 排序 ← α混合
+     每个点跑一次网络                         每个椭球投影一次
+     慢（几千亿次网络调用）                   快（GPU光栅化）
+     隐式（你看不到"场景长什么样"）           显式（椭球体就是场景）
+</code></pre>
+<p><strong>什么是 “Splatting”？</strong> Splatting 是计算机图形学中的一个经典概念：不是从每个像素出发去“找“它对应的 3D 内容（ray tracing），而是反过来——把 3D 的内容直接“拍“到屏幕上的对应位置。一个 3D 高斯椭球体“拍“到屏幕上就是一个 2D 椭圆光斑（splat）。把所有椭球体的光斑从前到后叠起来（α 混合），就得到最终的图像。</p>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p><strong>NeRF 是“射线法“（从像素出发去找颜色），Splatting 是“投影法“（从 3D 物体出发投到屏幕上）。</strong> Splatting 天然适合 GPU 并行——每个椭球体独立投影，不需要等别人的结果。这就是 3DGS 能跑到 100+ FPS 的根本原因。</p>
+</blockquote>
+<h2 id="3dgs-的三个关键设计选择"><a class="header" href="#3dgs-的三个关键设计选择">3DGS 的三个关键设计选择</a></h2>
+<h3 id="1-为什么是高斯椭球体"><a class="header" href="#1-为什么是高斯椭球体">1. 为什么是“高斯“椭球体？</a></h3>
+<p>一个 3D 高斯（Gaussian）由位置 $\mu$（中心在哪）和协方差矩阵 $\Sigma$（椭球的形状、大小、朝向）定义。用高斯有几个好处：</p>
+<ul>
+<li><strong>自然适合 α 混合</strong>：3D 高斯投影到 2D 后还是一个高斯（近似），两个重叠的高斯做 α 混合在数学上很干净。</li>
+<li><strong>各向异性</strong>：协方差矩阵让每个高斯可以有自己的朝向和拉伸程度——长条形的高斯适合表示墙壁、地板等平面；球形的高斯适合表示孤立的物体。</li>
+<li><strong>连续可微</strong>：高斯函数处处平滑、可微——梯度可以从渲染 loss 一直回传到高斯的参数。这对优化至关重要。</li>
+</ul>
+<h3 id="2-为什么不直接用点云"><a class="header" href="#2-为什么不直接用点云">2. 为什么不直接用点云？</a></h3>
+<p>从 COLMAP 出来的稀疏点云（通常几千个点）直接渲染效果很差——点之间的空隙会让图像全是洞。3DGS 的做法是：以稀疏点云为“种子“，在每个点上放一个初始高斯，然后在优化过程中<strong>自适应地增删高斯</strong>——覆盖不够的地方复制新的高斯，覆盖太密了就把大高斯拆成两个小的。经过几万次迭代，从几千个高斯扩展到几百万个高斯，覆盖整个场景。</p>
+<h3 id="3-为什么不需要神经网络"><a class="header" href="#3-为什么不需要神经网络">3. 为什么不需要神经网络？</a></h3>
+<p>NeRF 用一个 MLP 保存整个场景的颜色和密度。3DGS 把颜色存在每个高斯自己的参数里（球谐系数 SH，随视角变化）和不透明度（α）。渲染时不需要任何网络前向——把高斯投影到屏幕、排序、做 α 混合。整个过程是<strong>纯计算</strong>（矩阵运算 + 光栅化），没有神经网络的黑盒。这带来了两个好处：</p>
+<ul>
+<li><strong>速度</strong>：GPU 光栅化极快（这是显卡的看家本领）。</li>
+<li><strong>可解释性</strong>：场景就是一堆椭球体——你可以直接旋转、缩放、删除任何一个高斯。这对 3D 编辑至关重要。</li>
+</ul>
+<h2 id="3dgs-的局限"><a class="header" href="#3dgs-的局限">3DGS 的局限</a></h2>
+<ul>
+<li><strong>训练需要 COLMAP 位姿</strong>：不像 DUSt3R 可以无标定重建，3DGS 需要精确的相机位姿。如果 SfM 失败了（比如场景全是白墙，特征匹配不上），3DGS 就无法训练。</li>
+<li><strong>显存需求大</strong>：几百万个高斯 = 几百 MB 到几 GB 的显存。大场景需要更高效的高斯表示（Scaffold-GS 等改进方向）。</li>
+<li><strong>几何质量差</strong>：原始 3DGS 的 3D 高斯没有“表面“概念——它们是体积元素，不是表面元素。提取网格需要额外的处理（如 2D GS 或 SuGaR）。</li>
+<li><strong>对新视角的泛化能力有限</strong>：3DGS 是在训练视角上优化的——如果你要看的视角离训练视角太远（比如跑到盆栽背面但没拍过背面），质量会显著下降。</li>
+</ul>
+<h2 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h2>
+<pre class="mermaid">mindmap
+  root((3D Gaussian Splatting))
+    核心思想
+      显式3D椭球体
+      投影到屏幕
+      α混合渲染
+    优势
+      训练快
+      渲染快
+      可编辑
+    关键组件
+      SfM初始化
+      3D高斯参数
+      Tile光栅化
+      自适应密度控制
+    局限
+      需要位姿
+      显存大
+      几何差
+    改进方向
+      抗锯齿Mip
+      结构化Scaffold
+      2D表面重建
+      稀疏视角
+</pre>
+
 
                     </main>
 
@@ -218,6 +292,22 @@
         <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
         <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
         <script>

@@ -33,6 +33,7 @@
 - [NeRF：神经辐射场](05_nerf/nerf.md)
 - [视觉 SLAM：同时定位与建图](06_slam/slam.md)
 - [嵌入式部署：模型优化与芯片选型](07_depth_completion/embedded.md)
+- [6D 位姿估计：从 FoundationPose 到零样本](08_pose_estimation/pose_estimation.md)
 
 # 附录
 

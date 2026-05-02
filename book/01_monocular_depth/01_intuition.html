@@ -28,7 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
-        <link rel="stylesheet" href="../theme/css/custom-6d107f3d.css">
+        <link rel="stylesheet" href="../theme/css/custom-a8b5dea7.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-c0428002.js";
+            window.path_to_searchindex_js = "../searchindex-f41790b9.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4983ef3f.js"></script>
+        <script src="../toc-bfa4cbe2.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -181,7 +181,117 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="直观理解"><a class="header" href="#直观理解">直观理解</a></h1>
+                        <h1 id="a1-直观理解"><a class="header" href="#a1-直观理解">A.1 直观理解</a></h1>
+<blockquote>
+<p><strong>要回答的问题</strong>：为什么从一张照片猜距离在数学上是“无解的“？深度学习模型是怎么绕过这个无解的？relative depth 和 metric depth 到底差在哪？</p>
+</blockquote>
+<h2 id="一个场景"><a class="header" href="#一个场景">一个场景</a></h2>
+<p>你看到一张照片：一只咖啡杯放在白色桌面上，旁边有一本书，背景是一面浅灰色的墙。</p>
+<p>你看一眼就知道：杯子离相机大约 30 厘米，书在杯子右边 10 厘米处，墙在整张桌子后面大约 1.5 米远。</p>
+<p>你只用了<strong>一张二维图像</strong>——没有激光雷达、没有第二台相机、没有走到桌前拿尺子量——就判断出了物体之间的距离。你的大脑做了单目深度估计。</p>
+<p>但把同一张照片喂给 2015 年的任何计算机视觉算法，它说不出来。<strong>为什么人类可以，算法不行？</strong></p>
+<h2 id="核心矛盾无穷多个-3d-场景可以生成同一张-2d-照片"><a class="header" href="#核心矛盾无穷多个-3d-场景可以生成同一张-2d-照片">核心矛盾：无穷多个 3D 场景可以生成同一张 2D 照片</a></h2>
+<p>这就是单目深度估计被称作 <strong>ill-posed（病态）</strong> 问题的根本原因。</p>
+<p>回顾基础篇学的针孔模型：$x_{pixel} = K \cdot \operatorname{dist}(X/Z, Y/Z)$。投影过程中，$X$ 和 $Y$ 都被除以 $Z$。一个远的、较大的物体，和一个近的、较小的物体，在图像上会投影到<strong>完全相同的一组像素</strong>。</p>
+<pre><code>近处小桌子                   远处大桌子
+     ■                           ■■■
+    /|\                         / | \
+   / | \                       /  |  \
+  /  |  \                     /   |   \
+ ○  相机  ○                 ○   相机    ○
+     相同像素！                  相同像素！
+</code></pre>
+<p>这就意味着：单独一张 RGB 图像，<strong>没有任何数学上可倒推的深度解</strong>。你需要额外的信息——要么来自另一个视角（双目），要么来自对世界的先验知识。</p>
+<p>人类靠的就是“先验知识“。你知道一本正常的书大约 20 厘米宽，一个咖啡杯大约 10 厘米高，桌面是平的，墙壁是竖的。你的大脑积累了数十年的“世界长什么样“的数据库，在看到一个场景的瞬间，用这些先验去约束那个 ill-posed 问题。</p>
+<p><strong>深度学习模型做的，本质上也是这件事</strong>——只不过它“积累经验“的方式是用几百万到几千万张标注过的深度图像做训练。</p>
+<h2 id="relative-depth-vs-metric-depth"><a class="header" href="#relative-depth-vs-metric-depth">relative depth vs metric depth</a></h2>
+<p>这是单目深度估计领域最重要的区分，直接影响你能拿深度图做什么。</p>
+<p><strong>Relative Depth（相对深度）</strong> 回答：“A 比 B 离相机更近，但不知道近几厘米。”</p>
+<ul>
+<li>深度值之间保持正确的<strong>大小顺序</strong>，但没有物理单位</li>
+<li>如果对整个深度图做 $d \mapsto a \cdot d + b$（线性缩放+平移），新图和旧图都算是“正确的“ relative depth</li>
+<li>能做：景深模糊、背景替换、视觉排序</li>
+<li>不能做：机器人抓取、3D 重建、测量</li>
+</ul>
+<p><strong>Metric Depth（度量深度）</strong> 回答：“这个像素对应的物体距离相机 0.47 米，误差在 2 厘米以内。”</p>
+<ul>
+<li>深度值有物理单位（米或毫米），并且和真实世界的尺度一致</li>
+<li>如果对深度图做 $d \mapsto a \cdot d + b$，除非 $(a=1, b=0)$，否则就“不对“</li>
+<li>能做：所有事情</li>
+</ul>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>relative vs metric 不是两种算法，而是两种<strong>要求</strong>。同一个模型完全可以做到 relative 深度精准但 metric 深度不准。工程上最常见的方案是“先做 relative，再用少量 metric 数据拟合一个 scale/shift 对齐“。</p>
+</blockquote>
+<p>为什么 metric 难？回头看基础篇 $x_{pixel} = K \cdot \operatorname{dist}(X/Z, Y/Z)$。一张图像里没有任何关于“绝对尺度“的信息——一台微单和一台手机，用不同的焦距拍同一个场景，可以得到几乎完全相同的 RGB 图像，但它们的物理 $Z$ 差了数十倍。<strong>单目深度估计要恢复 metric 深度，就要从 RGB 里反向推断相机的内参和场景的物理尺度</strong>——这是极其困难的多对一映射。</p>
+<h2 id="核心直觉模型从数据里学到了什么线索"><a class="header" href="#核心直觉模型从数据里学到了什么线索">核心直觉：模型从数据里学到了什么“线索“</a></h2>
+<p>深度学习模型并不是“解方程“算出深度。它在训练数据中学会了利用以下视觉线索：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>线索</th><th>例子</th><th>有效性</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>透视</strong></td><td>平行线在远处交汇（铁轨）</td><td>强——几何本质</td></tr>
+<tr><td><strong>纹理梯度</strong></td><td>远处的草地纹理更密</td><td>中等——依赖场景</td></tr>
+<tr><td><strong>遮挡</strong></td><td>A 挡 B → A 比 B 近</td><td>强——但只给相对关系</td></tr>
+<tr><td><strong>相对大小</strong></td><td>远处的车看起来更小</td><td>中等——需要知道“正常大小“</td></tr>
+<tr><td><strong>光照和阴影</strong></td><td>阴影投射在物体上暗示空间关系</td><td>弱但有用</td></tr>
+<tr><td><strong>大气散射</strong></td><td>远山更蓝更模糊</td><td>只在户外远距有效</td></tr>
+<tr><td><strong>运动视差</strong></td><td>近处物体移动更快</td><td>仅视频中有用</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>有趣的是：<strong>没有任何一个线索单独能解决深度问题</strong>。透视告诉你“线往哪汇“，但不说“汇点多远“。相对大小告诉你“哪个车更远“，但不说“那辆车离你多少米“。模型的本质工作是：<strong>学会融合所有线索，在某些场景下甚至比几何方法更鲁棒</strong>——因为有纹理时它靠纹理，没纹理时靠语义先验（“我知道杯子一般多大”）。</p>
+</blockquote>
+<h2 id="技术全景"><a class="header" href="#技术全景">技术全景</a></h2>
+<pre class="mermaid">mindmap
+  root((单目深度估计))
+    核心问题
+      一张图恢复深度
+      无穷多解
+      需要先验约束
+    深度类型
+      相对深度 relative
+      度量深度 metric
+    视觉线索
+      透视
+      纹理梯度
+      遮挡
+      相对大小
+      光照阴影
+    技术路线
+      CNN
+      Transformer
+      扩散模型
+    关键模型
+      MiDaS
+      DPT
+      ZoeDepth
+      Depth Anything
+      Marigold
+      MoGe
+    应用
+      景深模拟
+      3D重建
+      机器人抓取
+      AR/VR
+      自动驾驶
+</pre>
+
+<h2 id="为什么-2023-年以后这个领域突然爆发"><a class="header" href="#为什么-2023-年以后这个领域突然爆发">为什么 2023 年以后这个领域突然爆发</a></h2>
+<p>2019-2022 年，单目深度估计的主要进展是 CNN 架构改进（MiDaS → DPT）。精度在涨，但泛化能力有限——在 NYU（室内）上训的模型，扔到 KITTI（室外自动驾驶）上基本不能用。</p>
+<p>2023 年以后，三个变化叠加催生了爆发：</p>
+<ol>
+<li><strong>大规模混合数据集训练（MiDaS 范式）</strong>：不再只用单一数据集的几千张图训练，而是混合 10+ 个数据集的几百万张图，让模型看到足够多的场景、相机和光照变化。效果：跨域泛化能力跃升。</li>
+<li><strong>Transformer 和 diffusion 架构</strong>：DPT 证明了 Vision Transformer 在密集预测任务上远超 CNN；Marigold 证明了 Stable Diffusion 里“锁着“的世界知识可以直接迁移给深度任务。</li>
+<li><strong>基础模型思维</strong>：不再把深度估计看作“一个任务训练一个模型“，而是“先训一个什么都懂的大模型，再针对具体场景微调“。Depth Anything V2 用 62M 到 1.3B 参数的模型在不同规模上验证了 scaling law——越大越准、泛化越好。</li>
+</ol>
+<blockquote>
+<p>现在的主流范式：<strong>一个预训练的基础模型 → zero-shot 迁移到任何场景 → 按需微调（可选）</strong>。这个范式还在快速迭代中。下一节会拆解这些模型的具体设计。</p>
+</blockquote>
 
                     </main>
 
@@ -218,6 +328,22 @@
         <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
         <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
         <script>

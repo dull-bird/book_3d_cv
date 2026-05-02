@@ -8,6 +8,7 @@ src = "src"
 git-repository-url = "https://github.com/dull-bird/book_3d_cv"
 edit-url-template = "https://github.com/dull-bird/book_3d_cv/edit/main/{path}"
 site-url = "/book_3d_cv/"
+no-section-label = true
 additional-js = ["theme/js/mathjax-mermaid.js", "theme/js/custom.js"]
 additional-css = ["theme/css/custom.css"]
 

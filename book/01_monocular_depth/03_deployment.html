@@ -28,7 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
-        <link rel="stylesheet" href="../theme/css/custom-6d107f3d.css">
+        <link rel="stylesheet" href="../theme/css/custom-a8b5dea7.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-c0428002.js";
+            window.path_to_searchindex_js = "../searchindex-f41790b9.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4983ef3f.js"></script>
+        <script src="../toc-bfa4cbe2.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -181,7 +181,180 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="部署实战"><a class="header" href="#部署实战">部署实战</a></h1>
+                        <h1 id="a3-部署实战"><a class="header" href="#a3-部署实战">A.3 部署实战</a></h1>
+<blockquote>
+<p><strong>目标</strong>：能在自己电脑上跑 Depth Anything V2 和 MoGe，理解它们的输出格式差异，知道什么时候选哪个。</p>
+</blockquote>
+<h2 id="选模型的三条经验法则"><a class="header" href="#选模型的三条经验法则">选模型的三条经验法则</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>你的需求</th><th>推荐</th><th>原因</th></tr>
+</thead>
+<tbody>
+<tr><td>只要“哪近哪远“（景深模拟、背景虚化）</td><td>Depth Anything V2 Small</td><td>25M 参数，CPU 可跑，relative depth 足够</td></tr>
+<tr><td>需要 metric 深度（机器人、3D 重建）</td><td>Depth Anything V2 Metric 版 或 MoGe</td><td>输出带物理单位的深度</td></tr>
+<tr><td>艺术风格图、极端非自然场景</td><td>Marigold</td><td>扩散模型先验空间更广</td></tr>
+<tr><td>精度第一，速度无所谓</td><td>Depth Anything V2 Giant</td><td>1.3B 参数，最强 zero-shot 精度</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="depth-anything-v2"><a class="header" href="#depth-anything-v2">Depth Anything V2</a></h2>
+<h3 id="安装"><a class="header" href="#安装">安装</a></h3>
+<pre><code class="language-bash">pip install torch torchvision
+git clone https://github.com/DepthAnything/Depth-Anything-V2
+cd Depth-Anything-V2
+pip install -r requirements.txt
+</code></pre>
+<h3 id="下载模型"><a class="header" href="#下载模型">下载模型</a></h3>
+<p>从 HuggingFace 下载预训练权重。四个版本：</p>
+<pre><code class="language-python"># metric_depth_estimation.py 中会自动下载，也可以手动指定
+# Small:  https://huggingface.co/depth-anything/Depth-Anything-V2-Small
+# Base:   https://huggingface.co/depth-anything/Depth-Anything-V2-Base
+# Large:  https://huggingface.co/depth-anything/Depth-Anything-V2-Large
+# Giant:  https://huggingface.co/depth-anything/Depth-Anything-V2-Giant
+</code></pre>
+<h3 id="推理relative-depth"><a class="header" href="#推理relative-depth">推理：relative depth</a></h3>
+<pre><code class="language-python">import cv2
+import torch
+import numpy as np
+from depth_anything_v2.dpt import DepthAnythingV2
+
+# 选模型
+model = DepthAnythingV2(
+    encoder='vits',      # vits / vitb / vitl / vitg
+    features=64,         # 64 / 128 / 256 / 384
+    out_channels=[48, 96, 192, 384],
+)
+
+# 加载权重
+model.load_state_dict(torch.load(
+    'checkpoints/depth_anything_v2_vits.pth', 
+    map_location='cpu'
+))
+model.eval()
+
+# 读图、推理
+img = cv2.imread('your_photo.jpg')
+h, w = img.shape[:2]
+# 模型期望 518x518 输入
+img_resized = cv2.resize(img, (518, 518))
+img_rgb = cv2.cvtColor(img_resized, cv2.COLOR_BGR2RGB) / 255.0
+img_tensor = torch.from_numpy(img_rgb).permute(2, 0, 1).unsqueeze(0).float()
+
+with torch.no_grad():
+    depth = model(img_tensor)  # (1, 518, 518), affine-invariant
+
+# 恢复原图尺寸
+depth = torch.nn.functional.interpolate(
+    depth.unsqueeze(1), size=(h, w), mode='bilinear'
+).squeeze().numpy()
+
+# 可视化（归一化到 0-255）
+depth_vis = (depth - depth.min()) / (depth.max() - depth.min()) * 255
+cv2.imwrite('depth_vis.png', depth_vis.astype(np.uint8))
+</code></pre>
+<h3 id="推理metric-depth"><a class="header" href="#推理metric-depth">推理：metric depth</a></h3>
+<pre><code class="language-python">from depth_anything_v2.dpt import DepthAnythingV2
+
+# Metric 版本需要不同配置
+model = DepthAnythingV2(
+    encoder='vitl',
+    features=256,
+    out_channels=[256, 512, 1024, 1024],
+    max_depth=20.0,  # 最大深度（米），根据场景调整
+)
+
+model.load_state_dict(torch.load(
+    'checkpoints/depth_anything_v2_metric_vkitti_vitl.pth',
+    map_location='cpu'
+))
+model.eval()
+
+# 推理同上，但输出是 metric 深度（米）
+with torch.no_grad():
+    depth = model(img_tensor)  
+# depth 的单位是米，值范围取决于 max_depth 参数
+print(f"Depth range: {depth.min():.2f}m to {depth.max():.2f}m")
+</code></pre>
+<h3 id="理解输出"><a class="header" href="#理解输出">理解输出</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>版本</th><th>输出</th><th>数值含义</th><th>单位</th></tr>
+</thead>
+<tbody>
+<tr><td>Relative（默认）</td><td>$(H, W)$ array</td><td>相对远近（大 = 远），只保持顺序关系</td><td>无量纲</td></tr>
+<tr><td>Metric（微调版）</td><td>$(H, W)$ array</td><td>沿光轴的物理距离</td><td>米</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote class="blockquote-tag blockquote-tag-caution">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Caution</p>
+<p><strong>Metric 版本不是零成本的。</strong> 它是在特定域（如 KITTI/室外或 NYU/室内）上微调的。如果你用它拍室内照片但用的是 outdoor metric 版，尺度会偏。对泛化要求高时，先跑 relative 版本，再手动对齐尺度。</p>
+</blockquote>
+<h2 id="moge"><a class="header" href="#moge">MoGe</a></h2>
+<p>MoGe 的优势是直接输出 <strong>3D 点图 + 深度图 + 相机内参</strong>，不需要额外 step。</p>
+<h3 id="安装-1"><a class="header" href="#安装-1">安装</a></h3>
+<pre><code class="language-bash">pip install moge
+# 或从源码
+git clone https://github.com/microsoft/MoGe
+cd MoGe
+pip install -e .
+</code></pre>
+<h3 id="推理"><a class="header" href="#推理">推理</a></h3>
+<pre><code class="language-python">import cv2
+import torch
+import numpy as np
+from moge.model import MoGeModel
+
+model = MoGeModel.from_pretrained('Ruicheng/moge-rtnlk').eval()
+
+img = cv2.imread('your_photo.jpg')
+img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+# 推理（自动处理 resize）
+with torch.no_grad():
+    output = model.infer(img_rgb)
+    # output['points']   : (H, W, 3)  affine-invariant 3D point map
+    # output['depth']    : (H, W)     metric depth（米）
+    # output['intrinsics']: (3, 3)    recovered camera intrinsics
+    # output['fov']      : float      视场角（度）
+
+print(f"FOV: {output['fov']:.1f}°")
+print(f"Depth range: {output['depth'].min():.2f} - {output['depth'].max():.2f} m")
+print(f"Recovered intrinsics:\n{output['intrinsics']}")
+</code></pre>
+<h3 id="理解输出-1"><a class="header" href="#理解输出-1">理解输出</a></h3>
+<p>MoGe 的输出比传统深度模型多了两个维度：</p>
+<ul>
+<li><strong>3D 点图 <code>points</code></strong>：每个像素对应一个 $(X, Y, Z)$ 坐标（相机坐标系，scale 是 metric 的）</li>
+<li><strong>相机内参 <code>intrinsics</code></strong>：用约 3ms 从点图中恢复的焦距和主点</li>
+<li><strong>FOV</strong>：直接给出的视场角</li>
+</ul>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>如果你需要把 MoGe 的深度图转回点云：直接取 <code>output['points']</code> 就是对齐好的 3D 坐标。不需要像传统深度图那样手动做 $X = (u-c_x)Z/f_x$ 的反投影。这是 MoGe 点图表示的核心工程优势。</p>
+</blockquote>
+<h2 id="精度-vs-速度"><a class="header" href="#精度-vs-速度">精度 vs 速度</a></h2>
+<p>在 2024 年的模型上，大致趋势（具体数字因硬件和输入分辨率而异）：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>模型</th><th>推理时间（GPU）</th><th>Zero-shot 泛化</th><th>输出类型</th></tr>
+</thead>
+<tbody>
+<tr><td>Depth Anything V2 Small</td><td>~10 ms</td><td>好</td><td>Relative</td></tr>
+<tr><td>Depth Anything V2 Large</td><td>~50 ms</td><td>很好</td><td>Relative / Metric</td></tr>
+<tr><td>Depth Anything V2 Giant</td><td>~200 ms</td><td>最好</td><td>Relative</td></tr>
+<tr><td>MoGe</td><td>~100 ms</td><td>很好</td><td><strong>Metric + 点图 + 内参</strong></td></tr>
+<tr><td>Marigold (4-step DDIM)</td><td>~1-2 s</td><td>很好（尤其艺术图）</td><td>Relative</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p><strong>选择建议</strong>：实际项目中 90% 的情况用 Depth Anything V2 Large metric 版就够。需要相机内参或 3D 点坐标时用 MoGe。处理艺术风格或极度非自然图像时考虑 Marigold。移动端或实时场景用 Depth Anything V2 Small。</p>
+</blockquote>
 
                     </main>
 
@@ -218,6 +391,22 @@
         <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
         <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
         <script>

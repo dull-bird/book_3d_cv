@@ -28,7 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
-        <link rel="stylesheet" href="../theme/css/custom-6d107f3d.css">
+        <link rel="stylesheet" href="../theme/css/custom-a8b5dea7.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-c0428002.js";
+            window.path_to_searchindex_js = "../searchindex-f41790b9.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4983ef3f.js"></script>
+        <script src="../toc-bfa4cbe2.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -181,7 +181,112 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="原理解析"><a class="header" href="#原理解析">原理解析</a></h1>
+                        <h1 id="c2-原理解析"><a class="header" href="#c2-原理解析">C.2 原理解析</a></h1>
+<blockquote>
+<p><strong>目标</strong>：理解 3DGS 的三个核心组件——3D 高斯表示、自适应密度控制、tile-based 快速可微光栅化器。知道 Mip-Splatting、Scaffold-GS、2DGS 各解决了什么问题。</p>
+</blockquote>
+<h2 id="3d-高斯的数学表示"><a class="header" href="#3d-高斯的数学表示">3D 高斯的数学表示</a></h2>
+<p>3DGS 的场景由 $N$ 个 3D 高斯椭球体组成。每个高斯 $i$ 由以下参数定义：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>参数</th><th>符号</th><th>维度</th><th>含义</th></tr>
+</thead>
+<tbody>
+<tr><td>位置（均值）</td><td>$\mu_i$</td><td>$3$</td><td>高斯中心在 3D 空间的位置</td></tr>
+<tr><td>协方差矩阵</td><td>$\Sigma_i$</td><td>$3 \times 3$</td><td>椭球的形状、大小和朝向</td></tr>
+<tr><td>不透明度</td><td>$\alpha_i$</td><td>$1$</td><td>0（完全透明）到 1（完全不透明）</td></tr>
+<tr><td>球谐系数</td><td>$SH_i$</td><td>$16 \times 3$（1 阶）或 $4 \times 3$（3 阶）</td><td>随视角变化的颜色</td></tr>
+</tbody>
+</table>
+</div>
+<p>协方差矩阵 $\Sigma$ 被分解为<strong>缩放矩阵 $S$ + 旋转矩阵 $R$</strong>，由四元数 $q$ 参数化——这是确保 $\Sigma$ 始终是正定矩阵的最便宜方式：</p>
+<p>$$\Sigma = RSS^T R^T$$</p>
+<p>其中 $S = \text{diag}(s_x, s_y, s_z)$ 是三个轴的缩放因子，$R$ 是由四元数 $q$ 构造的旋转矩阵。这种分解保证 $\Sigma$ 在任何参数值下都是合法的协方差。</p>
+<h2 id="tile-based-快速可微光栅化器"><a class="header" href="#tile-based-快速可微光栅化器">Tile-Based 快速可微光栅化器</a></h2>
+<p>这是 3DGS 论文实现实时渲染的核心工程贡献。不同于 NeRF 的逐射线体积渲染，3DGS 的渲染器基于 GPU 光栅化。</p>
+<h3 id="第一阶段剔除与预排序"><a class="header" href="#第一阶段剔除与预排序">第一阶段：剔除与预排序</a></h3>
+<ol>
+<li><strong>屏幕分块</strong>：将图像划分为 $16 \times 16$ 的 tile 网格。</li>
+<li><strong>视锥剔除</strong>：剔除投影后完全不在屏幕内的 3D 高斯（或置信区间 &lt; 99% 的）。</li>
+<li><strong>实例化</strong>：每个高斯按它覆盖的 tile 数量，复制对应的实例（一个高斯覆盖 3 个 tile → 复制 3 份）。</li>
+<li><strong>分配 Key</strong>：每个实例被分配一个 Key，由 <strong>视图空间深度 + tile ID</strong> 组成。</li>
+<li><strong>GPU Radix Sort</strong>：按 Key 一次性全局排序——排序后的序列中，每个 tile 内的高斯从前到后排列。</li>
+</ol>
+<p><strong>关键设计</strong>：全图一遍排序，不逐像素排序。利用了 GPU 的并行排序能力（NVIDIA CUB 库），开销远低于传统逐像素排序。</p>
+<h3 id="第二阶段tile-级并行渲染"><a class="header" href="#第二阶段tile-级并行渲染">第二阶段：Tile 级并行渲染</a></h3>
+<p>每个 tile 分配一个 CUDA 线程块：</p>
+<ul>
+<li>协作加载高斯的投影参数（2D 均值 + 2D 协方差 + α + 颜色）到<strong>共享内存</strong>。</li>
+<li>按排序列表从前到后累积颜色和不透明度：$C = \sum_{i} c_i \alpha_i \prod_{j &lt; i} (1 - \alpha_j)$。</li>
+<li>像素的 α 接近饱和（$\approx 1$）时，该像素的线程提前停止。</li>
+<li>整个 tile 的所有像素都饱和后，tile 整体终止。</li>
+</ul>
+<p><strong>为什么快</strong>：不限制参与混合的高斯数量（能适应任意深度复杂度的场景）。每个像素只需常数级额外显存。利用 tile 内像素的局部性——相邻像素看到的高斯高度重叠，共享内存命中率高。</p>
+<h3 id="第三阶段可微反向传播"><a class="header" href="#第三阶段可微反向传播">第三阶段：可微反向传播</a></h3>
+<p>前向渲染时只存一个值：每个像素的<strong>最终累积 α</strong>。反向传播时，利用这个值重建中间不透明度——从后向前遍历，每步的中间 α 可以通过最终的 α 除以当前高斯的透射率恢复。这避免了存储每个像素的完整混合列表（否则显存会爆炸）。</p>
+<p>所有梯度（$\mu, \Sigma, \alpha, SH$）都被显式推导并实现为 CUDA kernel，不依赖 PyTorch 的自动微分——这是 3DGS 训练速度的另一个关键因素。</p>
+<h3 id="渲染公式"><a class="header" href="#渲染公式">渲染公式</a></h3>
+<p>3D 高斯投影到 2D 后成为一个 2D 高斯光斑（splat），其 2D 协方差为：</p>
+<p>$$\Sigma’ = J W \Sigma W^T J^T$$</p>
+<p>其中 $W$ 是世界到相机的视图变换，$J$ 是投影变换的雅可比矩阵（affine approximation of perspective projection）。每个像素的颜色由覆盖该像素的 $N$ 个高斯按深度排序后 α 混合：</p>
+<p>$$C = \sum_{i=1}^{N} c_i \alpha_i \prod_{j=1}^{i-1} (1 - \alpha_j)$$</p>
+<p>其中 $c_i$ 是从球谐系数 $SH_i$ 在特定视角方向 $d$ 上计算的颜色，$\alpha_i$ 是高斯在像素位置的 2D 不透明度贡献。</p>
+<h2 id="自适应密度控制"><a class="header" href="#自适应密度控制">自适应密度控制</a></h2>
+<p>3DGS 从 SfM 稀疏点云（通常几千个点）开始，通过优化过程中动态增删高斯来达到几百万个高质量椭球体。</p>
+<p><strong>增长策略（欠重建）</strong>：在视空间位置梯度大的区域——说明场景在这里有比当前高斯更精细的结构——有两种操作：</p>
+<ul>
+<li><strong>克隆（Clone）</strong>：对于小的高斯，直接复制一份。适合需要更多高斯来覆盖的细节区域。</li>
+<li><strong>分裂（Split）</strong>：对于大的高斯，沿最大缩放轴一分为二（两个新高斯的大小按 1.6 倍缩小）。适合覆盖过大、模糊的单个高斯。</li>
+</ul>
+<p><strong>修剪策略（过重建）</strong>：定期移除两类高斯：</p>
+<ul>
+<li>α 接近 0 的——基本透明，对渲染无贡献。</li>
+<li>世界空间过大的——可能覆盖了不该覆盖的区域。</li>
+</ul>
+<p>此外，每 3000 次迭代将全部高斯的 α 重置为接近 0，防止优化过程中被少数早期“错误“的高斯占据。密度控制在前 15000 次迭代中最活跃，之后趋于稳定。</p>
+<h2 id="损失函数"><a class="header" href="#损失函数">损失函数</a></h2>
+<p>3DGS 的优化目标非常简单——只用 L1 和 SSIM：</p>
+<p>$$\mathcal{L} = (1 - \lambda)\mathcal{L}<em>1 + \lambda\mathcal{L}</em>{\text{D-SSIM}}$$</p>
+<p>默认 $\lambda = 0.2$。没有 3D 几何监督、没有法向量约束——纯粹的渲染 loss。这也是 3DGS 几何质量差的根本原因——模型只被激励去“画好看“，不关心“形状对不对“。</p>
+<h2 id="重要改进"><a class="header" href="#重要改进">重要改进</a></h2>
+<h3 id="mip-splattingcvpr-2024-oral-best-student-paper"><a class="header" href="#mip-splattingcvpr-2024-oral-best-student-paper">Mip-Splatting（CVPR 2024 Oral, Best Student Paper）</a></h3>
+<p>原始 3DGS 在缩放或改变焦距时会产生<strong>锯齿</strong>——当 3D 高斯投影到屏幕上已小于一个像素时，高频噪声出现。Mip-Splatting 加了两个滤波：</p>
+<ol>
+<li><strong>3D 平滑滤波</strong>：根据训练视角的最大采样频率（最远视角下每个像素覆盖的物理尺寸），限制 3D 高斯的尺寸下限——确保没有高斯小到失去意义。</li>
+<li><strong>2D Mip 滤波</strong>：用模拟 2D box filter 替代原始的 dilation 操作，在投影后对 2D 高斯做抗锯齿。</li>
+</ol>
+<h3 id="scaffold-gscvpr-2024-highlight"><a class="header" href="#scaffold-gscvpr-2024-highlight">Scaffold-GS（CVPR 2024 Highlight）</a></h3>
+<p>原始 3DGS 的每个高斯是独立优化、自由漂移的——容易出现“散架“（Gaussians 漂到不该去的地方）。Scaffold-GS 用<strong>锚点</strong>从稀疏体素网格组织高斯：</p>
+<ul>
+<li>每个锚点 spawn $k$ 个 neural Gaussian，属性由轻量 MLP 预测（输入：锚点特征 + 视角方向 + 距离）。</li>
+<li>锚点本身按梯度显著性和累积 α 做生长/修剪。</li>
+<li>结果：可比质量、~100 FPS、更小存储、对反射/透明更鲁棒。</li>
+</ul>
+<h3 id="2d-gaussian-splatting2024"><a class="header" href="#2d-gaussian-splatting2024">2D Gaussian Splatting（2024）</a></h3>
+<p>原始 3DGS 用 3D 体积椭球——没有“表面“概念，无法提取高质量网格。2DGS 把每个高斯替换为<strong>2D 平面高斯盘</strong>（flat disk），投影时用射线-平面求交（而非近似投影），并加强 normal consistency 和 depth distortion 正则化。在 DTU 和 Tanks &amp; Temples 上达到 SOTA 的表面重建质量。</p>
+<pre class="mermaid">mindmap
+  root((3DGS 架构))
+    初始化
+      SfM 稀疏点云
+      每点一个高斯
+    优化循环
+      渲染→Loss→梯度回传
+      自适应密度控制
+    高斯参数
+      位置 μ 3D
+      协方差 Σ 3x3
+      不透明度 α
+      球谐系数 SH
+    渲染器
+      Tile分块
+      GPU Radix Sort
+      α混合
+    损失
+      L1 + D-SSIM
+      λ=0.2
+</pre>
+
 
                     </main>
 
@@ -218,6 +323,22 @@
         <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
         <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
         <script>

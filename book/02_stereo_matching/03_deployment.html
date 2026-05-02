@@ -28,7 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
-        <link rel="stylesheet" href="../theme/css/custom-6d107f3d.css">
+        <link rel="stylesheet" href="../theme/css/custom-a8b5dea7.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-c0428002.js";
+            window.path_to_searchindex_js = "../searchindex-f41790b9.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4983ef3f.js"></script>
+        <script src="../toc-bfa4cbe2.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -181,7 +181,122 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="部署实战"><a class="header" href="#部署实战">部署实战</a></h1>
+                        <h1 id="b3-部署实战"><a class="header" href="#b3-部署实战">B.3 部署实战</a></h1>
+<blockquote>
+<p><strong>目标</strong>：用 CREStereo 跑一对手机拍的双目照片，理解输出格式差异，知道什么时候选什么模型。</p>
+</blockquote>
+<h2 id="选模型"><a class="header" href="#选模型">选模型</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>你的需求</th><th>推荐</th></tr>
+</thead>
+<tbody>
+<tr><td>两张标定好的矫正图，追求精度</td><td>CREStereo</td></tr>
+<tr><td>两张任意图，未标定，快出结果</td><td>DUSt3R</td></tr>
+<tr><td>视频流，需要实时</td><td>RAFT-Stereo Slow-Fast（~26 FPS）</td></tr>
+<tr><td>几十张图的大场景 3D 重建</td><td>MVSNet 或 COLMAP + 深度融合</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="crestereo"><a class="header" href="#crestereo">CREStereo</a></h2>
+<h3 id="安装"><a class="header" href="#安装">安装</a></h3>
+<pre><code class="language-bash">git clone https://github.com/megvii-research/CREStereo
+cd CREStereo
+pip install -r requirements.txt
+</code></pre>
+<h3 id="下载模型"><a class="header" href="#下载模型">下载模型</a></h3>
+<pre><code class="language-bash">mkdir -p weights
+# 从项目 Release 页面下载预训练权重到 weights/
+# crestereo_eth3d.pth 或 crestereo_sceneflow.pth
+</code></pre>
+<h3 id="推理"><a class="header" href="#推理">推理</a></h3>
+<pre><code class="language-python">import cv2
+import torch
+import numpy as np
+from crestereo import CREStereo
+
+model = CREStereo(
+    max_disp=256,  # 最大视差范围
+    mixed_precision=False,
+)
+model.load_state_dict(torch.load('weights/crestereo_eth3d.pth'))
+model.cuda().eval()
+
+# 读左右图（必须是矫正过的！）
+imgL = cv2.imread('left.jpg')
+imgR = cv2.imread('right.jpg')
+
+# 转为 tensor, BGR→RGB, normalize
+def preprocess(img):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
+    return torch.from_numpy(img).permute(2, 0, 1).unsqueeze(0).cuda()
+
+imgL_t = preprocess(imgL)
+imgR_t = preprocess(imgR)
+
+with torch.no_grad():
+    disp = model(imgL_t, imgR_t)  # (1, H, W), 视差图（像素）
+
+# 视差 → 深度: Z = f*b / d
+# 假设你的双目对已标定
+fx = 525.0   # 像素焦距（从你的 K 矩阵中取）
+baseline = 0.12  # 基线（米）
+depth = (fx * baseline) / (disp.squeeze().cpu().numpy() + 1e-6)
+
+# 可视化
+depth_vis = (depth - depth.min()) / (depth.max() - depth.min()) * 255
+cv2.imwrite('depth.png', depth_vis.astype(np.uint8))
+</code></pre>
+<blockquote class="blockquote-tag blockquote-tag-caution">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Caution</p>
+<p>CREStereo 假设输入是<strong>矫正过的双目对</strong>——左右图的对应点在同一行上。如果你用手机随意拍的两张照片（没有矫正），结果会非常差。先用 <code>cv2.stereoRectify</code> 做矫正。</p>
+</blockquote>
+<h2 id="dust3r不需要标定的方案"><a class="header" href="#dust3r不需要标定的方案">DUSt3R（不需要标定的方案）</a></h2>
+<p>DUSt3R 的独特优势：<strong>不需要标定、不需要矫正、不需要相机参数。</strong> 两张任意角度拍的照片直接输入。</p>
+<pre><code class="language-python">import torch
+from dust3r.model import AsymmetricCroCo3DStereo
+
+model = AsymmetricCroCo3DStereo.from_pretrained(
+    'naver/DUSt3R_ViTLarge_BaseDecoder_512_dpt'
+).cuda().eval()
+
+# 读两张任意图
+from dust3r.utils.image import load_images
+imgs = load_images(['view1.jpg', 'view2.jpg'], size=512)
+
+with torch.no_grad():
+    output = model(imgs[0], imgs[1])
+    # output['pts3d']: (H, W, 3) 两组点图
+    # output['conf']: 置信度（哪些像素匹配得好）
+
+pts3d_1 = output['pts3d'][0]  # 第一张图的点图
+conf = output['conf'][0]      # 置信度
+
+# 用置信度过滤低质量点
+valid = conf &gt; 0.5
+print(f"Valid points: {valid.sum()} / {valid.numel()}")
+</code></pre>
+<blockquote>
+<p>DUSt3R 输出的是 3D 点图（不是视差图也不是深度图），每个像素对应一个 $(X,Y,Z)$ 坐标。多视角时需要用全局对齐把 pairwise 点图拼到一个坐标系中。</p>
+</blockquote>
+<h2 id="精度-vs-速度"><a class="header" href="#精度-vs-速度">精度 vs 速度</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>模型</th><th>推理时间（GPU）</th><th>精度（Middlebury）</th><th>需要标定</th></tr>
+</thead>
+<tbody>
+<tr><td>RAFT-Stereo (standard)</td><td>~130 ms</td><td>4.74% bad-2px</td><td>是</td></tr>
+<tr><td>RAFT-Stereo (Slow-Fast)</td><td>~50 ms</td><td>接近 standard</td><td>是</td></tr>
+<tr><td>CREStereo</td><td>~200 ms</td><td>3.71% bad-2px</td><td>是</td></tr>
+<tr><td>DUSt3R</td><td>~1 s</td><td>无 Middlebury 可比指标</td><td><strong>否</strong></td></tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p><strong>选择建议</strong>：有标定好的双目对时用 CREStereo（精度最高）。需要实时处理用 RAFT-Stereo Slow-Fast。没有任何标定信息时用 DUSt3R（最方便，但精度和速度都不如专用双目模型）。</p>
+</blockquote>
 
                     </main>
 
@@ -218,6 +333,22 @@
         <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
         <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
         <script>

@@ -28,7 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
-        <link rel="stylesheet" href="../theme/css/custom-6d107f3d.css">
+        <link rel="stylesheet" href="../theme/css/custom-a8b5dea7.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-c0428002.js";
+            window.path_to_searchindex_js = "../searchindex-f41790b9.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4983ef3f.js"></script>
+        <script src="../toc-bfa4cbe2.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -181,7 +181,136 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="原理解析"><a class="header" href="#原理解析">原理解析</a></h1>
+                        <h1 id="a2-原理解析"><a class="header" href="#a2-原理解析">A.2 原理解析</a></h1>
+<blockquote>
+<p><strong>目标</strong>：理解三条技术路线的核心设计——CNN 混合训练（MiDaS 范式）、扩散模型嫁接（Marigold）、大规模蒸馏（Depth Anything）。知道它们各自的关键公式、训练策略和适用场景。</p>
+</blockquote>
+<p>单目深度估计在 2019-2025 年间经历了三条技术路线的快速迭代。本节按时间线拆解代表性模型的设计动机和关键技术选择。</p>
+<h2 id="cnn--混合数据集训练midas-范式"><a class="header" href="#cnn--混合数据集训练midas-范式">CNN + 混合数据集训练：MiDaS 范式</a></h2>
+<p><strong>核心问题</strong>：2019 年之前，单目深度估计模型在一个数据集上训练、在同一个数据集上测试。换一个相机、换一个场景类型，精度就崩塌。</p>
+<p>Ranftl 等人在 2019 年的 MiDaS（<em>Towards Robust Monocular Depth Estimation: Mixing Datasets for Zero-shot Cross-dataset Transfer</em>）中提出了一个简单但根本性的方案：<strong>把多个不同数据集的深度标注混合在一起训练同一个 CNN</strong>。</p>
+<p>但这里有一个技术障碍：不同数据集有完全不同的深度尺度。NYU v2 的深度值是 0-10 米（室内），KITTI 是 0-80 米（室外自动驾驶），而 ReDWeb 是来自网络的相对立体深度——单位不统一，零深度的含义也不同。</p>
+<p><strong>Scale- and Shift-Invariant Loss（SSI Loss）</strong></p>
+<p>MiDaS 的核心贡献是 SSI 损失函数。在计算 loss 之前，先对每个训练样本求解最优的 scale $a$ 和 shift $b$，使预测深度与 GT 深度在最小二乘意义上对齐：</p>
+<p>$$\mathcal{L}_{SSI} = \frac{1}{N} \sum_i \rho\left( \log \tilde{y}_i - \log(a \cdot \hat{y}_i + b) \right)$$</p>
+<p>其中 $\tilde{y}_i$ 是 GT 深度，$\hat{y}_i$ 是预测深度，$a, b$ 通过闭式最小二乘求解（每个样本独立计算），$\rho$ 是鲁棒损失函数（L1 或其变体）。在 log 空间中计算，因为深度误差更符合对数正态分布。</p>
+<p><strong>效果</strong>：模型不再被强迫学习“这个像素距离 3.47 米“，而是学习“这个像素比那个像素近，近的程度大约是它的 1.5 倍“——relative depth。换一个数据集、换一种相机、换一个场景类型，这种“相对关系“的泛化能力远超 metric 深度。</p>
+<p><strong>DPT（2021）：把 ViT 接进来</strong></p>
+<p>Ranftl 等人在 DPT（<em>Vision Transformers for Dense Prediction</em>, ICCV 2021）中验证了一个关键假设：Vision Transformer 比 CNN 更适合密集预测任务。DPT 用 ViT 作为编码器提取多尺度特征，通过 Reassemble + Fusion 模块把 token 特征重新组装成像素级预测。DPT 替换 MiDaS 的 CNN 骨干后，在 zero-shot 深度估计上取得了约 20% 的精度提升。</p>
+<h2 id="扩散模型路线marigold"><a class="header" href="#扩散模型路线marigold">扩散模型路线：Marigold</a></h2>
+<p>Ke 等人在 2024 年 CVPR（Oral）发表的 Marigold，思路完全不同：<strong>不给深度任务从头训练一个模型，而是把 Stable Diffusion 已经学会的视觉知识“借“过来</strong>。</p>
+<p><strong>核心洞察</strong>：Stable Diffusion v2 在数十亿张图像上预训练，其内部特征已经编码了非常丰富的场景几何信息（遮挡、透视、物体形状、表面朝向）。微调一个深度预测头，比从头训练一个完整的深度模型，能更好地利用这些“锁在“扩散模型里的先验。</p>
+<p><strong>训练方式</strong>：</p>
+<ul>
+<li>冻结 Stable Diffusion v2 的 VAE 和 UNet 大部分层</li>
+<li>只微调 UNet 的一小部分参数</li>
+<li><strong>只用合成数据集训练</strong>（没有用任何真实深度数据）</li>
+<li>在单张 GPU 上训练几天</li>
+</ul>
+<p><strong>推理过程</strong>：输入一张 RGB 图，加噪声后通过微调过的扩散 UNet 多步去噪（DDIM scheduler，1-4 步推理），输出 affine-invariant 深度图。</p>
+<p><strong>关键数据</strong>：Marigold 在多个 zero-shot 基准上比之前最好的方法（当时的 Depth Anything V1）有 &gt;20% 的相对提升。但代价是推理速度——扩散模型的多步去噪比 CNN 的直接前向推理慢 10 倍以上。</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>Marigold 的续作 Marigold v2 将同一思路扩展到表面法向量估计和 intrinsic image decomposition，证明了“扩散模型先验可迁移“不是深度估计的特例。</p>
+</blockquote>
+<h2 id="大规模蒸馏路线depth-anything-系列"><a class="header" href="#大规模蒸馏路线depth-anything-系列">大规模蒸馏路线：Depth Anything 系列</a></h2>
+<p>Depth Anything 是 2024 年影响最大的单目深度估计工作之一。第一作者李贺阳（HKU / TikTok），发表于 NeurIPS 2024。</p>
+<h3 id="v1用无标签数据扩展"><a class="header" href="#v1用无标签数据扩展">V1：用无标签数据扩展</a></h3>
+<p><strong>核心公式</strong>：Depth Anything V1 的 SSI 损失（基于 MiDaS）：</p>
+<p>$$\mathcal{L}_{ssi} = \frac{1}{N} \sum_i \rho( \log d_i^* - \log d_i )$$</p>
+<p>其中 $d_i^*$ 是 GT 深度，$d_i$ 是预测深度。$\rho$ 使用 scale-and-shift-invariant 的鲁棒形式，在 log 空间计算。</p>
+<p><strong>训练策略</strong>：两阶段。</p>
+<ol>
+<li>先在 <strong>1.5M 有标签数据</strong>（6 个公开数据集的混合）上训练 teacher 模型。</li>
+<li>用 teacher 给 <strong>62M 无标签图像</strong>（来自 ImageNet-21K、Places365 等 8 个来源）打伪标签。</li>
+<li>用 {原标签 + 伪标签} 联合训练 student 模型。</li>
+</ol>
+<p>架构是 DINOv2 ViT-L encoder + DPT decoder。</p>
+<h3 id="v2合成数据替代真实标签"><a class="header" href="#v2合成数据替代真实标签">V2：合成数据替代真实标签</a></h3>
+<p><strong>V2 最大的改变</strong>：<strong>Stage 1 不再使用任何真实深度标签</strong>。这反直觉，但效果更好。</p>
+<p><strong>三阶段训练</strong>：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>阶段</th><th>数据</th><th>操作</th></tr>
+</thead>
+<tbody>
+<tr><td>Stage 1</td><td><strong>595K 合成图像</strong>（Hypersim, Virtual KITTI 2, BlendedMVS, IRS, TartanAir）</td><td>训练 Teacher（DINOv2-G, ~1.3B params），使用 $\mathcal{L}<em>{ssi}$ + $\mathcal{L}</em>{gm}$</td></tr>
+<tr><td>Stage 2</td><td><strong>62M 无标签真实图像</strong>（BDD100K, ImageNet-21K, Places365, SA-1B 等 8 个来源）</td><td>冻结 Teacher，为全部图像生成伪深度标签</td></tr>
+<tr><td>Stage 3</td><td>62M 伪标签图像（无合成数据）</td><td>训练 Student（DINOv2-S/B/L 三种规模），使用 label-level distillation</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>为什么合成数据比真实标签更好？</strong> 论文分析了几个原因：合成图像的 GT 深度是 pixel-perfect（包括透明/反射表面和薄结构）；不存在真实传感器噪声（LiDAR 的稀疏性和镜面反射错误）；不会出现 SfM/MVS 重建中常见的尺度不一致问题。</p>
+<p><strong>损失函数细节</strong>：</p>
+<p>SSI Loss（继承自 MiDaS）：
+$$\mathcal{L}_{ssi} = \sqrt{\frac{1}{N} \sum_i (\log d_i - \log d_i^*)^2}$$</p>
+<p>其中 $d_i$ 和 $d_i^*$ 是先做 scale-shift 对齐后的预测和 GT 深度。对齐参数 $(a, b)$ 通过闭式最小二乘求解（每个样本独立）。</p>
+<p>Gradient Matching Loss（V2 新引入）：
+$$\mathcal{L}_{gm} = \frac{1}{N} \sum_i |\nabla d_i - \nabla d_i^*|_1$$</p>
+<p>这是 V2 的核心贡献之一。合成数据的 GT 深度有非常锐利的边缘——真实镜头因为焦距限制不可能这么锐。$\mathcal{L}<em>{gm}$ 强制模型学习这些锐利边缘，否则预测结果会过度平滑。论文中 $\mathcal{L}</em>{gm}$ 的权重约为 $\mathcal{L}_{ssi}$ 的 2 倍。</p>
+<p><strong>四档模型</strong>：Small (24.8M)、Base (97.5M)、Large (335.3M)、Giant (1.3B)。从 Small 到 Giant，在 zero-shot 基准上的精度单调提升——验证了 scaling law。</p>
+<p><strong>Metric 深度版本</strong>：在 Stage 3 后，用少量 metric 深度数据（Virtual KITTI 2 用于室外，NYU-D 用于室内）做微调，损失函数从 $\mathcal{L}_{ssi}$ 换成 L1 loss（在 metric 空间计算）。</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>Depth Anything V2 比 Marigold 的推理速度快 <strong>10 倍以上</strong>（单次前向 vs 多步扩散去噪），同时 fine detail 更好。但 Marigold 在极端场景（非自然图像、艺术风格图像）中可能更鲁棒——扩散模型的先验空间更广。</p>
+</blockquote>
+<h2 id="点图路线moge"><a class="header" href="#点图路线moge">点图路线：MoGe</a></h2>
+<p>Wang 等人在 2024 年 10 月发表的 MoGe（arXiv:2410.19115, CVPR 2025 Oral），对单目几何估计的表示方式做了一次根本性的重新思考。</p>
+<p><strong>传统深度估计的输出是一个 $H \times W$ 的深度值矩阵</strong>。MoGe 的输出是一个 $H \times W \times 3$ 的 <strong>3D 点图（point map）</strong>——每个像素对应的是 $(X,Y,Z)$ 坐标，而不仅仅是 $Z$ 值。</p>
+<p><strong>为什么是点图？</strong> 深度图 $d(u,v)$ 是“沿着像素方向的距离“，但不同像素的方向是不同的（取决于相机内参和畸变）。$d(u,v)$ 无法独立表达一个 3D 点的位置——你需要额外知道这个像素的方向。而点图 $P(u,v) = (X,Y,Z)$ 直接给出 3D 坐标，不需要标准针孔投影的“除以 Z + 乘 K“流程。这避免了深度学习中因内参未知导致的模糊性。</p>
+<p><strong>Affine-Invariant Point Map</strong></p>
+<p>MoGe 预测的点图是 <strong>affine-invariant</strong> 的：预测值 $\hat{P}$ 和真实值 $P$ 之间差一个未知的全局 scale $s$ 和 translation $t$（即 $\hat{P} \approx sP + t$）。这解决了“单张图无法推断绝对尺度“的问题——先让模型学会“相对几何“，后续再用少量 metric 数据恢复尺度。这与 Depth Anything 的 affine-invariant depth 是同一个思路，但推广到了 3D 点云空间。</p>
+<p><strong>ROE Solver</strong>：训练时，对每个样本求解最优的 $(s, t)$ 使预测点云与 GT 点云对齐。MoGe 使用一个高效的并行搜索策略（ROE = Robust, Optimal, Efficient），在几毫秒内完成对齐。</p>
+<p><strong>Multi-Scale Local Geometry Loss</strong>：在 $\mathcal{L}_1$ 全局损失之外，MoGe 在 GT 点云中随机采样球体区域，对每个球体内的预测和 GT 分别做局部对齐后再计算 loss。这迫使模型在局部几何上也做到准确（不只是全局“大模样“对）。</p>
+<p><strong>训练数据</strong>：约 9M 帧，混合合成数据集和真实数据集。</p>
+<p><strong>相机内参恢复</strong>：从 affine-invariant 点图中恢复相机焦距的过程非常快（约 3ms），通过闭式优化求解。这使 MoGe 可以直接输出 metric 深度和 FOV，而不需要依赖 Ground Truth 内参。</p>
+<h2 id="路线对比"><a class="header" href="#路线对比">路线对比</a></h2>
+<pre class="mermaid">mindmap
+  root((单目深度估计路线))
+    MiDaS 范式
+      混合数据集训练
+      SSI Loss 解决尺度不一致
+      Relative Depth
+      DPT: ViT替代CNN
+    扩散模型
+      Marigold
+      Stable Diffusion微调
+      只用合成数据
+      精度高但速度慢
+    大规模蒸馏
+      Depth Anything
+      合成数据训Teacher
+      伪标签62M图像
+      ViT-S/B/L/G四档
+      Metric版本可微调
+    点图路线
+      MoGe
+      直接预测3D点图
+      Affine-Invariant
+      ROE全局对齐
+      同时恢复内参
+</pre>
+
+<h2 id="什么决定了泛化能力"><a class="header" href="#什么决定了泛化能力">什么决定了泛化能力</a></h2>
+<p>读完四篇论文，每个团队都在回答同一个问题：<strong>怎么让模型在没见过的新场景、新相机下也能用？</strong></p>
+<p>四个答案：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>策略</th><th>代表</th><th>原理</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>SSI Loss</strong></td><td>MiDaS, Depth Anything</td><td>训练时不强迫学习绝对尺度，只学相对关系</td></tr>
+<tr><td><strong>数据多样性</strong></td><td>Depth Anything V2</td><td>62M 伪标签图像覆盖 8 个数据源，从 ImageNet 到自动驾驶</td></tr>
+<tr><td><strong>预训练先验</strong></td><td>Marigold, MoGe</td><td>Stable Diffusion/DINOv2 的视觉表征已经编码了丰富的几何信息</td></tr>
+<tr><td><strong>3D-aware 表示</strong></td><td>MoGe</td><td>把输出从 1D 深度值升级为 3D 点坐标，直接用 3D 几何做监督</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p>现在的主流方案是“四合一“：DINOv2 骨干 + SSI 损失 + 大规模数据蒸馏 + metric 微调。Depth Anything V2 + metric fine-tuning 和 MoGe 是最接近这个理想的当代方法。但扩散模型路线（Marigold）可能在特定领域（艺术风格、极端场景）仍有独特优势。</p>
+</blockquote>
 
                     </main>
 
@@ -218,6 +347,22 @@
         <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
         <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
         <script>
