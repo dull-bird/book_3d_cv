@@ -34,6 +34,14 @@
 - [视觉 SLAM：同时定位与建图](06_slam/slam.md)
 - [嵌入式部署：模型优化与芯片选型](07_depth_completion/embedded.md)
 - [6D 位姿估计：从 FoundationPose 到零样本](08_pose_estimation/pose_estimation.md)
+- [模块 D：点云处理与分析](09_point_cloud/00_index.md)
+  - [直观理解](09_point_cloud/01_intuition.md)
+  - [原理解析](09_point_cloud/02_principles.md)
+  - [部署实战](09_point_cloud/03_deployment.md)
+- [模块 E：生成式 3D——从文字和图片到三维世界](10_generative_3d/00_index.md)
+  - [直观理解](10_generative_3d/01_intuition.md)
+  - [原理解析](10_generative_3d/02_principles.md)
+  - [部署实战](10_generative_3d/03_deployment.md)
 
 # 附录
 
